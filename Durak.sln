@@ -81,7 +81,7 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PlayerIdentityService.Web", "Services\PlayerIdentityService\src\PlayerIdentityService.Web\PlayerIdentityService.Web.csproj", "{2E57E61C-37C1-4A32-BDC1-8492FCDFB834}"
 EndProject
 # Tools Projects
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScenarioTester", "ScenarioTester\ScenarioTester.csproj", "{DBE1B1E3-E849-4E05-A6D3-315C3B39531F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScenarioTester", "Tools\ScenarioTester\ScenarioTester.csproj", "{DBE1B1E3-E849-4E05-A6D3-315C3B39531F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
