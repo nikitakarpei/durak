@@ -12,7 +12,6 @@ public sealed class MongoDbEventStore : IEventStore
     private readonly MongoDbEventStoreOptions _options;
 
     private IMongoCollection<EventDocument>? _eventCollection = null;
-    private const int MongoDbNamespaceExistsErrorCode = 48;
 
     public MongoDbEventStore(IMongoDatabase database, IOptions<MongoDbEventStoreOptions> options)
     {
@@ -107,28 +106,15 @@ public sealed class MongoDbEventStore : IEventStore
 
     private async Task<IMongoCollection<EventDocument>> GetEventCollectionAsync(CancellationToken cancellationToken)
     {
-        bool created = false;
-
-        try
-        {
-            await _database.CreateCollectionAsync(_options.CollectionName, cancellationToken: cancellationToken);
-            created = true;
-        }
-        catch (MongoCommandException ex) when (ex.Code == MongoDbNamespaceExistsErrorCode)
-        {
-            // Collection already exists
-        }
+        await _database.CreateCollectionAsync(_options.CollectionName, cancellationToken: cancellationToken);
 
         var collection = _database.GetCollection<EventDocument>(_options.CollectionName);
 
-        if (created)
-        {
-            await collection.Indexes.CreateOneAsync(
-                new CreateIndexModel<EventDocument>(Builders<EventDocument>.IndexKeys.Hashed(e => e.StreamName)),
-                null,
-                cancellationToken
-            );
-        }
+        await collection.Indexes.CreateOneAsync(
+            new CreateIndexModel<EventDocument>(Builders<EventDocument>.IndexKeys.Hashed(e => e.StreamName)),
+            null,
+            cancellationToken
+        );
 
         return collection;
     }
