@@ -1,0 +1,110 @@
+syntax = "proto3";
+package game_service.api.game_events;
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+import "game_service_data.proto";
+import "game_service_possible_moves.proto";
+
+message YourTurnStarted
+{
+  string player_id = 1;
+  repeated google.protobuf.Any possible_moves = 2;
+}
+
+message OpponentTurnStarted
+{
+  string player_id = 1;
+}
+
+message AllPlayersJoined
+{
+}
+
+message AttackCardBeaten
+{
+  string player_id = 1;
+  google.protobuf.Timestamp played_at = 2;
+  string attacker_card_id = 3;
+  google.protobuf.Any defender_card = 4;
+}
+
+message AttackCardPlayed
+{
+  string player_id = 1;
+  google.protobuf.Timestamp played_at = 2;
+  google.protobuf.Any played_card = 3;
+}
+
+message CardDealtToPlayer
+{
+  string player_id = 1;
+  google.protobuf.Any dealt_card = 2;
+}
+
+message CardDiscarded
+{
+  string card_id = 1;
+}
+
+message CardsInTalonShuffled
+{
+  message CardInTalon
+  {
+    string id = 1;
+    int32 new_position = 2;
+  }
+
+  repeated CardInTalon cards = 2;
+}
+
+message CommonTrumpCardChosen
+{
+  data.RegularCard chosen_card = 1;
+}
+
+message DefenceGivenUp
+{
+  string player_id = 1;
+}
+
+message FoolDeclared
+{
+  string player_id = 1;
+}
+
+message GameCreated
+{
+  message CardInTalon
+  {
+    string id = 1;
+    int32 position = 2;
+  }
+  
+  repeated google.protobuf.Any options = 1;
+  repeated CardInTalon cards_in_talon = 2;
+}
+
+message LobbyOpened
+{
+}
+
+message PlayerFinished
+{
+  string player_id = 1;
+}
+
+message PlayerJoined
+{
+  string player_id = 1;
+  int32 seat = 2;
+}
+
+message RoundFinished
+{
+}
+
+message RoundStarted
+{
+  string attacker_player_id = 1;
+  string defender_player_id = 2;
+}

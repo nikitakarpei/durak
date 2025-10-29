@@ -1,0 +1,14 @@
+<Project>
+    <PropertyGroup>
+        <SolutionDir>$(MSBuildThisFileDirectory)</SolutionDir>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageOutputPath>$(SolutionDir)packages</PackageOutputPath>
+        <PackageId>Durak.$(MSBuildProjectName)</PackageId>
+        <Authors>Nikita Karpei</Authors>
+        <Description>$(MSBuildProjectName)</Description>
+        <PackProjectReferences>true</PackProjectReferences>
+        <SuppressDependenciesWhenPacking>false</SuppressDependenciesWhenPacking>
+        <IncludeBuildOutput>true</IncludeBuildOutput>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    </PropertyGroup>
+</Project>

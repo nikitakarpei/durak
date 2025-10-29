@@ -1,0 +1,20 @@
+# Build artifacts
+**/bin/
+**/obj/
+**/packages/
+
+# IDE files
+.vscode/
+**/.godot/
+**/.vs/
+.claude/
+.idea/
+
+# NuGet
+*.nupkg
+*.snupkg
+**/project.assets.json
+**/project.nuget.cache
+**/project.nuget.g.props
+**/project.nuget.g.targets
+**/project.nuget.dgspec.json

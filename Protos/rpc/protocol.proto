@@ -1,0 +1,51 @@
+syntax = "proto3";
+package rpc.protocol;
+import "google/protobuf/any.proto";
+
+enum RpcServerErrorCode
+{
+    RPC_SERVER_ERROR_CODE_UNSPECIFIED = 0;
+    RPC_SERVER_ERROR_CODE_NOT_IMPLEMENTED = 1;
+    RPC_SERVER_ERROR_CODE_MALFORMED_REQUEST = 2;
+    RPC_SERVER_ERROR_CODE_INTERNAL = 3;
+}
+
+message RpcClientEnvelope 
+{
+    google.protobuf.Any payload = 1;
+}
+
+message RpcServerEnvelope 
+{
+    google.protobuf.Any payload = 1;
+}
+
+message RpcInvoke
+{
+    string callId = 1;
+    string method = 2;
+    google.protobuf.Any data = 3;
+}
+
+message RpcServerError
+{
+    string callId = 1;
+    RpcServerErrorCode code = 2;
+}
+
+message RpcServerUnaryCallResponse
+{
+    string callId = 1;
+    google.protobuf.Any data = 2;
+}
+
+message RpcServerStreamingCallResponse
+{
+    string callId = 1;
+    google.protobuf.Any data = 2;
+}
+
+message RpcServerStreamingCallFinished
+{
+    string callId = 1;
+}

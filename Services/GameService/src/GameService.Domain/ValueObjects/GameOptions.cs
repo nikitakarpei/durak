@@ -1,0 +1,10 @@
+namespace GameService.Domain;
+
+public static class GameOptions
+{
+    public record AmountOfPlayers(int Count) : GameOption;
+
+    public record CardRanksInTalon(CardRank[] Ranks) : GameOption;
+
+    public record MinHandSize(int Count) : GameOption;
+}

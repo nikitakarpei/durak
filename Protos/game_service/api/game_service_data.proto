@@ -1,0 +1,54 @@
+syntax = "proto3";
+package game_service.api.data;
+
+enum CardRank
+{
+  CARD_RANK_UNSPECIFIED = 0;
+  CARD_RANK_TWO = 1;
+  CARD_RANK_THREE = 2;
+  CARD_RANK_FOUR = 3;
+  CARD_RANK_FIVE = 4;
+  CARD_RANK_SIX = 5;
+  CARD_RANK_SEVEN = 6;
+  CARD_RANK_EIGHT = 7;
+  CARD_RANK_NINE = 8;
+  CARD_RANK_TEN = 9;
+  CARD_RANK_JACK = 10;
+  CARD_RANK_QUEEN = 11;
+  CARD_RANK_KING = 12;
+  CARD_RANK_ACE = 13;
+}
+
+enum CardSuit
+{
+  CARD_SUIT_UNSPECIFIED = 0;
+  CARD_SUIT_CLUBS = 1;
+  CARD_SUIT_DIAMONDS = 2;
+  CARD_SUIT_HEARTS = 3;
+  CARD_SUIT_SPADES = 4;
+}
+
+enum JokerColor
+{
+  JOKER_COLOR_UNSPECIFIED = 0;
+  JOKER_COLOR_RED = 1;
+  JOKER_COLOR_BLACK = 2;
+}
+
+message RegularCard
+{
+  string id = 1;
+  CardSuit suit = 2;
+  CardRank rank = 3;
+}
+
+message JokerCard
+{
+  string id = 1;
+  JokerColor color = 2;
+}
+
+message UnrevealedCard
+{
+  string id = 1;
+}

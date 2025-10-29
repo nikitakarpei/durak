@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <EnableDynamicLoading>true</EnableDynamicLoading>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Akka" Version="1.5.42" />
+        <PackageReference Include="Akka.DependencyInjection" Version="1.5.42" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+        <PackageReference Include="Grpc.Tools" Version="2.72.0" />
+        <PackageReference Include="Google.Protobuf" Version="3.31.0" />
+    </ItemGroup>
+    <ItemGroup>
+        <Protobuf Include="$(SolutionDir)Protos\bot_service\api\**\*.proto" GrpcServices="None" />
+        <Protobuf Include="$(SolutionDir)Protos\game_service\api\**\*.proto" GrpcServices="None" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\BotService.Domain\BotService.Domain.csproj" />
+        <ProjectReference Include="$(SolutionDir)\Libraries\LibRpc\src\LibRpc.Core\LibRpc.Core.csproj" />
+    </ItemGroup>
+</Project>

@@ -1,0 +1,31 @@
+syntax = "proto3";
+package rpc.tests;
+
+message TestRequest
+{
+    string message = 1;
+    int32 value = 2;
+}
+
+message TestResponse
+{
+    string result = 1;
+    int32 computed_value = 2;
+}
+
+message StreamingTestRequest
+{
+    int32 count = 1;
+    int32 delay_ms = 2;
+}
+
+message StreamingTestResponse
+{
+    int32 index = 1;
+    string message = 2;
+}
+
+message EmptyRequest { }
+
+message EmptyResponse { }
+

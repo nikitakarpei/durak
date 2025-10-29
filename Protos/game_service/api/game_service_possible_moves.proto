@@ -1,0 +1,17 @@
+syntax = "proto3";
+package game_service.api.possible_moves;
+
+message PlayAttackCard
+{
+  string your_card_id = 1;
+}
+
+message BeatAttackCard
+{
+  string your_card_id = 1;
+  string target_card_id = 2;
+}
+
+message GiveUpDefence
+{
+}

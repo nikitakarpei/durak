@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <EnableDynamicLoading>true</EnableDynamicLoading>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
+        <PackageReference Include="TngTech.ArchUnitNET" Version="0.12.3" />
+        <PackageReference Include="TngTech.ArchUnitNET.xUnit" Version="0.12.3" />
+        <PackageReference Include="xunit" Version="2.9.3" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\GameService.Application\GameService.Application.csproj" />
+        <ProjectReference Include="..\..\src\GameService.Domain\GameService.Domain.csproj" />
+    </ItemGroup>
+</Project>

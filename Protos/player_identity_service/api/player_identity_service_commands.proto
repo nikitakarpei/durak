@@ -1,0 +1,40 @@
+syntax = "proto3";
+package player_identity_service.api.commands;
+import "player_identity_service_data.proto";
+
+message LoginWithAndroidDeviceIdCommand
+{
+    message Request
+    {
+        string device_id = 1;
+    }
+
+    message Response
+    {
+        data.LoginResult result = 1;
+    }
+}
+
+message LoginWithIosDeviceIdCommand
+{
+    message Request
+    {
+        string device_id = 1;
+    }
+
+    message Response
+    {
+        data.LoginResult result = 1;
+    }
+}
+
+message GetIdentityTokenPublicKeyCommand
+{
+    message Request
+    {}
+
+    message Response
+    {
+        string key = 1;
+    }
+}
