@@ -66,13 +66,9 @@ public class MongoDbEventStoreTests : IAsyncLifetime
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
 
         await using var subscription = await _eventStore.SubscribeToStreamAsync(streamName, cts.Token);
-        await foreach (var evt in subscription.GetEvents(cts.Token))
+        await foreach (var evt in subscription.GetExistingEvents(cts.Token))
         {
             receivedEvents.Add(evt);
-            if (evt is ExistingRecordedEvent { IsLast: true })
-            {
-                break;
-            }
         }
 
         receivedEvents.Should().HaveCount(1);
@@ -106,13 +102,9 @@ public class MongoDbEventStoreTests : IAsyncLifetime
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
 
         await using var subscription = await _eventStore.SubscribeToStreamAsync(streamName, cts.Token);
-        await foreach (var evt in subscription.GetEvents(cts.Token))
+        await foreach (var evt in subscription.GetExistingEvents(cts.Token))
         {
             receivedEvents.Add(evt);
-            if (evt is ExistingRecordedEvent { IsLast: true })
-            {
-                break;
-            }
         }
 
         receivedEvents.Should().HaveCount(10);
@@ -141,7 +133,7 @@ public class MongoDbEventStoreTests : IAsyncLifetime
 
         var subscribeTask = Task.Run(async () =>
         {
-            await foreach (var evt in subscription.GetEvents(cts.Token))
+            await foreach (var evt in subscription.GetNewEvents(cts.Token))
             {
                 subscribedEvents.Add(evt);
                 if (subscribedEvents.Count >= 1)
@@ -162,7 +154,6 @@ public class MongoDbEventStoreTests : IAsyncLifetime
 
         // Assert
         subscribedEvents.Should().HaveCount(1);
-        subscribedEvents[0].Should().BeOfType<NewRecordedEvent>();
         subscribedEvents[0].EventId.Should().Be(eventId);
     }
 
@@ -184,7 +175,14 @@ public class MongoDbEventStoreTests : IAsyncLifetime
 
         var subscribeTask = Task.Run(async () =>
         {
-            await foreach (var evt in subscription.GetEvents(cts.Token))
+            // First get existing events
+            await foreach (var evt in subscription.GetExistingEvents(cts.Token))
+            {
+                receivedEvents.Add(evt);
+            }
+
+            // Then get new events
+            await foreach (var evt in subscription.GetNewEvents(cts.Token))
             {
                 receivedEvents.Add(evt);
                 if (receivedEvents.Count >= 2)
@@ -201,9 +199,7 @@ public class MongoDbEventStoreTests : IAsyncLifetime
 
         // Assert
         receivedEvents.Should().HaveCount(2);
-        receivedEvents[0].Should().BeOfType<ExistingRecordedEvent>();
         receivedEvents[0].EventId.Should().Be(existingEvent.EventId);
-        receivedEvents[1].Should().BeOfType<NewRecordedEvent>();
         receivedEvents[1].EventId.Should().Be(newEvent.EventId);
     }
 
@@ -236,37 +232,25 @@ public class MongoDbEventStoreTests : IAsyncLifetime
 
         var sub1Task = Task.Run(async () =>
         {
-            await foreach (var evt in subscription1.GetEvents(cts.Token))
+            await foreach (var evt in subscription1.GetExistingEvents(cts.Token))
             {
                 subscriber1Events.Add(evt);
-                if (evt is ExistingRecordedEvent { IsLast: true })
-                {
-                    break;
-                }
             }
         });
 
         var sub2Task = Task.Run(async () =>
         {
-            await foreach (var evt in subscription2.GetEvents(cts.Token))
+            await foreach (var evt in subscription2.GetExistingEvents(cts.Token))
             {
                 subscriber2Events.Add(evt);
-                if (evt is ExistingRecordedEvent { IsLast: true })
-                {
-                    break;
-                }
             }
         });
 
         var sub3Task = Task.Run(async () =>
         {
-            await foreach (var evt in subscription3.GetEvents(cts.Token))
+            await foreach (var evt in subscription3.GetExistingEvents(cts.Token))
             {
                 subscriber3Events.Add(evt);
-                if (evt is ExistingRecordedEvent { IsLast: true })
-                {
-                    break;
-                }
             }
         });
 
@@ -281,45 +265,6 @@ public class MongoDbEventStoreTests : IAsyncLifetime
         subscriber1Events.Select(e => e.EventId).Should().BeEquivalentTo(expectedIds);
         subscriber2Events.Select(e => e.EventId).Should().BeEquivalentTo(expectedIds);
         subscriber3Events.Select(e => e.EventId).Should().BeEquivalentTo(expectedIds);
-    }
-
-    [Fact]
-    public async Task SubscribeToStreamAsync_IsLastFlag_ShouldBeCorrect()
-    {
-        // Arrange
-        var streamName = "test-stream";
-        var events = Enumerable
-            .Range(1, 5)
-            .Select(i => new EventData(
-                Guid.NewGuid(),
-                $"Event{i}",
-                JsonSerializer.Serialize(new { test = $"data{i}" })
-            ))
-            .ToList();
-
-        await _eventStore!.AppendToStreamAsync(streamName, events, CancellationToken.None);
-
-        // Act
-        var receivedEvents = new List<RecordedEvent>();
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
-
-        await using var subscription = await _eventStore.SubscribeToStreamAsync(streamName, cts.Token);
-        await foreach (var evt in subscription.GetEvents(cts.Token))
-        {
-            receivedEvents.Add(evt);
-            if (evt is ExistingRecordedEvent { IsLast: true })
-            {
-                break;
-            }
-        }
-
-        // Assert
-        receivedEvents.Should().HaveCount(5);
-        for (int i = 0; i < 4; i++)
-        {
-            receivedEvents[i].Should().BeOfType<ExistingRecordedEvent>().Which.IsLast.Should().BeFalse();
-        }
-        receivedEvents[4].Should().BeOfType<ExistingRecordedEvent>().Which.IsLast.Should().BeTrue();
     }
 
     [Fact]
@@ -341,23 +286,15 @@ public class MongoDbEventStoreTests : IAsyncLifetime
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
 
         await using var subscription1 = await _eventStore.SubscribeToStreamAsync(stream1, cts.Token);
-        await foreach (var evt in subscription1.GetEvents(cts.Token))
+        await foreach (var evt in subscription1.GetExistingEvents(cts.Token))
         {
             stream1Events.Add(evt);
-            if (evt is ExistingRecordedEvent { IsLast: true })
-            {
-                break;
-            }
         }
 
         await using var subscription2 = await _eventStore.SubscribeToStreamAsync(stream2, cts.Token);
-        await foreach (var evt in subscription2.GetEvents(cts.Token))
+        await foreach (var evt in subscription2.GetExistingEvents(cts.Token))
         {
             stream2Events.Add(evt);
-            if (evt is ExistingRecordedEvent { IsLast: true })
-            {
-                break;
-            }
         }
 
         stream1Events.Should().HaveCount(1);
@@ -372,37 +309,23 @@ public class MongoDbEventStoreTests : IAsyncLifetime
     {
         // Arrange
         var streamName = "test-stream";
-        var events = Enumerable
-            .Range(1, 3)
-            .Select(i => new EventData(
-                Guid.NewGuid(),
-                $"Event{i}",
-                JsonSerializer.Serialize(new { test = $"data{i}" })
-            ))
-            .ToList();
-
-        await _eventStore!.AppendToStreamAsync(streamName, events, CancellationToken.None);
 
         // Act
         var receivedEvents = new List<RecordedEvent>();
         using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(500));
 
-        await using var subscription = await _eventStore.SubscribeToStreamAsync(streamName, cts.Token);
+        await using var subscription = await _eventStore!.SubscribeToStreamAsync(streamName, cts.Token);
 
         try
         {
-            await foreach (var evt in subscription.GetEvents(cts.Token))
+            await foreach (var evt in subscription.GetNewEvents(cts.Token))
             {
                 receivedEvents.Add(evt);
-                // Don't break, let cancellation happen
             }
         }
         catch (OperationCanceledException)
         {
             // Expected
         }
-
-        // Assert - should have received existing events before cancellation
-        receivedEvents.Should().HaveCount(3);
     }
 }

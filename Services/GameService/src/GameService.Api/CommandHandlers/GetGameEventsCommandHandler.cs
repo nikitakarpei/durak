@@ -4,7 +4,6 @@ using System.Text.Json;
 namespace GameService.Api;
 
 public class GetGameEventsCommandHandler(
-    Application.IGameAccessTokenVerifier gameAccessTokenVerifier,
     Application.IVerifiedPlayerIdentityProvider verifiedPlayerIdentityProvider,
     EventStore.IEventStore eventStore
 )
@@ -13,6 +12,11 @@ public class GetGameEventsCommandHandler(
         Commands.GetGameEventsCommand.Types.StreamResponse
     >
 {
+    private static readonly Dictionary<string, Type> EventTypeCache = typeof(Domain.GameEvents)
+        .GetNestedTypes()
+        .Where(t => t.IsClass || t.IsValueType)
+        .ToDictionary(t => t.Name, t => t);
+
     public async IAsyncEnumerable<Commands.GetGameEventsCommand.Types.StreamResponse> HandleAsync(
         Commands.GetGameEventsCommand.Types.Request request,
         [EnumeratorCancellation] CancellationToken cancellationToken
@@ -21,108 +25,64 @@ public class GetGameEventsCommandHandler(
         var playerIdentity =
             verifiedPlayerIdentityProvider.Identity ?? throw new InvalidOperationException("Player identity not found");
 
-        var gameAccessToken = await gameAccessTokenVerifier.VerifyAsync(request.AccessToken, cancellationToken);
-        if (gameAccessToken is null)
-        {
-            yield return new Commands.GetGameEventsCommand.Types.StreamResponse()
-            {
-                InvalidAccessToken = new Commands.GetGameEventsCommand.Types.StreamResponse.Types.InvalidAccessToken(),
-            };
-            yield break;
-        }
-
         Domain.GameState gameState = new();
 
         await using var subscription = await eventStore.SubscribeToStreamAsync(
-            Application.GameEventStreams.DomainEvents(gameAccessToken.GameId),
+            Application.GameEventStreams.DomainEvents(request.GameId),
             cancellationToken
         );
 
-        await foreach (var @event in subscription.GetEvents(cancellationToken))
+        // First, yield all existing events
+        await foreach (var @event in subscription.GetExistingEvents(cancellationToken))
         {
             var domainEvent = DeserializeDomainEvent(@event);
-
-            if (domainEvent is null)
-            {
-                throw new Exception($"Failed to deserialize domain event: {@event.Type}");
-            }
 
             gameState = gameState.When(domainEvent);
 
             var apiEvent = ConvertToApiEvent(playerIdentity.PlayerId, gameState, (dynamic)domainEvent);
 
-            var streamResponse = new Commands.GetGameEventsCommand.Types.StreamResponse();
-
-            switch (@event)
+            yield return new Commands.GetGameEventsCommand.Types.StreamResponse()
             {
-                case EventStore.ExistingRecordedEvent existingEvent:
-                    streamResponse.OldEvent = new Commands.GetGameEventsCommand.Types.StreamResponse.Types.OldEvent()
-                    {
-                        Event = apiEvent,
-                        IsLast = existingEvent.IsLast,
-                    };
-                    break;
-                case EventStore.NewRecordedEvent newEvent:
-                    streamResponse.NewEvent = new Commands.GetGameEventsCommand.Types.StreamResponse.Types.NewEvent()
-                    {
-                        Event = apiEvent,
-                    };
-                    break;
-                default:
-                    throw new Exception("Unknown event type");
-            }
+                OldEvent = new Commands.GetGameEventsCommand.Types.StreamResponse.Types.OldEvent() { Event = apiEvent },
+            };
+        }
 
-            yield return streamResponse;
+        yield return new Commands.GetGameEventsCommand.Types.StreamResponse()
+        {
+            OldEventsEnded = new Commands.GetGameEventsCommand.Types.StreamResponse.Types.OldEventsEnded(),
+        };
+
+        // Then, yield new events as they arrive
+        await foreach (var @event in subscription.GetNewEvents(cancellationToken))
+        {
+            var domainEvent = DeserializeDomainEvent(@event);
+
+            gameState = gameState.When(domainEvent);
+
+            var apiEvent = ConvertToApiEvent(playerIdentity.PlayerId, gameState, (dynamic)domainEvent);
+
+            yield return new Commands.GetGameEventsCommand.Types.StreamResponse()
+            {
+                NewEvent = new Commands.GetGameEventsCommand.Types.StreamResponse.Types.NewEvent() { Event = apiEvent },
+            };
         }
     }
 
-    private object? DeserializeDomainEvent(EventStore.RecordedEvent @event)
+    private static object DeserializeDomainEvent(EventStore.RecordedEvent @event)
     {
-        return @event.Type switch
+        if (!EventTypeCache.TryGetValue(@event.Type, out var eventType))
         {
-            nameof(Domain.GameEvents.ActivePlayerChanged) =>
-                JsonSerializer.Deserialize<Domain.GameEvents.ActivePlayerChanged>(@event.JsonData),
-            nameof(Domain.GameEvents.AllPlayersJoined) =>
-                JsonSerializer.Deserialize<Domain.GameEvents.AllPlayersJoined>(@event.JsonData),
-            nameof(Domain.GameEvents.AttackCardBeaten) =>
-                JsonSerializer.Deserialize<Domain.GameEvents.AttackCardBeaten>(@event.JsonData),
-            nameof(Domain.GameEvents.AttackCardPlayed) =>
-                JsonSerializer.Deserialize<Domain.GameEvents.AttackCardPlayed>(@event.JsonData),
-            nameof(Domain.GameEvents.CardDealtToPlayer) =>
-                JsonSerializer.Deserialize<Domain.GameEvents.CardDealtToPlayer>(@event.JsonData),
-            nameof(Domain.GameEvents.CardDiscarded) => JsonSerializer.Deserialize<Domain.GameEvents.CardDiscarded>(
-                @event.JsonData
-            ),
-            nameof(Domain.GameEvents.CardsInTalonShuffled) =>
-                JsonSerializer.Deserialize<Domain.GameEvents.CardsInTalonShuffled>(@event.JsonData),
-            nameof(Domain.GameEvents.CommonTrumpCardChosen) =>
-                JsonSerializer.Deserialize<Domain.GameEvents.CommonTrumpCardChosen>(@event.JsonData),
-            nameof(Domain.GameEvents.DefenceGivenUp) => JsonSerializer.Deserialize<Domain.GameEvents.DefenceGivenUp>(
-                @event.JsonData
-            ),
-            nameof(Domain.GameEvents.FoolDeclared) => JsonSerializer.Deserialize<Domain.GameEvents.FoolDeclared>(
-                @event.JsonData
-            ),
-            nameof(Domain.GameEvents.GameCreated) => JsonSerializer.Deserialize<Domain.GameEvents.GameCreated>(
-                @event.JsonData
-            ),
-            nameof(Domain.GameEvents.LobbyOpened) => JsonSerializer.Deserialize<Domain.GameEvents.LobbyOpened>(
-                @event.JsonData
-            ),
-            nameof(Domain.GameEvents.PlayerFinished) => JsonSerializer.Deserialize<Domain.GameEvents.PlayerFinished>(
-                @event.JsonData
-            ),
-            nameof(Domain.GameEvents.PlayerJoined) => JsonSerializer.Deserialize<Domain.GameEvents.PlayerJoined>(
-                @event.JsonData
-            ),
-            nameof(Domain.GameEvents.RoundFinished) => JsonSerializer.Deserialize<Domain.GameEvents.RoundFinished>(
-                @event.JsonData
-            ),
-            nameof(Domain.GameEvents.RoundStarted) => JsonSerializer.Deserialize<Domain.GameEvents.RoundStarted>(
-                @event.JsonData
-            ),
-            _ => throw new ArgumentException($"Unknown event type: {@event.Type}"),
-        };
+            throw new ArgumentException($"Unknown event type: {@event.Type}");
+        }
+
+        var domainEvent = JsonSerializer.Deserialize(@event.JsonData, eventType);
+
+        if (domainEvent is null)
+        {
+            throw new Exception($"Failed to deserialize domain event: {@event.Type}");
+        }
+
+        return domainEvent;
     }
 
     private Google.Protobuf.WellKnownTypes.Any ConvertToApiEvent(
@@ -220,7 +180,7 @@ public class GetGameEventsCommandHandler(
             var otherPlayersEventDto = new GameEvents.CardDealtToPlayer()
             {
                 PlayerId = @event.PlayerId,
-                DealtCard = Google.Protobuf.WellKnownTypes.Any.Pack(new Api.Data.UnrevealedCard { Id = dealtCard.Id }),
+                DealtCard = Google.Protobuf.WellKnownTypes.Any.Pack(new Data.UnrevealedCard { Id = dealtCard.Id }),
             };
 
             return Google.Protobuf.WellKnownTypes.Any.Pack(otherPlayersEventDto);
@@ -246,14 +206,10 @@ public class GetGameEventsCommandHandler(
     {
         List<GameEvents.CardsInTalonShuffled.Types.CardInTalon> cardDtos = [];
 
-        foreach (var card in currentState.Cards)
+        foreach (var card in @event.Cards)
         {
             cardDtos.Add(
-                new GameEvents.CardsInTalonShuffled.Types.CardInTalon
-                {
-                    Id = card.Id,
-                    NewPosition = ((Domain.CardLocations.Talon)card.Location).Position,
-                }
+                new GameEvents.CardsInTalonShuffled.Types.CardInTalon { Id = card.Id, NewPosition = card.NewPosition }
             );
         }
 
@@ -312,7 +268,7 @@ public class GetGameEventsCommandHandler(
 
         List<GameEvents.GameCreated.Types.CardInTalon> cardDtos = [];
 
-        foreach (var card in currentState.Cards)
+        foreach (var card in @event.Cards)
         {
             cardDtos.Add(
                 new GameEvents.GameCreated.Types.CardInTalon

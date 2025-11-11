@@ -53,7 +53,7 @@ message GetGameEventsCommand
 {
   message Request
   {
-    string access_token = 1;
+    string game_id = 1;
   }
   
   message StreamResponse
@@ -61,21 +61,21 @@ message GetGameEventsCommand
     message OldEvent
     {
       google.protobuf.Any event = 1;
-      bool is_last = 2;
     }
+
+    message OldEventsEnded
+    {}
 
     message NewEvent
     {
       google.protobuf.Any event = 1; 
     }
-    
-    message InvalidAccessToken {};
 
     oneof result
     {
       OldEvent old_event = 1;
-      NewEvent new_event = 2;
-      InvalidAccessToken invalid_access_token = 3;
+      OldEventsEnded old_events_ended = 2;
+      NewEvent new_event = 3;
     }
   }
 }

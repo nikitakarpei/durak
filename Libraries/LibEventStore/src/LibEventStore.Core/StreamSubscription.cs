@@ -1,23 +1,27 @@
-using System.Runtime.CompilerServices;
-
 namespace EventStore;
 
 public class StreamSubscription : IAsyncDisposable
 {
-    private readonly Func<CancellationToken, IAsyncEnumerable<RecordedEvent>> _eventsFactory;
+    private readonly Func<CancellationToken, IAsyncEnumerable<RecordedEvent>> _existingEventsFactory;
+    private readonly Func<CancellationToken, IAsyncEnumerable<RecordedEvent>> _newEventsFactory;
     private readonly Func<ValueTask>? _disposeAction;
 
     public StreamSubscription(
-        Func<CancellationToken, IAsyncEnumerable<RecordedEvent>> eventsFactory,
+        Func<CancellationToken, IAsyncEnumerable<RecordedEvent>> existingEventsFactory,
+        Func<CancellationToken, IAsyncEnumerable<RecordedEvent>> newEventsFactory,
         Func<ValueTask>? disposeAction = null
     )
     {
-        _eventsFactory = eventsFactory;
+        _existingEventsFactory = existingEventsFactory;
+        _newEventsFactory = newEventsFactory;
         _disposeAction = disposeAction;
     }
 
-    public IAsyncEnumerable<RecordedEvent> GetEvents(CancellationToken cancellationToken = default) =>
-        _eventsFactory(cancellationToken);
+    public IAsyncEnumerable<RecordedEvent> GetExistingEvents(CancellationToken cancellationToken) =>
+        _existingEventsFactory(cancellationToken);
+
+    public IAsyncEnumerable<RecordedEvent> GetNewEvents(CancellationToken cancellationToken) =>
+        _newEventsFactory(cancellationToken);
 
     public ValueTask DisposeAsync() => _disposeAction?.Invoke() ?? ValueTask.CompletedTask;
 }

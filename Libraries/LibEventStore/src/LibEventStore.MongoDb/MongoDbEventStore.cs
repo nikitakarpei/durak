@@ -59,19 +59,21 @@ public sealed class MongoDbEventStore : IEventStore
             .SortBy(e => e.Id)
             .ToListAsync(cancellationToken);
 
-        async IAsyncEnumerable<RecordedEvent> EventsFactory([EnumeratorCancellation] CancellationToken ct)
+        ObjectId? lastExistingId = existingEvents.LastOrDefault()?.Id;
+
+        async IAsyncEnumerable<RecordedEvent> ExistingEventsFactory([EnumeratorCancellation] CancellationToken ct)
         {
-            // Yield existing events first
-            for (int i = 0; i < existingEvents.Count; i++)
+            // Yield existing events
+            foreach (var doc in existingEvents)
             {
-                var doc = existingEvents[i];
-                bool isLast = i == existingEvents.Count - 1;
-                yield return new ExistingRecordedEvent(doc.EventId, doc.Type, doc.Data.ToJson(), isLast);
+                yield return new RecordedEvent(doc.EventId, doc.Type, doc.Data.ToJson());
             }
+            await Task.CompletedTask;
+        }
 
-            ObjectId? lastExistingId = existingEvents.LastOrDefault()?.Id;
-
-            // Then watch for new events
+        async IAsyncEnumerable<RecordedEvent> NewEventsFactory([EnumeratorCancellation] CancellationToken ct)
+        {
+            // Watch for new events
             while (await cursor.MoveNextAsync(ct))
             {
                 foreach (var change in cursor.Current)
@@ -85,7 +87,7 @@ public sealed class MongoDbEventStore : IEventStore
                         continue;
                     }
 
-                    yield return new NewRecordedEvent(
+                    yield return new RecordedEvent(
                         change.FullDocument.EventId,
                         change.FullDocument.Type,
                         change.FullDocument.Data.ToJson()
@@ -101,7 +103,7 @@ public sealed class MongoDbEventStore : IEventStore
             return ValueTask.CompletedTask;
         }
 
-        return new StreamSubscription(EventsFactory, DisposeAction);
+        return new StreamSubscription(ExistingEventsFactory, NewEventsFactory, DisposeAction);
     }
 
     private async Task<IMongoCollection<EventDocument>> GetEventCollectionAsync(CancellationToken cancellationToken)

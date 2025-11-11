@@ -61,28 +61,27 @@ public sealed class InMemoryEventStore : IEventStore
             snapshot = state.Events;
         }
 
-        // Factory for event enumeration
-        async IAsyncEnumerable<RecordedEvent> EventsFactory([EnumeratorCancellation] CancellationToken ct)
+        // Factory for existing events
+        async IAsyncEnumerable<RecordedEvent> ExistingEventsFactory([EnumeratorCancellation] CancellationToken ct)
         {
             // Yield existing events
-            for (int i = 0; i < snapshot.Count; i++)
+            foreach (var eventData in snapshot)
             {
-                var eventData = snapshot[i];
-                yield return new ExistingRecordedEvent(
-                    eventData.EventId,
-                    eventData.Type,
-                    eventData.JsonData,
-                    i == snapshot.Count - 1
-                );
+                yield return new RecordedEvent(eventData.EventId, eventData.Type, eventData.JsonData);
             }
+            await Task.CompletedTask;
+        }
 
+        // Factory for new events
+        async IAsyncEnumerable<RecordedEvent> NewEventsFactory([EnumeratorCancellation] CancellationToken ct)
+        {
             // Yield live events from channel
             var reader = channel.Reader;
             while (await reader.WaitToReadAsync(ct))
             {
                 while (reader.TryRead(out var eventData))
                 {
-                    yield return new NewRecordedEvent(eventData.EventId, eventData.Type, eventData.JsonData);
+                    yield return new RecordedEvent(eventData.EventId, eventData.Type, eventData.JsonData);
                 }
             }
         }
@@ -97,6 +96,6 @@ public sealed class InMemoryEventStore : IEventStore
             return ValueTask.CompletedTask;
         }
 
-        return Task.FromResult(new StreamSubscription(EventsFactory, DisposeAction));
+        return Task.FromResult(new StreamSubscription(ExistingEventsFactory, NewEventsFactory, DisposeAction));
     }
 }
