@@ -6,10 +6,13 @@ namespace GameService.Infrastructure;
 public class GameCollection(IActorRefFactory actorRefFactory, IDependencyResolver dependencyResolver)
     : Application.IGameCollection
 {
-    public void Create(string gameId, Domain.GameOption[] options)
+    public void Create(string gameId, Domain.GameOption[] options, byte[] randomSeed)
     {
-        var props = dependencyResolver.Props<GameActor>(gameId, Guid.NewGuid().GetHashCode(), options);
+        var props = dependencyResolver.Props<GameActor>(gameId);
         actorRefFactory.ActorOf(props, GetGameActorName(gameId));
+
+        var game = Get(gameId);
+        game.When(new Domain.GameCommands.CreateGame(randomSeed, options));
     }
 
     public void Delete(string gameId)

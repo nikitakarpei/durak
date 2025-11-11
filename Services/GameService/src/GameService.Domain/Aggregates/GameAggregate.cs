@@ -3,30 +3,14 @@ using Eventuous;
 
 namespace GameService.Domain;
 
-public class GameAggregate(Random random, Action<object>? eventHandler) : Aggregate<GameState>
+public class GameAggregate(IRandomNumberGenerator randomNumberGenerator, IPossibleMovesFinder possibleMovesFinder)
+    : Aggregate<GameState>
 {
-    private readonly IPossibleMovesFinder _possibleMovesFinder = new PossibleMovesFinder();
-
-    private new (GameState PreviousState, GameState CurrentState) Apply<TEvent>(TEvent evt)
-        where TEvent : class
+    public void When(GameCommands.CreateGame createGame)
     {
-        var (previousState, currentState) = base.Apply(evt);
-        eventHandler?.Invoke(evt);
-        return (previousState, currentState);
-    }
+        var cards = CreateTalon(createGame.Options);
 
-    public static GameAggregate Create(Random random, GameOption[] options, Action<object>? eventHandler)
-    {
-        var game = new GameAggregate(random, eventHandler);
-        game.OnCreated(options);
-        return game;
-    }
-
-    private void OnCreated(GameOption[] options)
-    {
-        var cards = CreateTalon(options);
-
-        Apply(new GameEvents.GameCreated(options, cards));
+        Apply(new GameEvents.GameCreated(createGame.RandomSeed, createGame.Options, cards));
     }
 
     public void When(GameCommands.OpenLobby openLobby)
@@ -62,15 +46,34 @@ public class GameAggregate(Random random, Action<object>? eventHandler) : Aggreg
         if (amountOfPlayersOption.Count == State.Players.Count)
         {
             Apply(new GameEvents.AllPlayersJoined());
-
-            ShuffleCardsInTalon();
-
-            DealInitialCards();
-
-            ChooseCommonTrumpSuit();
-
-            StartFirstRound();
         }
+    }
+
+    public void When(GameCommands.StartFirstRound startFirstRound)
+    {
+        if (State.PlayedRounds.Count > 0)
+        {
+            throw new InvalidOperationException("First round has already been played.");
+        }
+
+        if (State.CurrentRound != null)
+        {
+            throw new InvalidOperationException("First round has already been started.");
+        }
+
+        ShuffleCardsInTalon();
+
+        DealInitialCards();
+
+        ChooseCommonTrumpSuit();
+
+        var attacker = FindFirstAttackerForFirstRound();
+
+        var defender = FindFirstDefender(attacker);
+
+        Apply(new GameEvents.RoundStarted(attacker.Id, defender.Id));
+
+        ChangeActivePlayer(attacker.Id);
     }
 
     public void When(GameCommands.PlayAttackCard playAttackCard)
@@ -118,13 +121,13 @@ public class GameAggregate(Random random, Action<object>? eventHandler) : Aggreg
         {
             // todo: если подкидной, то переводим атаку на другого игрока
 
-            ApplyActivePlayerChanged(State.CurrentRound!.CurrentDefenderId);
+            ChangeActivePlayer(State.CurrentRound!.CurrentDefenderId);
         }
         else
         {
             // todo: если подкидной, то игрок продолжает ходить
 
-            ApplyActivePlayerChanged(State.CurrentRound!.CurrentDefenderId);
+            ChangeActivePlayer(State.CurrentRound!.CurrentDefenderId);
         }
     }
 
@@ -213,6 +216,29 @@ public class GameAggregate(Random random, Action<object>? eventHandler) : Aggreg
         FinishCurrentRound();
     }
 
+    public void When(GameCommands.StartNextRound startNextRound)
+    {
+        if (State.CurrentRound != null)
+        {
+            throw new InvalidOperationException("Current round is not finished.");
+        }
+
+        if (State.PlayedRounds.Count == 0)
+        {
+            throw new InvalidOperationException("No rounds have been played yet.");
+        }
+
+        var previousRound = State.PlayedRounds.Last();
+
+        var newAttacker = FindFirstAttackerForNextRound(previousRound);
+
+        var newDefender = FindFirstDefender(newAttacker);
+
+        Apply(new GameEvents.RoundStarted(newAttacker.Id, newDefender.Id));
+
+        ChangeActivePlayer(newAttacker.Id);
+    }
+
     // -----------------------------------------------------
 
     private Card[] CreateTalon(GameOption[] options)
@@ -250,7 +276,7 @@ public class GameAggregate(Random random, Action<object>? eventHandler) : Aggreg
             .OrderBy(card => ((CardLocations.Talon)card.Location).Position)
             .ToArray();
 
-        var shuffledPositions = GenerateShuffledPositions(originalCards.Length);
+        var (shuffledPositions, newSeed) = GenerateShuffledPositions(originalCards.Length);
 
         var shuffledCards = originalCards
             .Select((card, index) => card with { Location = new CardLocations.Talon(shuffledPositions[index]) })
@@ -263,21 +289,25 @@ public class GameAggregate(Random random, Action<object>? eventHandler) : Aggreg
                         card.Id,
                         ((CardLocations.Talon)card.Location).Position
                     ))
-                    .ToArray()
+                    .ToArray(),
+                newSeed
             )
         );
     }
 
-    private int[] GenerateShuffledPositions(int count)
+    private (int[] Positions, byte[] NewSeed) GenerateShuffledPositions(int count)
     {
+        var seed = State.RandomSeed;
+
         var positions = Enumerable.Range(0, count).ToArray();
         for (var i = positions.Length - 1; i >= 1; i--)
         {
-            var j = random.Next(i + 1);
+            var (j, newSeed) = randomNumberGenerator.GetInt32(seed, i + 1);
+            seed = newSeed;
             (positions[i], positions[j]) = (positions[j], positions[i]);
         }
 
-        return positions;
+        return (positions, seed);
     }
 
     private void DealInitialCards()
@@ -323,17 +353,6 @@ public class GameAggregate(Random random, Action<object>? eventHandler) : Aggreg
         }
 
         Apply(new GameEvents.CommonTrumpCardChosen(regularCard.Id));
-    }
-
-    private void StartFirstRound()
-    {
-        var attacker = FindFirstAttackerForFirstRound();
-
-        var defender = FindFirstDefender(attacker);
-
-        Apply(new GameEvents.RoundStarted(attacker.Id, defender.Id));
-
-        ApplyActivePlayerChanged(attacker.Id);
     }
 
     private Player FindFirstAttackerForFirstRound()
@@ -385,8 +404,6 @@ public class GameAggregate(Random random, Action<object>? eventHandler) : Aggreg
 
         Apply(new GameEvents.FoolDeclared(fool.Id));
 
-        FinishCurrentRound();
-
         return true;
     }
 
@@ -420,37 +437,27 @@ public class GameAggregate(Random random, Action<object>? eventHandler) : Aggreg
 
     private void FinishCurrentRound()
     {
-        var round = State.CurrentRound!;
-
-        Apply(new GameEvents.RoundFinished());
-
-        if (State.FoolId != null)
+        if (State.CurrentRound == null)
         {
-            return;
+            throw new InvalidOperationException("There is no current round.");
         }
 
-        if (round.DefenceGivenUp)
+        if (State.CurrentRound.DefenceGivenUp)
         {
-            GiveTableCardsToPlayer(round.CurrentDefenderId);
+            GiveTableCardsToPlayer(State.CurrentRound.CurrentDefenderId);
         }
         else
         {
             DiscardCardsOnTable();
         }
 
-        TopUpHand(round.FirstAttackerId);
+        TopUpHand(State.CurrentRound.FirstAttackerId);
 
         // todo: раздать карты всем атакующим (раздавать всем по часовой от первого атакующего или хранить в раунде историю кто в какой очереди атаковал?)
 
-        TopUpHand(round.CurrentDefenderId);
+        TopUpHand(State.CurrentRound.CurrentDefenderId);
 
-        var newAttacker = FindFirstAttackerForNextRound(round);
-
-        var newDefender = FindFirstDefender(newAttacker);
-
-        Apply(new GameEvents.RoundStarted(newAttacker.Id, newDefender.Id));
-
-        ApplyActivePlayerChanged(newAttacker.Id);
+        Apply(new GameEvents.RoundFinished());
     }
 
     private void GiveTableCardsToPlayer(string playerId)
@@ -488,9 +495,9 @@ public class GameAggregate(Random random, Action<object>? eventHandler) : Aggreg
         throw new InvalidOperationException("Cannot find attacker for next round");
     }
 
-    private void ApplyActivePlayerChanged(string playerId)
+    private void ChangeActivePlayer(string playerId)
     {
-        var possibleMoves = _possibleMovesFinder.FindPossibleMoves(State, playerId);
+        var possibleMoves = possibleMovesFinder.FindPossibleMoves(State, playerId);
         Apply(new GameEvents.ActivePlayerChanged(playerId, possibleMoves.ToArray()));
     }
 }

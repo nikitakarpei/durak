@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+
 namespace GameService.Api;
 
 public class CreateGameCommandHandler(Application.IGameCollection gameCollection)
@@ -14,7 +16,7 @@ public class CreateGameCommandHandler(Application.IGameCollection gameCollection
 
         var gameId = Guid.NewGuid().ToString();
 
-        gameCollection.Create(gameId, gameOptions);
+        gameCollection.Create(gameId, gameOptions, RandomNumberGenerator.GetBytes(32));
 
         var game = gameCollection.Get(gameId);
         game.When(new Domain.GameCommands.OpenLobby());

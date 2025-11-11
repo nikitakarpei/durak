@@ -13,6 +13,7 @@ public record GameState : State<GameState>
                 {
                     Options = @event.Options.ToImmutableList(),
                     Cards = @event.Cards.ToImmutableHashSet(),
+                    RandomSeed = @event.RandomSeed,
                 }
         );
 
@@ -31,9 +32,10 @@ public record GameState : State<GameState>
         On<GameEvents.CardsInTalonShuffled>(
             static (state, @event) =>
             {
-                return Enumerable.Aggregate(
-                    @event.Cards,
-                    state,
+                var newState = state with { RandomSeed = @event.NewRandomSeed };
+
+                newState = @event.Cards.Aggregate(
+                    newState,
                     (current, cardDto) =>
                     {
                         var oldCard = current.Cards.First(card => card.Id == cardDto.Id);
@@ -45,6 +47,8 @@ public record GameState : State<GameState>
                         };
                     }
                 );
+
+                return newState;
             }
         );
 
@@ -149,7 +153,14 @@ public record GameState : State<GameState>
             static (state, @event) => state with { CurrentRound = state.CurrentRound! with { DefenceGivenUp = true } }
         );
 
-        On<GameEvents.RoundFinished>(static (state, @event) => state with { CurrentRound = null });
+        On<GameEvents.RoundFinished>(
+            static (state, @event) =>
+                state with
+                {
+                    PlayedRounds = state.PlayedRounds.Add(state.CurrentRound!),
+                    CurrentRound = null,
+                }
+        );
 
         On<GameEvents.CardDiscarded>(
             static (state, @event) =>
@@ -164,17 +175,27 @@ public record GameState : State<GameState>
             }
         );
 
-        On<GameEvents.FoolDeclared>(static (state, @event) => state with { FoolId = @event.PlayerId });
+        On<GameEvents.FoolDeclared>(
+            static (state, @event) =>
+                state with
+                {
+                    FoolId = @event.PlayerId,
+                    PlayedRounds = state.PlayedRounds.Add(state.CurrentRound!),
+                    CurrentRound = null,
+                }
+        );
     }
 
     public ImmutableHashSet<Player> Players { get; init; } = ImmutableHashSet<Player>.Empty;
     public ImmutableHashSet<Card> Cards { get; init; } = ImmutableHashSet<Card>.Empty;
     public ImmutableList<GameOption> Options { get; init; } = ImmutableList<GameOption>.Empty;
+    public ImmutableList<Round> PlayedRounds { get; init; } = ImmutableList<Round>.Empty;
     public Lobby? Lobby { get; init; }
     public string? LastDealtCardId { get; init; }
     public CardSuit? CommonTrumpSuit { get; init; }
     public Round? CurrentRound { get; init; }
     public string? FoolId { get; init; }
+    public byte[] RandomSeed { get; init; } = Array.Empty<byte>();
 
     public bool HasCardsOnTable()
     {

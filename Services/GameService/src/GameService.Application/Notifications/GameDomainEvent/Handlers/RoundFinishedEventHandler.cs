@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace GameService.Application;
 
-public class RoundFinishedEventHandler(EventStore.IEventStore eventStore)
+public class RoundFinishedEventHandler(IGameCollection gameCollection, EventStore.IEventStore eventStore)
     : MediatR.INotificationHandler<GameDomainEventNotification<Domain.GameEvents.RoundFinished>>
 {
     public async Task Handle(
@@ -21,5 +21,7 @@ public class RoundFinishedEventHandler(EventStore.IEventStore eventStore)
 
         var streamName = GameEventStreams.DomainEvents(notification.GameId);
         await eventStore.AppendToStreamAsync(streamName, events, cancellationToken);
+
+        gameCollection.Get(notification.GameId).When(new Domain.GameCommands.StartNextRound());
     }
 }

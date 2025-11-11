@@ -94,6 +94,11 @@ builder.Services.AddScoped<GameService.Application.IVerifiedPlayerIdentityProvid
 
 // Game Domain Services
 builder.Services.AddScoped<GameService.Application.IGameCollection, GameService.Infrastructure.GameCollection>();
+builder.Services.AddScoped<
+    GameService.Domain.IRandomNumberGenerator,
+    GameService.Infrastructure.RandomNumberGenerator
+>();
+builder.Services.AddScoped<GameService.Domain.IPossibleMovesFinder, GameService.Domain.PossibleMovesFinder>();
 
 // Authentication & Authorization
 builder.Services.AddSingleton<GameService.Infrastructure.GameAccessTokenService>();

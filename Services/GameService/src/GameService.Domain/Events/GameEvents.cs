@@ -14,7 +14,7 @@ public static class GameEvents
 
     public record CardDiscarded(string CardId);
 
-    public record CardsInTalonShuffled(CardsInTalonShuffled.CardInTalon[] Cards)
+    public record CardsInTalonShuffled(CardsInTalonShuffled.CardInTalon[] Cards, byte[] NewRandomSeed)
     {
         public record CardInTalon(string Id, int NewPosition);
     }
@@ -25,7 +25,7 @@ public static class GameEvents
 
     public record FoolDeclared(string PlayerId);
 
-    public record GameCreated(GameOption[] Options, Card[] Cards);
+    public record GameCreated(byte[] RandomSeed, GameOption[] Options, Card[] Cards);
 
     public record LobbyOpened();
 

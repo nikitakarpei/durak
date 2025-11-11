@@ -1,5 +1,10 @@
 namespace GameService.Domain;
 
+public interface IPossibleMovesFinder
+{
+    public ICollection<PossibleMove> FindPossibleMoves(GameState gameState, string playerId);
+}
+
 public class PossibleMovesFinder : IPossibleMovesFinder
 {
     public ICollection<PossibleMove> FindPossibleMoves(GameState gameState, string playerId)
@@ -48,7 +53,7 @@ public class PossibleMovesFinder : IPossibleMovesFinder
                 defenceCardIdsByAttackCardId[unbeatenCard.Id] = defenceCards.Select(card => card.Id).ToList();
             }
 
-            var possibleMoves = new List<PossibleMove> { (PossibleMove)new PossibleMoves.GiveUpDefence() };
+            var possibleMoves = new List<PossibleMove> { new PossibleMoves.GiveUpDefence() };
 
             if (CanBeatAllCards(defenceCardIdsByAttackCardId))
             {
@@ -56,9 +61,7 @@ public class PossibleMovesFinder : IPossibleMovesFinder
 
                 foreach (var defenceCardId in defenceCardIdsByAttackCardId[oldestUnbeatenCardId])
                 {
-                    possibleMoves.Add(
-                        (PossibleMove)new PossibleMoves.BeatAttackCard(defenceCardId, oldestUnbeatenCardId)
-                    );
+                    possibleMoves.Add(new PossibleMoves.BeatAttackCard(defenceCardId, oldestUnbeatenCardId));
                 }
             }
 
