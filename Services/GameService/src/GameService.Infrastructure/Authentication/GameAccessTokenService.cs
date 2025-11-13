@@ -7,7 +7,7 @@ namespace GameService.Infrastructure;
 
 public class GameAccessTokenServiceOptions
 {
-    public string SecretKey { get; set; } = string.Empty;
+    public string SecretId { get; set; } = string.Empty;
 }
 
 public class GameAccessTokenService : Application.IGameAccessTokenIssuer, Application.IGameAccessTokenVerifier
@@ -69,7 +69,7 @@ public class GameAccessTokenService : Application.IGameAccessTokenIssuer, Applic
 
     private async Task<PasetoSymmetricKey> GetSecretKeyAsync(CancellationToken cancellationToken)
     {
-        var secret = await _secretsProvider.GetSecretAsync(_options.SecretKey, cancellationToken);
+        var secret = await _secretsProvider.GetSecretAsync(_options.SecretId, cancellationToken);
         var key = Paserk.Decode(secret);
 
         if (key is PasetoSymmetricKey symmetricKey)

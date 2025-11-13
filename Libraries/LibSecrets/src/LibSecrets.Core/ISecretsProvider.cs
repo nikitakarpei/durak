@@ -1,9 +1,9 @@
 namespace Secrets;
 
 /// <summary>
-/// Interface for retrieving secrets by key.
+/// Interface for retrieving secrets by secret identifier.
 /// </summary>
 public interface ISecretsProvider
 {
-    Task<string> GetSecretAsync(string key, CancellationToken cancellationToken);
+    Task<string> GetSecretAsync(string secretId, CancellationToken cancellationToken);
 }
