@@ -20,7 +20,7 @@ public sealed class MongoDbEventStore : IEventStore
     }
 
     public async Task AppendToStreamAsync(
-        string streamName,
+        string streamId,
         IEnumerable<EventData> events,
         CancellationToken cancellationToken
     )
@@ -31,7 +31,7 @@ public sealed class MongoDbEventStore : IEventStore
             .Select(evt => new EventDocument
             {
                 Id = ObjectId.GenerateNewId(),
-                StreamName = streamName,
+                StreamId = streamId,
                 EventId = evt.EventId,
                 Type = evt.Type,
                 Data = BsonDocument.Parse(evt.JsonData),
@@ -44,18 +44,18 @@ public sealed class MongoDbEventStore : IEventStore
         }
     }
 
-    public async Task<StreamSubscription> SubscribeToStreamAsync(string streamName, CancellationToken cancellationToken)
+    public async Task<StreamSubscription> SubscribeToStreamAsync(string streamId, CancellationToken cancellationToken)
     {
         _eventCollection ??= await GetEventCollectionAsync(cancellationToken);
 
         var pipeline = new EmptyPipelineDefinition<ChangeStreamDocument<EventDocument>>().Match(change =>
-            change.OperationType == ChangeStreamOperationType.Insert && change.FullDocument.StreamName == streamName
+            change.OperationType == ChangeStreamOperationType.Insert && change.FullDocument.StreamId == streamId
         );
 
         var cursor = await _eventCollection.WatchAsync(pipeline, null, cancellationToken);
 
         var existingEvents = await _eventCollection
-            .Find(Builders<EventDocument>.Filter.Eq(e => e.StreamName, streamName))
+            .Find(Builders<EventDocument>.Filter.Eq(e => e.StreamId, streamId))
             .SortBy(e => e.Id)
             .ToListAsync(cancellationToken);
 
@@ -113,7 +113,7 @@ public sealed class MongoDbEventStore : IEventStore
         var collection = _database.GetCollection<EventDocument>(_options.CollectionName);
 
         await collection.Indexes.CreateOneAsync(
-            new CreateIndexModel<EventDocument>(Builders<EventDocument>.IndexKeys.Hashed(e => e.StreamName)),
+            new CreateIndexModel<EventDocument>(Builders<EventDocument>.IndexKeys.Hashed(e => e.StreamId)),
             null,
             cancellationToken
         );

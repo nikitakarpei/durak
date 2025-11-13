@@ -15,13 +15,9 @@ public sealed class InMemoryEventStore : IEventStore
 
     private readonly ConcurrentDictionary<string, StreamState> _streams = new();
 
-    public Task AppendToStreamAsync(
-        string streamName,
-        IEnumerable<EventData> events,
-        CancellationToken cancellationToken
-    )
+    public Task AppendToStreamAsync(string streamId, IEnumerable<EventData> events, CancellationToken cancellationToken)
     {
-        var state = _streams.GetOrAdd(streamName, _ => new StreamState());
+        var state = _streams.GetOrAdd(streamId, _ => new StreamState());
 
         lock (state)
         {
@@ -42,9 +38,9 @@ public sealed class InMemoryEventStore : IEventStore
         return Task.CompletedTask;
     }
 
-    public Task<StreamSubscription> SubscribeToStreamAsync(string streamName, CancellationToken cancellationToken)
+    public Task<StreamSubscription> SubscribeToStreamAsync(string streamId, CancellationToken cancellationToken)
     {
-        var state = _streams.GetOrAdd(streamName, _ => new StreamState());
+        var state = _streams.GetOrAdd(streamId, _ => new StreamState());
 
         // Setup phase - create channel and register subscriber
         var channel = Channel.CreateUnbounded<EventData>();

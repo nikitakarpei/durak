@@ -8,7 +8,7 @@ internal class EventDocument
     [BsonId]
     public ObjectId Id { get; set; }
 
-    public string StreamName { get; set; } = string.Empty;
+    public string StreamId { get; set; } = string.Empty;
 
     [BsonGuidRepresentation(GuidRepresentation.Standard)]
     public Guid EventId { get; set; }
