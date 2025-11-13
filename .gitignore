@@ -18,3 +18,8 @@
 **/project.nuget.g.props
 **/project.nuget.g.targets
 **/project.nuget.dgspec.json
+
+# ASP.NET configuration files
+**/appsettings.*.json
+**/appsettings.json
+**/Properties/launchSettings.json
