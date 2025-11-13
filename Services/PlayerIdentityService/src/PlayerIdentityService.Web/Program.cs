@@ -115,7 +115,7 @@ builder.Services.AddScoped<Rpc.Server.RpcRequestHandler>();
 
 var app = builder.Build();
 
-app.Map(
+app.MapPost(
     "/",
     async context =>
     {

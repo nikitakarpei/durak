@@ -3,7 +3,8 @@ using Rpc.Transport;
 
 namespace Rpc.Net.Transport;
 
-public class ClientHttpConnection(Guid id, HttpClient httpClient, Uri uri) : ITransportConnection
+public class ClientHttpConnection(Guid id, HttpClient httpClient, Uri uri, Version? minimumHttpVersion = null)
+    : ITransportConnection
 {
     public Guid Id { get; init; } = id;
 
@@ -19,7 +20,14 @@ public class ClientHttpConnection(Guid id, HttpClient httpClient, Uri uri) : ITr
         var content = new ByteArrayContent(packet.AsRawBytes());
         content.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
 
-        var response = await httpClient.PostAsync(uri, content, cancellationToken);
+        var request = new HttpRequestMessage(HttpMethod.Post, uri)
+        {
+            Content = content,
+            Version = minimumHttpVersion ?? new Version(1, 1),
+            VersionPolicy = HttpVersionPolicy.RequestVersionOrHigher,
+        };
+
+        var response = await httpClient.SendAsync(request, cancellationToken);
 
         if (response.IsSuccessStatusCode)
         {

@@ -3,53 +3,57 @@ namespace GameService.Web.Endpoints;
 internal class RpcEndpointHandler(
     Rpc.Server.RpcRequestHandler requestHandler,
     PlayerIdentityVerify.IPlayerIdentityTokenVerifier playerIdentityTokenVerifier,
-    Application.VerifiedPlayerIdentityAccessor verifiedPlayerIdentityAccessor
+    Application.VerifiedPlayerIdentityAccessor verifiedPlayerIdentityAccessor,
+    ILogger<RpcEndpointHandler> logger
 )
 {
     public async Task HandleAsync(HttpContext context)
     {
-        if (!context.WebSockets.IsWebSocketRequest)
+        logger.LogDebug("Received RPC request. http version: {HttpVersion}", context.Request.Protocol);
+        if (!await VerifyPlayerIdentityAsync(context))
         {
-            context.Response.StatusCode = StatusCodes.Status400BadRequest;
-            await context.Response.WriteAsync("websocket request is required", context.RequestAborted);
             return;
         }
 
-        if (!context.Request.Query.TryGetValue("player_id_token", out var playerIdToken))
-        {
-            context.Response.StatusCode = StatusCodes.Status400BadRequest;
-            await context.Response.WriteAsync("player_id_token is required", context.RequestAborted);
-            return;
-        }
-
-        var playerIdentity = await playerIdentityTokenVerifier.VerifyAsync(playerIdToken!, context.RequestAborted);
-
-        if (playerIdentity is null)
-        {
-            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            await context.Response.WriteAsync("invalid player_id_token", context.RequestAborted);
-            return;
-        }
-
-        verifiedPlayerIdentityAccessor.Identity = playerIdentity;
-
-        await HandleWebSocketAsync(context, context.RequestAborted);
+        await HandleHttpRequestAsync(context);
     }
 
-    private async Task HandleWebSocketAsync(HttpContext context, CancellationToken cancellationToken)
+    private async Task<bool> VerifyPlayerIdentityAsync(HttpContext context)
     {
-        using var webSocketAdapter = new Adapters.WebSocketAdapter(await context.WebSockets.AcceptWebSocketAsync());
-
-        webSocketAdapter.MessageReceived += async message =>
+        if (context.Request.Query.TryGetValue("player_id_token", out var playerIdToken))
         {
-            var packet = Rpc.Protocol.RpcPacket.FromRawBytes(message);
+            var playerIdentity = await playerIdentityTokenVerifier.VerifyAsync(playerIdToken!, context.RequestAborted);
 
-            await foreach (var response in requestHandler.HandleAsync(packet, cancellationToken))
+            if (playerIdentity is null)
             {
-                await webSocketAdapter.SendAsync(response.AsRawBytes(), cancellationToken);
-            }
-        };
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await context.Response.WriteAsync("Player identity verification failed", context.RequestAborted);
 
-        await webSocketAdapter.PollAsync(cancellationToken);
+                return false;
+            }
+
+            verifiedPlayerIdentityAccessor.Identity = playerIdentity;
+        }
+
+        return true;
+    }
+
+    private async Task HandleHttpRequestAsync(HttpContext context)
+    {
+        using var reader = new MemoryStream(new byte[context.Request.ContentLength ?? 0]);
+        await context.Request.Body.CopyToAsync(reader, context.RequestAborted);
+
+        var packet = Rpc.Protocol.RpcPacket.FromRawBytes(reader.ToArray());
+
+        context.Response.StatusCode = StatusCodes.Status200OK;
+        context.Response.ContentType = "application/octet-stream";
+
+        await foreach (var response in requestHandler.HandleAsync(packet, context.RequestAborted))
+        {
+            await context.Response.Body.WriteAsync(response.AsRawBytes(), context.RequestAborted);
+            await context.Response.Body.FlushAsync(context.RequestAborted);
+        }
+
+        await context.Response.CompleteAsync();
     }
 }

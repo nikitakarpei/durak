@@ -1,4 +1,3 @@
-using System.Net.WebSockets;
 using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -321,9 +320,12 @@ public class ScenarioRunner
 
     private async Task<string> CreateGame(string playerIdToken)
     {
-        using var webSocket = new ClientWebSocket();
-        await webSocket.ConnectAsync(new Uri(GetGameServiceUrl(playerIdToken)), CancellationToken.None);
-        using var connection = new Rpc.Net.Transport.ClientWebSocketConnection(Guid.NewGuid(), webSocket);
+        using var httpClient = _httpClientFactory.CreateClient();
+        using var connection = new Rpc.Net.Transport.ClientHttpConnection(
+            Guid.NewGuid(),
+            httpClient,
+            new Uri(GetGameServiceUrl(playerIdToken))
+        );
         using Rpc.Client.IClient rpcClient = new Rpc.Client.RpcClient(
             connection,
             _loggerFactory.CreateLogger<Rpc.Client.RpcClient>()
@@ -355,8 +357,6 @@ public class ScenarioRunner
             GameService.Api.Commands.CreateGameCommand.Types.Response
         >("CreateGame", request, CancellationToken.None);
 
-        await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Game created", CancellationToken.None);
-
         if (response.Success != null)
         {
             return response.Success.GameId;
@@ -367,9 +367,12 @@ public class ScenarioRunner
 
     private async Task<string> GetGameAccessToken(string gameId, string playerIdToken)
     {
-        using var webSocket = new ClientWebSocket();
-        await webSocket.ConnectAsync(new Uri(GetGameServiceUrl(playerIdToken)), CancellationToken.None);
-        using var connection = new Rpc.Net.Transport.ClientWebSocketConnection(Guid.NewGuid(), webSocket);
+        using var httpClient = _httpClientFactory.CreateClient();
+        using var connection = new Rpc.Net.Transport.ClientHttpConnection(
+            Guid.NewGuid(),
+            httpClient,
+            new Uri(GetGameServiceUrl(playerIdToken))
+        );
         using Rpc.Client.IClient rpcClient = new Rpc.Client.RpcClient(
             connection,
             _loggerFactory.CreateLogger<Rpc.Client.RpcClient>()
@@ -381,12 +384,6 @@ public class ScenarioRunner
             GameService.Api.Commands.GetGameAccessTokenCommand.Types.Request,
             GameService.Api.Commands.GetGameAccessTokenCommand.Types.Response
         >("GetGameAccessToken", request, CancellationToken.None);
-
-        await webSocket.CloseAsync(
-            WebSocketCloseStatus.NormalClosure,
-            "Game access token received",
-            CancellationToken.None
-        );
 
         if (response.Success != null)
         {

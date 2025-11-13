@@ -175,9 +175,7 @@ builder.Services.AddScoped<GameService.Web.Endpoints.RpcEndpointHandler>();
 // Application Build & Configuration
 var app = builder.Build();
 
-app.UseWebSockets();
-
-app.Map(
+app.MapPost(
     "/",
     (HttpContext context, GameService.Web.Endpoints.RpcEndpointHandler handler) => handler.HandleAsync(context)
 );
