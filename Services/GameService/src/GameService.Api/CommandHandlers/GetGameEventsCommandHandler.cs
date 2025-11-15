@@ -27,13 +27,13 @@ public class GetGameEventsCommandHandler(
 
         Domain.GameState gameState = new();
 
-        await using var subscription = await eventStore.SubscribeToStreamAsync(
+        // First, yield all existing events
+        var events = await eventStore.ReadStreamAsync(
             Application.GameEventStreams.DomainEvents(request.GameId),
             cancellationToken
         );
 
-        // First, yield all existing events
-        await foreach (var @event in subscription.GetExistingEvents(cancellationToken))
+        foreach (var @event in events)
         {
             var domainEvent = DeserializeDomainEvent(@event);
 
@@ -47,13 +47,21 @@ public class GetGameEventsCommandHandler(
             };
         }
 
+        var lastEventId = events.LastOrDefault()?.EventId;
+
         yield return new Commands.GetGameEventsCommand.Types.StreamResponse()
         {
             OldEventsEnded = new Commands.GetGameEventsCommand.Types.StreamResponse.Types.OldEventsEnded(),
         };
 
         // Then, yield new events as they arrive
-        await foreach (var @event in subscription.GetNewEvents(cancellationToken))
+        await foreach (
+            var @event in eventStore.SubscribeToStreamAsync(
+                Application.GameEventStreams.DomainEvents(request.GameId),
+                lastEventId,
+                cancellationToken
+            )
+        )
         {
             var domainEvent = DeserializeDomainEvent(@event);
 

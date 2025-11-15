@@ -61,15 +61,10 @@ public class MongoDbEventStoreTests : IAsyncLifetime
         // Act
         await _eventStore!.AppendToStreamAsync(streamName, new[] { eventData }, CancellationToken.None);
 
-        // Assert - verify by subscribing
-        var receivedEvents = new List<RecordedEvent>();
+        // Assert - verify by reading
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
 
-        await using var subscription = await _eventStore.SubscribeToStreamAsync(streamName, cts.Token);
-        await foreach (var evt in subscription.GetExistingEvents(cts.Token))
-        {
-            receivedEvents.Add(evt);
-        }
+        var receivedEvents = await _eventStore.ReadStreamAsync(streamName, cts.Token);
 
         receivedEvents.Should().HaveCount(1);
         receivedEvents[0].EventId.Should().Be(eventId);
@@ -98,14 +93,9 @@ public class MongoDbEventStoreTests : IAsyncLifetime
         await _eventStore!.AppendToStreamAsync(streamName, events, CancellationToken.None);
 
         // Assert
-        var receivedEvents = new List<RecordedEvent>();
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
 
-        await using var subscription = await _eventStore.SubscribeToStreamAsync(streamName, cts.Token);
-        await foreach (var evt in subscription.GetExistingEvents(cts.Token))
-        {
-            receivedEvents.Add(evt);
-        }
+        var receivedEvents = await _eventStore.ReadStreamAsync(streamName, cts.Token);
 
         receivedEvents.Should().HaveCount(10);
         for (int i = 0; i < 10; i++)
@@ -127,13 +117,11 @@ public class MongoDbEventStoreTests : IAsyncLifetime
 
         // Act - subscribe first
         var subscribedEvents = new List<RecordedEvent>();
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-
-        await using var subscription = await _eventStore!.SubscribeToStreamAsync(streamName, cts.Token);
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         var subscribeTask = Task.Run(async () =>
         {
-            await foreach (var evt in subscription.GetNewEvents(cts.Token))
+            await foreach (var evt in _eventStore!.SubscribeToStreamAsync(streamName, null, cts.Token))
             {
                 subscribedEvents.Add(evt);
                 if (subscribedEvents.Count >= 1)
@@ -143,7 +131,10 @@ public class MongoDbEventStoreTests : IAsyncLifetime
             }
         });
 
-        // Append event - no delay needed, subscription is already ready!
+        // Give MongoDB change stream a moment to set up
+        await Task.Delay(1000);
+
+        // Append event
         await _eventStore!.AppendToStreamAsync(
             streamName,
             new[] { new EventData(eventId, "NewEvent", JsonSerializer.Serialize(new { test = "data" })) },
@@ -169,42 +160,36 @@ public class MongoDbEventStoreTests : IAsyncLifetime
 
         // Act
         var receivedEvents = new List<RecordedEvent>();
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-
-        await using var subscription = await _eventStore.SubscribeToStreamAsync(streamName, cts.Token);
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         var subscribeTask = Task.Run(async () =>
         {
-            // First get existing events
-            await foreach (var evt in subscription.GetExistingEvents(cts.Token))
+            // Subscribe with the anchor set to the existing event ID to get new events after it
+            await foreach (var evt in _eventStore.SubscribeToStreamAsync(streamName, existingEvent.EventId, cts.Token))
             {
                 receivedEvents.Add(evt);
-            }
-
-            // Then get new events
-            await foreach (var evt in subscription.GetNewEvents(cts.Token))
-            {
-                receivedEvents.Add(evt);
-                if (receivedEvents.Count >= 2)
+                if (receivedEvents.Count >= 1)
                 {
                     break;
                 }
             }
         });
 
-        // Append new event - no delay needed, subscription is already ready!
+        // Give MongoDB change stream a moment to set up
+        await Task.Delay(1000);
+
+        // Append new event
         await _eventStore!.AppendToStreamAsync(streamName, new[] { newEvent }, CancellationToken.None);
 
         await subscribeTask;
 
         // Assert
-        receivedEvents.Should().HaveCount(2);
-        receivedEvents[0].EventId.Should().Be(existingEvent.EventId);
-        receivedEvents[1].EventId.Should().Be(newEvent.EventId);
+        receivedEvents.Should().HaveCount(1);
+        receivedEvents[0].EventId.Should().Be(newEvent.EventId);
     }
 
     [Fact]
-    public async Task SubscribeToStreamAsync_MultipleSubscribers_ShouldAllReceiveEvents()
+    public async Task ReadStreamAsync_MultipleReaders_ShouldAllReceiveEvents()
     {
         // Arrange
         var streamName = "test-stream";
@@ -219,52 +204,39 @@ public class MongoDbEventStoreTests : IAsyncLifetime
 
         await _eventStore!.AppendToStreamAsync(streamName, events, CancellationToken.None);
 
-        // Act - multiple subscribers
-        var subscriber1Events = new List<RecordedEvent>();
-        var subscriber2Events = new List<RecordedEvent>();
-        var subscriber3Events = new List<RecordedEvent>();
+        // Act - multiple readers
+        IList<RecordedEvent>? reader1Events = null;
+        IList<RecordedEvent>? reader2Events = null;
+        IList<RecordedEvent>? reader3Events = null;
 
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
-        await using var subscription1 = await _eventStore.SubscribeToStreamAsync(streamName, cts.Token);
-        await using var subscription2 = await _eventStore.SubscribeToStreamAsync(streamName, cts.Token);
-        await using var subscription3 = await _eventStore.SubscribeToStreamAsync(streamName, cts.Token);
-
-        var sub1Task = Task.Run(async () =>
+        var read1Task = Task.Run(async () =>
         {
-            await foreach (var evt in subscription1.GetExistingEvents(cts.Token))
-            {
-                subscriber1Events.Add(evt);
-            }
+            reader1Events = await _eventStore.ReadStreamAsync(streamName, cts.Token);
         });
 
-        var sub2Task = Task.Run(async () =>
+        var read2Task = Task.Run(async () =>
         {
-            await foreach (var evt in subscription2.GetExistingEvents(cts.Token))
-            {
-                subscriber2Events.Add(evt);
-            }
+            reader2Events = await _eventStore.ReadStreamAsync(streamName, cts.Token);
         });
 
-        var sub3Task = Task.Run(async () =>
+        var read3Task = Task.Run(async () =>
         {
-            await foreach (var evt in subscription3.GetExistingEvents(cts.Token))
-            {
-                subscriber3Events.Add(evt);
-            }
+            reader3Events = await _eventStore.ReadStreamAsync(streamName, cts.Token);
         });
 
-        await Task.WhenAll(sub1Task, sub2Task, sub3Task);
+        await Task.WhenAll(read1Task, read2Task, read3Task);
 
         // Assert
-        subscriber1Events.Should().HaveCount(5);
-        subscriber2Events.Should().HaveCount(5);
-        subscriber3Events.Should().HaveCount(5);
+        reader1Events!.Should().HaveCount(5);
+        reader2Events!.Should().HaveCount(5);
+        reader3Events!.Should().HaveCount(5);
 
         var expectedIds = events.Select(e => e.EventId).ToList();
-        subscriber1Events.Select(e => e.EventId).Should().BeEquivalentTo(expectedIds);
-        subscriber2Events.Select(e => e.EventId).Should().BeEquivalentTo(expectedIds);
-        subscriber3Events.Select(e => e.EventId).Should().BeEquivalentTo(expectedIds);
+        reader1Events!.Select(e => e.EventId).Should().BeEquivalentTo(expectedIds);
+        reader2Events!.Select(e => e.EventId).Should().BeEquivalentTo(expectedIds);
+        reader3Events!.Select(e => e.EventId).Should().BeEquivalentTo(expectedIds);
     }
 
     [Fact]
@@ -281,21 +253,10 @@ public class MongoDbEventStoreTests : IAsyncLifetime
         await _eventStore!.AppendToStreamAsync(stream2, new[] { event2 }, CancellationToken.None);
 
         // Assert
-        var stream1Events = new List<RecordedEvent>();
-        var stream2Events = new List<RecordedEvent>();
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
 
-        await using var subscription1 = await _eventStore.SubscribeToStreamAsync(stream1, cts.Token);
-        await foreach (var evt in subscription1.GetExistingEvents(cts.Token))
-        {
-            stream1Events.Add(evt);
-        }
-
-        await using var subscription2 = await _eventStore.SubscribeToStreamAsync(stream2, cts.Token);
-        await foreach (var evt in subscription2.GetExistingEvents(cts.Token))
-        {
-            stream2Events.Add(evt);
-        }
+        var stream1Events = await _eventStore.ReadStreamAsync(stream1, cts.Token);
+        var stream2Events = await _eventStore.ReadStreamAsync(stream2, cts.Token);
 
         stream1Events.Should().HaveCount(1);
         stream1Events[0].EventId.Should().Be(event1.EventId);
@@ -314,11 +275,9 @@ public class MongoDbEventStoreTests : IAsyncLifetime
         var receivedEvents = new List<RecordedEvent>();
         using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(500));
 
-        await using var subscription = await _eventStore!.SubscribeToStreamAsync(streamName, cts.Token);
-
         try
         {
-            await foreach (var evt in subscription.GetNewEvents(cts.Token))
+            await foreach (var evt in _eventStore!.SubscribeToStreamAsync(streamName, null, cts.Token))
             {
                 receivedEvents.Add(evt);
             }
@@ -327,5 +286,42 @@ public class MongoDbEventStoreTests : IAsyncLifetime
         {
             // Expected
         }
+    }
+
+    [Fact]
+    public async Task SubscribeToStreamAsync_WithAnchor_ShouldEmitEventsAfterAnchor()
+    {
+        // Arrange
+        var streamName = "test-stream";
+        var event1 = new EventData(Guid.NewGuid(), "Event1", JsonSerializer.Serialize(new { test = "data1" }));
+        var event2 = new EventData(Guid.NewGuid(), "Event2", JsonSerializer.Serialize(new { test = "data2" }));
+        var event3 = new EventData(Guid.NewGuid(), "Event3", JsonSerializer.Serialize(new { test = "data3" }));
+
+        await _eventStore!.AppendToStreamAsync(streamName, new[] { event1, event2, event3 }, CancellationToken.None);
+
+        // Act - subscribe with anchor set to event1's ID
+        var receivedEvents = new List<RecordedEvent>();
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+
+        var events = await _eventStore.ReadStreamAsync(streamName, CancellationToken.None);
+
+        events.Should().HaveCount(3);
+        events[0].EventId.Should().Be(event1.EventId);
+        events[1].EventId.Should().Be(event2.EventId);
+        events[2].EventId.Should().Be(event3.EventId);
+
+        await foreach (var evt in _eventStore.SubscribeToStreamAsync(streamName, event1.EventId, cts.Token))
+        {
+            receivedEvents.Add(evt);
+            if (receivedEvents.Count >= 2)
+            {
+                break;
+            }
+        }
+
+        // Assert - should receive event2 and event3, but not event1
+        receivedEvents.Should().HaveCount(2);
+        receivedEvents[0].EventId.Should().Be(event2.EventId);
+        receivedEvents[1].EventId.Should().Be(event3.EventId);
     }
 }

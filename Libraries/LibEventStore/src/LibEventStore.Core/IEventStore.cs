@@ -8,7 +8,15 @@ public interface IEventStore
         CancellationToken cancellationToken
     );
 
-    /// Returns a subscription to events in the order they were appended to the stream and new events as they are appended.
-    /// The subscription is ready to use when returned.
-    public Task<StreamSubscription> SubscribeToStreamAsync(string streamId, CancellationToken cancellationToken);
+    /// Returns all existing events in the stream in the order they were appended.
+    public Task<IList<RecordedEvent>> ReadStreamAsync(string streamId, CancellationToken cancellationToken);
+
+    /// Subscribes to new events in the stream.
+    /// If anchor is null, only yields new events as they are appended.
+    /// If anchor is provided, yields all events after the specified event ID (both existing and new).
+    public IAsyncEnumerable<RecordedEvent> SubscribeToStreamAsync(
+        string streamId,
+        Guid? anchor,
+        CancellationToken cancellationToken
+    );
 }

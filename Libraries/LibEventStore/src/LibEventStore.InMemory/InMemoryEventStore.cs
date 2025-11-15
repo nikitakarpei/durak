@@ -38,7 +38,26 @@ public sealed class InMemoryEventStore : IEventStore
         return Task.CompletedTask;
     }
 
-    public Task<StreamSubscription> SubscribeToStreamAsync(string streamId, CancellationToken cancellationToken)
+    public Task<IList<RecordedEvent>> ReadStreamAsync(string streamId, CancellationToken cancellationToken)
+    {
+        var state = _streams.GetOrAdd(streamId, _ => new StreamState());
+
+        ImmutableList<EventData> snapshot;
+        lock (state)
+        {
+            snapshot = state.Events;
+        }
+
+        var events = snapshot.Select(e => new RecordedEvent(e.EventId, e.Type, e.JsonData)).ToList();
+
+        return Task.FromResult<IList<RecordedEvent>>(events);
+    }
+
+    public async IAsyncEnumerable<RecordedEvent> SubscribeToStreamAsync(
+        string streamId,
+        Guid? anchor,
+        [EnumeratorCancellation] CancellationToken cancellationToken
+    )
     {
         var state = _streams.GetOrAdd(streamId, _ => new StreamState());
 
@@ -50,30 +69,34 @@ public sealed class InMemoryEventStore : IEventStore
             state.Subscribers.Add(channel);
         }
 
-        // Take snapshot of existing events
-        ImmutableList<EventData> snapshot;
-        lock (state)
+        try
         {
-            snapshot = state.Events;
-        }
-
-        // Factory for existing events
-        async IAsyncEnumerable<RecordedEvent> ExistingEventsFactory([EnumeratorCancellation] CancellationToken ct)
-        {
-            // Yield existing events
-            foreach (var eventData in snapshot)
+            // If anchor is provided, yield existing events after the anchor
+            if (anchor.HasValue)
             {
-                yield return new RecordedEvent(eventData.EventId, eventData.Type, eventData.JsonData);
-            }
-            await Task.CompletedTask;
-        }
+                ImmutableList<EventData> snapshot;
+                lock (state)
+                {
+                    snapshot = state.Events;
+                }
 
-        // Factory for new events
-        async IAsyncEnumerable<RecordedEvent> NewEventsFactory([EnumeratorCancellation] CancellationToken ct)
-        {
-            // Yield live events from channel
+                bool foundAnchor = false;
+                foreach (var eventData in snapshot)
+                {
+                    if (foundAnchor)
+                    {
+                        yield return new RecordedEvent(eventData.EventId, eventData.Type, eventData.JsonData);
+                    }
+                    else if (eventData.EventId == anchor.Value)
+                    {
+                        foundAnchor = true;
+                    }
+                }
+            }
+
+            // Yield new events from channel
             var reader = channel.Reader;
-            while (await reader.WaitToReadAsync(ct))
+            while (await reader.WaitToReadAsync(cancellationToken))
             {
                 while (reader.TryRead(out var eventData))
                 {
@@ -81,17 +104,13 @@ public sealed class InMemoryEventStore : IEventStore
                 }
             }
         }
-
-        // Cleanup action
-        ValueTask DisposeAction()
+        finally
         {
+            // Cleanup
             lock (state)
             {
                 state.Subscribers.Remove(channel);
             }
-            return ValueTask.CompletedTask;
         }
-
-        return Task.FromResult(new StreamSubscription(ExistingEventsFactory, NewEventsFactory, DisposeAction));
     }
 }

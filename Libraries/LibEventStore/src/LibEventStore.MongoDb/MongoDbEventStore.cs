@@ -44,7 +44,23 @@ public sealed class MongoDbEventStore : IEventStore
         }
     }
 
-    public async Task<StreamSubscription> SubscribeToStreamAsync(string streamId, CancellationToken cancellationToken)
+    public async Task<IList<RecordedEvent>> ReadStreamAsync(string streamId, CancellationToken cancellationToken)
+    {
+        _eventCollection ??= await GetEventCollectionAsync(cancellationToken);
+
+        var documents = await _eventCollection
+            .Find(Builders<EventDocument>.Filter.Eq(e => e.StreamId, streamId))
+            .SortBy(e => e.Id)
+            .ToListAsync(cancellationToken);
+
+        return documents.Select(doc => new RecordedEvent(doc.EventId, doc.Type, doc.Data.ToJson())).ToList();
+    }
+
+    public async IAsyncEnumerable<RecordedEvent> SubscribeToStreamAsync(
+        string streamId,
+        Guid? anchor,
+        [EnumeratorCancellation] CancellationToken cancellationToken
+    )
     {
         _eventCollection ??= await GetEventCollectionAsync(cancellationToken);
 
@@ -52,58 +68,59 @@ public sealed class MongoDbEventStore : IEventStore
             change.OperationType == ChangeStreamOperationType.Insert && change.FullDocument.StreamId == streamId
         );
 
-        var cursor = await _eventCollection.WatchAsync(pipeline, null, cancellationToken);
+        using var cursor = await _eventCollection.WatchAsync(pipeline, null, cancellationToken);
 
-        var existingEvents = await _eventCollection
-            .Find(Builders<EventDocument>.Filter.Eq(e => e.StreamId, streamId))
-            .SortBy(e => e.Id)
-            .ToListAsync(cancellationToken);
+        ObjectId? lastYieldedId = null;
 
-        ObjectId? lastExistingId = existingEvents.LastOrDefault()?.Id;
-
-        async IAsyncEnumerable<RecordedEvent> ExistingEventsFactory([EnumeratorCancellation] CancellationToken ct)
+        // If anchor is provided, yield existing events after the anchor
+        if (anchor.HasValue)
         {
-            // Yield existing events
-            foreach (var doc in existingEvents)
-            {
-                yield return new RecordedEvent(doc.EventId, doc.Type, doc.Data.ToJson());
-            }
-            await Task.CompletedTask;
-        }
+            var documents = await _eventCollection
+                .Find(Builders<EventDocument>.Filter.Eq(e => e.StreamId, streamId))
+                .SortBy(e => e.Id)
+                .ToListAsync(cancellationToken);
 
-        async IAsyncEnumerable<RecordedEvent> NewEventsFactory([EnumeratorCancellation] CancellationToken ct)
-        {
-            // Watch for new events
-            while (await cursor.MoveNextAsync(ct))
+            bool foundAnchor = false;
+            foreach (var doc in documents)
             {
-                foreach (var change in cursor.Current)
+                if (foundAnchor)
                 {
-                    if (change.FullDocument is null)
-                    {
-                        continue;
-                    }
-                    if (lastExistingId.HasValue && change.FullDocument.Id.CompareTo(lastExistingId.Value) <= 0)
-                    {
-                        continue;
-                    }
-
-                    yield return new RecordedEvent(
-                        change.FullDocument.EventId,
-                        change.FullDocument.Type,
-                        change.FullDocument.Data.ToJson()
-                    );
+                    yield return new RecordedEvent(doc.EventId, doc.Type, doc.Data.ToJson());
+                    lastYieldedId = doc.Id;
+                }
+                else if (doc.EventId == anchor.Value)
+                {
+                    foundAnchor = true;
+                    lastYieldedId = doc.Id;
                 }
             }
         }
 
-        // Dispose action to clean up the cursor
-        ValueTask DisposeAction()
+        // Watch for new events
+        while (await cursor.MoveNextAsync(cancellationToken))
         {
-            cursor.Dispose();
-            return ValueTask.CompletedTask;
-        }
+            foreach (var change in cursor.Current)
+            {
+                if (change.FullDocument is null)
+                {
+                    continue;
+                }
 
-        return new StreamSubscription(ExistingEventsFactory, NewEventsFactory, DisposeAction);
+                // Skip events we've already yielded
+                if (lastYieldedId.HasValue && change.FullDocument.Id.CompareTo(lastYieldedId.Value) <= 0)
+                {
+                    continue;
+                }
+
+                yield return new RecordedEvent(
+                    change.FullDocument.EventId,
+                    change.FullDocument.Type,
+                    change.FullDocument.Data.ToJson()
+                );
+
+                lastYieldedId = change.FullDocument.Id;
+            }
+        }
     }
 
     private async Task<IMongoCollection<EventDocument>> GetEventCollectionAsync(CancellationToken cancellationToken)
