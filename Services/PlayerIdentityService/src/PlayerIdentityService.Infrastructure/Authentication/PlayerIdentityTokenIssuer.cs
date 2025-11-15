@@ -7,7 +7,7 @@ namespace PlayerIdentityService.Infrastructure.Authentication;
 
 public class PlayerIdentityTokenIssuerOptions
 {
-    public string SeedKey { get; set; } = string.Empty;
+    public string SeedSecretId { get; set; } = string.Empty;
 }
 
 public class PlayerIdentityTokenIssuer : Application.IPlayerIdentityTokenIssuer
@@ -48,7 +48,7 @@ public class PlayerIdentityTokenIssuer : Application.IPlayerIdentityTokenIssuer
 
     private async Task<PasetoAsymmetricKeyPair> GenerateKeyPairAsync(CancellationToken cancellationToken)
     {
-        var seed = await _secretsProvider.GetSecretAsync(_options.SeedKey, cancellationToken);
+        var seed = await _secretsProvider.GetSecretAsync(_options.SeedSecretId, cancellationToken);
         var seedBytes = Convert.FromHexString(seed);
 
         return new PasetoBuilder().Use(_protocolVersion, Purpose.Public).GenerateAsymmetricKeyPair(seedBytes);
