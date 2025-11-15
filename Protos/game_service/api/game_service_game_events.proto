@@ -16,10 +16,6 @@ message OpponentTurnStarted
   string player_id = 1;
 }
 
-message AllPlayersJoined
-{
-}
-
 message AttackCardBeaten
 {
   string player_id = 1;
@@ -35,10 +31,10 @@ message AttackCardPlayed
   google.protobuf.Any played_card = 3;
 }
 
-message CardDealtToPlayer
+message CardsDealtToPlayer
 {
   string player_id = 1;
-  google.protobuf.Any dealt_card = 2;
+  repeated google.protobuf.Any dealt_cards = 2;
 }
 
 message CardDiscarded
@@ -88,9 +84,8 @@ message LobbyOpened
 {
 }
 
-message PlayerFinished
+message LobbyClosed
 {
-  string player_id = 1;
 }
 
 message PlayerJoined

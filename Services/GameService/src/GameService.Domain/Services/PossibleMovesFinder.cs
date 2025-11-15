@@ -5,7 +5,7 @@ public interface IPossibleMovesFinder
     public ICollection<PossibleMove> FindPossibleMoves(GameState gameState, string playerId);
 }
 
-public class PossibleMovesFinder : IPossibleMovesFinder
+public class PossibleMovesFinder(ICardMoveValidator cardMoveValidator) : IPossibleMovesFinder
 {
     public ICollection<PossibleMove> FindPossibleMoves(GameState gameState, string playerId)
     {
@@ -44,11 +44,13 @@ public class PossibleMovesFinder : IPossibleMovesFinder
                 throw new InvalidOperationException("No unbeaten cards found");
             }
 
-            Dictionary<string, List<string>> defenceCardIdsByAttackCardId = new();
+            var defenceCardIdsByAttackCardId = new Dictionary<string, List<string>>();
 
             foreach (var unbeatenCard in unbeatenCards)
             {
-                var defenceCards = playerCards.Where(card => CanCardBeBeaten(gameState, unbeatenCard, card));
+                var defenceCards = playerCards.Where(card =>
+                    cardMoveValidator.CanCardBeBeaten(gameState, unbeatenCard, card)
+                );
 
                 defenceCardIdsByAttackCardId[unbeatenCard.Id] = defenceCards.Select(card => card.Id).ToList();
             }
@@ -69,26 +71,6 @@ public class PossibleMovesFinder : IPossibleMovesFinder
         }
 
         throw new InvalidOperationException($"Player {playerId} is neither attacker nor defender");
-    }
-
-    private static bool CanCardBeBeaten(GameState gameState, Card attackerCard, Card defenderCard)
-    {
-        if (attackerCard is RegularCard attackerRegularCard && defenderCard is RegularCard defenderRegularCard)
-        {
-            if (defenderRegularCard.Suit == attackerRegularCard.Suit)
-            {
-                return defenderRegularCard.Rank > attackerRegularCard.Rank;
-            }
-
-            if (gameState.CommonTrumpSuit != null)
-            {
-                return defenderRegularCard.Suit == gameState.CommonTrumpSuit;
-            }
-
-            return false;
-        }
-
-        throw new NotImplementedException();
     }
 
     private static bool CanBeatAllCards(IDictionary<string, List<string>> defenceCardIdsByAttackCardId)

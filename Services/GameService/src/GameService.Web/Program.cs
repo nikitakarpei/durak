@@ -93,12 +93,22 @@ builder.Services.AddScoped<GameService.Application.IVerifiedPlayerIdentityProvid
 );
 
 // Game Domain Services
-builder.Services.AddScoped<GameService.Application.IGameCollection, GameService.Infrastructure.GameCollection>();
-builder.Services.AddScoped<
-    GameService.Domain.IRandomNumberGenerator,
+builder.Services.AddSingleton<GameService.Application.IGameCollection, GameService.Infrastructure.GameCollection>();
+builder.Services.AddSingleton<
+    GameService.Infrastructure.IRandomNumberGenerator,
     GameService.Infrastructure.RandomNumberGenerator
 >();
-builder.Services.AddScoped<GameService.Domain.IPossibleMovesFinder, GameService.Domain.PossibleMovesFinder>();
+builder.Services.AddSingleton<GameService.Domain.IPossibleMovesFinder, GameService.Domain.PossibleMovesFinder>();
+builder.Services.AddSingleton<
+    GameService.Domain.IShuffledPositionsGenerator,
+    GameService.Infrastructure.ShuffledPositionsGenerator
+>();
+builder.Services.AddSingleton<GameService.Domain.IAttackerFinder, GameService.Domain.AttackerFinder>();
+builder.Services.AddSingleton<GameService.Domain.IDefenderFinder, GameService.Domain.DefenderFinder>();
+builder.Services.AddSingleton<GameService.Domain.ICardMoveValidator, GameService.Domain.CardMoveValidator>();
+builder.Services.AddSingleton<GameService.Domain.ITalonCreator, GameService.Domain.TalonCreator>();
+builder.Services.AddSingleton<GameService.Domain.IFoolFinder, GameService.Domain.FoolFinder>();
+builder.Services.AddSingleton<GameService.Domain.GameService>();
 
 // Authentication & Authorization
 builder.Services.AddSingleton<GameService.Infrastructure.GameAccessTokenService>();

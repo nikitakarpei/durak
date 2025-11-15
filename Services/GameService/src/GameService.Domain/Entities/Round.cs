@@ -5,7 +5,7 @@ public record Round(
     string FirstDefenderId,
     string CurrentAttackerId,
     string CurrentDefenderId,
-    string ActivePlayerId,
+    string? ActivePlayerId,
     bool DefenceGivenUp
 )
 { }

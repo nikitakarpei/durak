@@ -1,3 +1,3 @@
 namespace GameService.Domain;
 
-public record Lobby { }
+public abstract record Lobby { }

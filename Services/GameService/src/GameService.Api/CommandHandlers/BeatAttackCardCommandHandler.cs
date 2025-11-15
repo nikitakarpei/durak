@@ -28,7 +28,7 @@ public class BeatAttackCardCommandHandler(
         }
 
         var game = gameCollection.Get(gameAccessToken.GameId);
-        game.When(
+        game.Execute(
             new Domain.GameCommands.BeatAttackCard(
                 playerIdentity.PlayerId,
                 request.AttackerCardId,

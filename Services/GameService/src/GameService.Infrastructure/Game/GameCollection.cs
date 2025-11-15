@@ -12,7 +12,7 @@ public class GameCollection(IActorRefFactory actorRefFactory, IDependencyResolve
         actorRefFactory.ActorOf(props, GetGameActorName(gameId));
 
         var game = Get(gameId);
-        game.When(new Domain.GameCommands.CreateGame(randomSeed, options));
+        game.Execute(new Domain.GameCommands.CreateGame(randomSeed, options));
     }
 
     public void Delete(string gameId)

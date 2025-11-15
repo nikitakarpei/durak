@@ -19,7 +19,7 @@ public class CreateGameCommandHandler(Application.IGameCollection gameCollection
         gameCollection.Create(gameId, gameOptions, RandomNumberGenerator.GetBytes(32));
 
         var game = gameCollection.Get(gameId);
-        game.When(new Domain.GameCommands.OpenLobby());
+        game.Execute(new Domain.GameCommands.OpenLobby());
 
         return Task.FromResult(
             new Commands.CreateGameCommand.Types.Response

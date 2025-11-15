@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Akka.Actor;
 using Akka.Event;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,50 +8,50 @@ namespace GameService.Infrastructure;
 public class GameActor : ReceiveActor, ILogReceive
 {
     private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
-    private readonly IServiceScope _scope;
-    private readonly MediatR.IMediator _mediator;
-    private readonly Domain.IRandomNumberGenerator _randomNumberGenerator;
-    private readonly Domain.IPossibleMovesFinder _possibleMovesFinder;
+    private readonly IServiceProvider _serviceProvider;
 
     private readonly string _gameId;
-    private IEnumerable<object> _domainEvents = [];
+    private Domain.GameState _state = new();
 
     public GameActor(IServiceProvider serviceProvider, string gameId)
     {
-        _scope = serviceProvider.CreateScope();
-        _mediator = _scope.ServiceProvider.GetRequiredService<MediatR.IMediator>();
-        _randomNumberGenerator = _scope.ServiceProvider.GetRequiredService<Domain.IRandomNumberGenerator>();
-        _possibleMovesFinder = _scope.ServiceProvider.GetRequiredService<Domain.IPossibleMovesFinder>();
-
+        _serviceProvider = serviceProvider;
         _gameId = gameId;
 
         ReceiveAsync<ExecuteCommandMessage>(HandleMessage);
     }
 
-    protected override void PostStop()
-    {
-        _scope.Dispose();
-    }
-
     // Message types
-    public record struct ExecuteCommandMessage(object Command);
+    public record struct ExecuteCommandMessage(Domain.GameCommand Command);
 
     private async Task HandleMessage(ExecuteCommandMessage message)
     {
         try
         {
-            var gameAggregate = new Domain.GameAggregate(_randomNumberGenerator, _possibleMovesFinder);
+            using var scope = _serviceProvider.CreateScope();
 
-            gameAggregate.Load(_domainEvents);
+            var gameService = scope.ServiceProvider.GetRequiredService<Domain.GameService>();
 
-            gameAggregate.When((dynamic)message.Command);
+            var oldState = _state;
 
-            foreach (var change in gameAggregate.Changes)
+            var @event = (Domain.GameEvent?)gameService.Decide(oldState, (dynamic)message.Command);
+
+            if (@event is null)
             {
-                await _mediator.Publish(CreateDomainEventNotification(change));
+                return;
             }
 
-            _domainEvents = _domainEvents.Concat(gameAggregate.Changes);
+            var newState = oldState.When(@event);
+
+            var eventStore = scope.ServiceProvider.GetRequiredService<EventStore.IEventStore>();
+
+            await PersistEvent(eventStore, @event, CancellationToken.None);
+
+            var mediator = scope.ServiceProvider.GetRequiredService<MediatR.IMediator>();
+
+            await mediator.Publish(CreateDomainEventNotification(oldState, newState, @event));
+
+            _state = newState;
         }
         catch (Exception e)
         {
@@ -58,13 +59,33 @@ public class GameActor : ReceiveActor, ILogReceive
         }
     }
 
-    private MediatR.INotification CreateDomainEventNotification(object @event)
+    private async Task PersistEvent(
+        EventStore.IEventStore eventStore,
+        object @event,
+        CancellationToken cancellationToken
+    )
+    {
+        var eventType = @event.GetType();
+        var eventData = new EventStore.EventData(
+            Guid.NewGuid(),
+            eventType.Name,
+            JsonSerializer.Serialize(@event, eventType)
+        );
+        var streamName = Application.GameEventStreams.DomainEvents(_gameId);
+        await eventStore.AppendToStreamAsync(streamName, new[] { eventData }, cancellationToken);
+    }
+
+    private MediatR.INotification CreateDomainEventNotification(
+        Domain.GameState oldState,
+        Domain.GameState newState,
+        object @event
+    )
     {
         var eventType = @event.GetType();
         var notificationType = typeof(Application.GameDomainEventNotification<>).MakeGenericType(eventType);
 
         var notification =
-            Activator.CreateInstance(notificationType, _gameId, @event)
+            Activator.CreateInstance(notificationType, _gameId, oldState, newState, @event)
             ?? throw new InvalidOperationException($"Failed to create notification for event: {eventType.Name}");
 
         return (MediatR.INotification)notification;

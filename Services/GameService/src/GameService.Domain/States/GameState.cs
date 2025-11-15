@@ -17,17 +17,17 @@ public record GameState : State<GameState>
                 }
         );
 
-        On<GameEvents.LobbyOpened>(static (state, @event) => state with { Lobby = new Lobby() });
+        On<GameEvents.LobbyOpened>(static (state, @event) => state with { Lobby = new OpenedLobby() });
 
         On<GameEvents.PlayerJoined>(
             static (state, @event) =>
                 state with
                 {
-                    Players = state.Players.Add(new Player(@event.PlayerId, @event.Seat, false)),
+                    Players = state.Players.Add(new Player(@event.PlayerId, @event.Seat)),
                 }
         );
 
-        On<GameEvents.AllPlayersJoined>(static (state, @event) => state with { Lobby = null });
+        On<GameEvents.LobbyClosed>(static (state, @event) => state with { Lobby = new ClosedLobby() });
 
         On<GameEvents.CardsInTalonShuffled>(
             static (state, @event) =>
@@ -52,17 +52,20 @@ public record GameState : State<GameState>
             }
         );
 
-        On<GameEvents.CardDealtToPlayer>(
+        On<GameEvents.CardsDealtToPlayer>(
             static (state, @event) =>
             {
-                var oldCard = state.Cards.First(card => card.Id == @event.CardId);
-                var newCard = oldCard with { Location = new CardLocations.Hand(@event.PlayerId) };
+                var newState = state with { LastDealtCardId = @event.CardIds.Last() };
 
-                return state with
+                foreach (var cardId in @event.CardIds)
                 {
-                    Cards = state.Cards.Remove(oldCard).Add(newCard),
-                    LastDealtCardId = oldCard.Id,
-                };
+                    var oldCard = state.Cards.First(card => card.Id == cardId);
+                    var newCard = oldCard with { Location = new CardLocations.Hand(@event.PlayerId) };
+
+                    newState = newState with { Cards = newState.Cards.Remove(oldCard).Add(newCard) };
+                }
+
+                return newState;
             }
         );
 
@@ -113,19 +116,6 @@ public record GameState : State<GameState>
                 return state with
                 {
                     Cards = state.Cards.Remove(oldCard).Add(newCard),
-                };
-            }
-        );
-
-        On<GameEvents.PlayerFinished>(
-            static (state, @event) =>
-            {
-                var oldPlayer = state.Players.First(player => player.Id == @event.PlayerId);
-                var newPlayer = oldPlayer with { Finished = true };
-
-                return state with
-                {
-                    Players = state.Players.Remove(oldPlayer).Add(newPlayer),
                 };
             }
         );
@@ -269,5 +259,10 @@ public record GameState : State<GameState>
                 && defence.BeatenCardId == attackCard.Id
             )
         );
+    }
+
+    public IEnumerable<Player> PlayersWithEmptyHand()
+    {
+        return Players.Where(player => IsPlayerHandEmpty(player.Id));
     }
 }

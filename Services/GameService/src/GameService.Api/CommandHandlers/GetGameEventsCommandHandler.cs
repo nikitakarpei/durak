@@ -112,17 +112,6 @@ public class GetGameEventsCommandHandler(
     private Google.Protobuf.WellKnownTypes.Any ConvertToApiEvent(
         string playerId,
         Domain.GameState currentState,
-        Domain.GameEvents.AllPlayersJoined @event
-    )
-    {
-        var eventDto = new GameEvents.AllPlayersJoined();
-
-        return Google.Protobuf.WellKnownTypes.Any.Pack(eventDto);
-    }
-
-    private Google.Protobuf.WellKnownTypes.Any ConvertToApiEvent(
-        string playerId,
-        Domain.GameState currentState,
         Domain.GameEvents.AttackCardBeaten @event
     )
     {
@@ -160,27 +149,32 @@ public class GetGameEventsCommandHandler(
     private Google.Protobuf.WellKnownTypes.Any ConvertToApiEvent(
         string playerId,
         Domain.GameState currentState,
-        Domain.GameEvents.CardDealtToPlayer @event
+        Domain.GameEvents.CardsDealtToPlayer @event
     )
     {
-        var dealtCard = currentState.Cards.First(card => card.Id == @event.CardId);
+        var dealtCards = currentState.Cards.Where(card => @event.CardIds.Contains(card.Id)).ToList();
 
         if (playerId == @event.PlayerId)
         {
-            var cardReceiverEventDto = new GameEvents.CardDealtToPlayer()
+            var cardReceiverEventDto = new GameEvents.CardsDealtToPlayer()
             {
                 PlayerId = @event.PlayerId,
-                DealtCard = Google.Protobuf.WellKnownTypes.Any.Pack(dealtCard.ToApiDto()),
+                DealtCards = { dealtCards.Select(card => Google.Protobuf.WellKnownTypes.Any.Pack(card.ToApiDto())) },
             };
 
             return Google.Protobuf.WellKnownTypes.Any.Pack(cardReceiverEventDto);
         }
         else
         {
-            var otherPlayersEventDto = new GameEvents.CardDealtToPlayer()
+            var otherPlayersEventDto = new GameEvents.CardsDealtToPlayer()
             {
                 PlayerId = @event.PlayerId,
-                DealtCard = Google.Protobuf.WellKnownTypes.Any.Pack(new Data.UnrevealedCard { Id = dealtCard.Id }),
+                DealtCards =
+                {
+                    dealtCards.Select(card =>
+                        Google.Protobuf.WellKnownTypes.Any.Pack(new Data.UnrevealedCard { Id = card.Id })
+                    ),
+                },
             };
 
             return Google.Protobuf.WellKnownTypes.Any.Pack(otherPlayersEventDto);
@@ -298,10 +292,10 @@ public class GetGameEventsCommandHandler(
     private Google.Protobuf.WellKnownTypes.Any ConvertToApiEvent(
         string playerId,
         Domain.GameState currentState,
-        Domain.GameEvents.PlayerFinished @event
+        Domain.GameEvents.LobbyClosed @event
     )
     {
-        var eventDto = new GameEvents.PlayerFinished { PlayerId = @event.PlayerId };
+        var eventDto = new GameEvents.LobbyClosed();
 
         return Google.Protobuf.WellKnownTypes.Any.Pack(eventDto);
     }
@@ -312,7 +306,7 @@ public class GetGameEventsCommandHandler(
         Domain.GameEvents.PlayerJoined @event
     )
     {
-        var eventDto = new GameEvents.PlayerJoined { PlayerId = @event.PlayerId };
+        var eventDto = new GameEvents.PlayerJoined { PlayerId = @event.PlayerId, Seat = @event.Seat };
 
         return Google.Protobuf.WellKnownTypes.Any.Pack(eventDto);
     }

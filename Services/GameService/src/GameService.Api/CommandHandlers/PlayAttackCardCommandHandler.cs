@@ -28,7 +28,7 @@ public class PlayAttackCardCommandHandler(
         }
 
         var game = gameCollection.Get(gameAccessToken.GameId);
-        game.When(new Domain.GameCommands.PlayAttackCard(playerIdentity.PlayerId, request.CardId));
+        game.Execute(new Domain.GameCommands.PlayAttackCard(playerIdentity.PlayerId, request.CardId));
 
         return new Commands.PlayAttackCardCommand.Types.Response()
         {

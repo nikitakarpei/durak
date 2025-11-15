@@ -1,6 +1,6 @@
 namespace GameService.Domain;
 
-public record Player(string Id, int Seat, bool Finished)
+public record Player(string Id, int Seat)
 {
     public virtual bool Equals(Player? other)
     {

@@ -3,7 +3,12 @@ using System.Security.Cryptography;
 
 namespace GameService.Infrastructure;
 
-public class RandomNumberGenerator : Domain.IRandomNumberGenerator
+public interface IRandomNumberGenerator
+{
+    public (int Value, byte[] NewSeed) GetInt32(byte[] seed, int maxValue);
+}
+
+public class RandomNumberGenerator : IRandomNumberGenerator
 {
     public (int Value, byte[] NewSeed) GetInt32(byte[] seed, int maxValue)
     {

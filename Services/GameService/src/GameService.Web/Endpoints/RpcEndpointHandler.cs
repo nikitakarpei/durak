@@ -3,13 +3,11 @@ namespace GameService.Web.Endpoints;
 internal class RpcEndpointHandler(
     Rpc.Server.RpcRequestHandler requestHandler,
     PlayerIdentityVerify.IPlayerIdentityTokenVerifier playerIdentityTokenVerifier,
-    Application.VerifiedPlayerIdentityAccessor verifiedPlayerIdentityAccessor,
-    ILogger<RpcEndpointHandler> logger
+    Application.VerifiedPlayerIdentityAccessor verifiedPlayerIdentityAccessor
 )
 {
     public async Task HandleAsync(HttpContext context)
     {
-        logger.LogDebug("Received RPC request. http version: {HttpVersion}", context.Request.Protocol);
         if (!await VerifyPlayerIdentityAsync(context))
         {
             return;
