@@ -3,6 +3,9 @@ using Akka.Configuration;
 using Akka.DependencyInjection;
 using EventStore.MongoDb;
 using Google.Api.Gax;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,13 +39,15 @@ var mongoDbOptions =
 
 var mongoClient = new MongoClient(mongoDbOptions.ConnectionString);
 
+BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
+
 builder.Services.AddSingleton<IMongoClient>(mongoClient);
 builder.Services.AddSingleton<IMongoDatabase>(sp => mongoClient.GetDatabase(mongoDbOptions.DatabaseName));
 
 // Event Store
 builder.Services.AddMongoDbEventStore(options =>
 {
-    options.CollectionName = "events";
+    options.CollectionName = "eventStreams";
 });
 
 // Akka.NET Configuration

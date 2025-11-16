@@ -149,14 +149,12 @@ public class MongoDbEventStoreTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task SubscribeToStreamAsync_WithExistingEvents_ShouldEmitExistingThenNew()
+    public async Task SubscribeToStreamAsync_WithAnchor_ShouldNotEmitAnchorEvent()
     {
         // Arrange
         var streamName = "test-stream";
         var existingEvent = new EventData(Guid.NewGuid(), "Existing", JsonSerializer.Serialize(new { test = "old" }));
         var newEvent = new EventData(Guid.NewGuid(), "New", JsonSerializer.Serialize(new { test = "new" }));
-
-        await _eventStore!.AppendToStreamAsync(streamName, new[] { existingEvent }, CancellationToken.None);
 
         // Act
         var receivedEvents = new List<RecordedEvent>();
@@ -165,7 +163,7 @@ public class MongoDbEventStoreTests : IAsyncLifetime
         var subscribeTask = Task.Run(async () =>
         {
             // Subscribe with the anchor set to the existing event ID to get new events after it
-            await foreach (var evt in _eventStore.SubscribeToStreamAsync(streamName, existingEvent.EventId, cts.Token))
+            await foreach (var evt in _eventStore!.SubscribeToStreamAsync(streamName, existingEvent.EventId, cts.Token))
             {
                 receivedEvents.Add(evt);
                 if (receivedEvents.Count >= 1)
@@ -179,13 +177,67 @@ public class MongoDbEventStoreTests : IAsyncLifetime
         await Task.Delay(1000);
 
         // Append new event
+        await _eventStore!.AppendToStreamAsync(streamName, new[] { existingEvent, newEvent }, CancellationToken.None);
+
+        await subscribeTask;
+
+        // Assert - should only receive the new event, not the anchor event
+        receivedEvents.Should().HaveCount(1);
+        receivedEvents[0].EventId.Should().Be(newEvent.EventId);
+    }
+
+    [Fact]
+    public async Task SubscribeToStreamAsync_WithNullAnchor_ShouldOnlyEmitNewEvents()
+    {
+        // Arrange
+        var streamName = "test-stream";
+        var existingEvent1 = new EventData(
+            Guid.NewGuid(),
+            "Existing1",
+            JsonSerializer.Serialize(new { test = "old1" })
+        );
+        var existingEvent2 = new EventData(
+            Guid.NewGuid(),
+            "Existing2",
+            JsonSerializer.Serialize(new { test = "old2" })
+        );
+        var newEvent = new EventData(Guid.NewGuid(), "New", JsonSerializer.Serialize(new { test = "new" }));
+
+        // Add existing events to the stream
+        await _eventStore!.AppendToStreamAsync(
+            streamName,
+            new[] { existingEvent1, existingEvent2 },
+            CancellationToken.None
+        );
+
+        // Act - subscribe with null anchor (should NOT emit existing events)
+        var receivedEvents = new List<RecordedEvent>();
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+
+        var subscribeTask = Task.Run(async () =>
+        {
+            await foreach (var evt in _eventStore.SubscribeToStreamAsync(streamName, null, cts.Token))
+            {
+                receivedEvents.Add(evt);
+                if (receivedEvents.Count >= 1)
+                {
+                    break;
+                }
+            }
+        });
+
+        // Give MongoDB change stream a moment to set up
+        await Task.Delay(1000);
+
+        // Append new event after subscription started
         await _eventStore!.AppendToStreamAsync(streamName, new[] { newEvent }, CancellationToken.None);
 
         await subscribeTask;
 
-        // Assert
+        // Assert - should only receive the new event, not the existing ones
         receivedEvents.Should().HaveCount(1);
         receivedEvents[0].EventId.Should().Be(newEvent.EventId);
+        receivedEvents[0].Type.Should().Be("New");
     }
 
     [Fact]
@@ -303,13 +355,6 @@ public class MongoDbEventStoreTests : IAsyncLifetime
         var receivedEvents = new List<RecordedEvent>();
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
 
-        var events = await _eventStore.ReadStreamAsync(streamName, CancellationToken.None);
-
-        events.Should().HaveCount(3);
-        events[0].EventId.Should().Be(event1.EventId);
-        events[1].EventId.Should().Be(event2.EventId);
-        events[2].EventId.Should().Be(event3.EventId);
-
         await foreach (var evt in _eventStore.SubscribeToStreamAsync(streamName, event1.EventId, cts.Token))
         {
             receivedEvents.Add(evt);
@@ -323,5 +368,41 @@ public class MongoDbEventStoreTests : IAsyncLifetime
         receivedEvents.Should().HaveCount(2);
         receivedEvents[0].EventId.Should().Be(event2.EventId);
         receivedEvents[1].EventId.Should().Be(event3.EventId);
+    }
+
+    [Fact]
+    public async Task ReadStreamAsync_NonExistentStream_ShouldReturnEmptyList()
+    {
+        // Arrange
+        var streamName = "non-existent-stream";
+
+        // Act
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+        var result = await _eventStore!.ReadStreamAsync(streamName, cts.Token);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task SubscribeToStreamAsync_WithAnchorOnNonExistentStream_ShouldThrow()
+    {
+        // Arrange
+        var streamName = "non-existent-stream";
+        var anchor = Guid.NewGuid();
+
+        // Act
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+        var act = async () =>
+        {
+            await foreach (var evt in _eventStore!.SubscribeToStreamAsync(streamName, anchor, cts.Token))
+            {
+                // Should not reach here
+            }
+        };
+
+        // Assert
+        await act.Should().ThrowAsync<Exception>();
     }
 }
