@@ -1,306 +1,147 @@
 namespace GameService.Domain;
 
-public sealed class GameService(
+public class GameService(
     ITalonCreator talonCreator,
     IShuffledPositionsGenerator shuffledPositionsGenerator,
-    IPossibleMovesFinder possibleMovesFinder,
     IAttackerFinder attackerFinder,
     IDefenderFinder defenderFinder,
-    ICardMoveValidator cardMoveValidator
+    ICardMoveValidator cardMoveValidator,
+    IFoolFinder foolFinder,
+    IPossibleMovesFinder possibleMovesFinder
 )
 {
-    public GameEvents.GameCreated Decide(GameState state, GameCommands.CreateGame createGame)
-    {
-        var cards = talonCreator.CreateTalon(createGame.Options);
+    #region Command handlers
 
-        return new GameEvents.GameCreated(createGame.RandomSeed, createGame.Options, cards);
+    public void Handle(GameAggregate game, GameCommands.CreateGame command)
+    {
+        game.Create(talonCreator, command.RandomSeed, command.Options);
     }
 
-    public GameEvents.LobbyOpened Decide(GameState state, GameCommands.OpenLobby openLobby)
+    public void Handle(GameAggregate game, GameCommands.BeatAttackCard command)
     {
-        if (state.Lobby != null)
-        {
-            throw new InvalidOperationException("Lobby was already opened before.");
-        }
-
-        return new GameEvents.LobbyOpened();
+        game.BeatAttackCard(cardMoveValidator, command.PlayerId, command.AttackerCardId, command.DefenderCardId);
     }
 
-    public GameEvents.LobbyClosed Decide(GameState state, GameCommands.CloseLobby closeLobby)
-    {
-        if (state.Lobby == null)
-        {
-            throw new InvalidOperationException("Lobby does not exist.");
-        }
-
-        if (state.Lobby is not OpenedLobby)
-        {
-            throw new InvalidOperationException("Lobby is not opened.");
-        }
-
-        return new GameEvents.LobbyClosed();
-    }
-
-    public GameEvents.PlayerJoined Decide(GameState state, GameCommands.JoinLobby joinLobby)
-    {
-        if (state.Lobby == null)
-        {
-            throw new InvalidOperationException("Lobby is not opened.");
-        }
-
-        if (state.Players.Any(player => player.Id == joinLobby.PlayerId))
-        {
-            throw new InvalidOperationException("Player is already joined.");
-        }
-
-        var seat = state.Players.Count;
-
-        return new GameEvents.PlayerJoined(joinLobby.PlayerId, seat);
-    }
-
-    public GameEvents.CardsInTalonShuffled Decide(GameState state, GameCommands.ShuffleCardsInTalon shuffleCardsInTalon)
-    {
-        // todo: надо перемешивать так чтобы в руку игрока не попали карты одной масти
-
-        var originalCards = state
-            .Cards.Where(card => card.Location is CardLocations.Talon)
-            .OrderBy(card => ((CardLocations.Talon)card.Location).Position)
-            .ToArray();
-
-        var (shuffledPositions, newSeed) = shuffledPositionsGenerator.GenerateShuffledPositions(
-            state.RandomSeed,
-            originalCards.Length
-        );
-
-        var shuffledCards = originalCards
-            .Select((card, index) => card with { Location = new CardLocations.Talon(shuffledPositions[index]) })
-            .ToArray();
-
-        return new GameEvents.CardsInTalonShuffled(
-            shuffledCards
-                .Select(card => new GameEvents.CardsInTalonShuffled.CardInTalon(
-                    card.Id,
-                    ((CardLocations.Talon)card.Location).Position
-                ))
-                .ToArray(),
-            newSeed
-        );
-    }
-
-    public GameEvents.CardsDealtToPlayer? Decide(GameState state, GameCommands.TopUpHand topUpHand)
-    {
-        var minHandSize = state.Options.OfType<GameOptions.MinHandSize>().First().Count;
-
-        var handSize = state.Cards.Count(card =>
-            card.Location is CardLocations.Hand hand && hand.PlayerId == topUpHand.PlayerId
-        );
-
-        if (handSize >= minHandSize)
-        {
-            return null;
-        }
-
-        var cardsToDraw = minHandSize - handSize;
-
-        var cards = state
-            .Cards.Where(card => card.Location is CardLocations.Talon)
-            .OrderByDescending(card => ((CardLocations.Talon)card.Location).Position)
-            .Take(cardsToDraw);
-
-        return new GameEvents.CardsDealtToPlayer(topUpHand.PlayerId, cards.Select(card => card.Id).ToArray());
-    }
-
-    public GameEvents.CommonTrumpCardChosen? Decide(
-        GameState state,
-        GameCommands.ChooseCommonTrumpSuit chooseCommonTrumpSuit
-    )
-    {
-        // todo: проверить кейс с последней выданной картой
-        var card = state.GetBottomCardFromTalon() ?? state.GetLastDealtCard();
-
-        if (card is not RegularCard regularCard)
-        {
-            return null;
-        }
-
-        return new GameEvents.CommonTrumpCardChosen(regularCard.Id);
-    }
-
-    public GameEvent? Decide(GameState state, GameCommands.StartFirstRound startFirstRound)
-    {
-        if (state.PlayedRounds.Count > 0)
-        {
-            throw new InvalidOperationException("First round has already been played.");
-        }
-
-        if (state.CurrentRound != null)
-        {
-            throw new InvalidOperationException("First round has already been started.");
-        }
-
-        var attacker = attackerFinder.FindFirstAttackerForFirstRound(state);
-
-        var defender = defenderFinder.FindFirstDefender(state, attacker);
-
-        return new GameEvents.RoundStarted(attacker.Id, defender.Id);
-    }
-
-    public GameEvents.AttackCardPlayed Decide(GameState state, GameCommands.PlayAttackCard playAttackCard)
-    {
-        if (state.CurrentRound == null)
-        {
-            throw new InvalidOperationException("There is no round.");
-        }
-
-        if (state.CurrentRound.CurrentAttackerId != playAttackCard.PlayerId)
-        {
-            throw new InvalidOperationException("The player is not the attacker.");
-        }
-
-        if (state.CurrentRound.ActivePlayerId != playAttackCard.PlayerId)
-        {
-            throw new InvalidOperationException("It's the other player's turn now");
-        }
-
-        var attackerCard = state.Cards.First(card => card.Id == playAttackCard.CardId);
-
-        if (attackerCard.Location is not CardLocations.Hand hand || hand.PlayerId != playAttackCard.PlayerId)
-        {
-            throw new InvalidOperationException("The card is not in a hand.");
-        }
-
-        if (!cardMoveValidator.CanCardBePlayed(state, attackerCard))
-        {
-            throw new InvalidOperationException("Card can not be played.");
-        }
-
-        return new GameEvents.AttackCardPlayed(playAttackCard.PlayerId, attackerCard.Id, DateTime.UtcNow);
-    }
-
-    public GameEvents.AttackCardBeaten Decide(GameState state, GameCommands.BeatAttackCard beatAttackCard)
-    {
-        if (state.CurrentRound == null)
-        {
-            throw new InvalidOperationException("There is no round.");
-        }
-
-        if (state.CurrentRound.CurrentDefenderId != beatAttackCard.PlayerId)
-        {
-            throw new InvalidOperationException("The player is not the defender.");
-        }
-
-        if (state.CurrentRound.ActivePlayerId != beatAttackCard.PlayerId)
-        {
-            throw new InvalidOperationException("It's the other player's turn now");
-        }
-
-        var attackerCard = state.Cards.First(card => card.Id == beatAttackCard.AttackerCardId);
-
-        if (attackerCard.Location is not CardLocations.Table { Role: CardRolesOnTable.Attack })
-        {
-            throw new InvalidOperationException("The card is not attacking");
-        }
-
-        var defenderCard = state.Cards.First(card => card.Id == beatAttackCard.DefenderCardId);
-
-        if (defenderCard.Location is not CardLocations.Hand hand || hand.PlayerId != beatAttackCard.PlayerId)
-        {
-            throw new InvalidOperationException("The card is not in a hand.");
-        }
-
-        if (!cardMoveValidator.CanCardBeBeaten(state, attackerCard, defenderCard))
-        {
-            throw new InvalidOperationException("Card can not be played.");
-        }
-
-        return new GameEvents.AttackCardBeaten(
-            beatAttackCard.PlayerId,
-            attackerCard.Id,
-            defenderCard.Id,
-            DateTime.UtcNow
-        );
-    }
-
-    public GameEvent? Decide(GameState state, GameCommands.ConcludeAttack concludeAttack)
+    public void Handle(GameAggregate game, GameCommands.ConcludeAttack command)
     {
         throw new NotImplementedException();
     }
 
-    public GameEvents.DefenceGivenUp Decide(GameState state, GameCommands.GiveUpDefence giveUpDefence)
+    public void Handle(GameAggregate game, GameCommands.GiveUpDefence command)
     {
-        if (state.CurrentRound == null)
-        {
-            throw new InvalidOperationException("There is no round.");
-        }
-
-        if (state.CurrentRound.CurrentDefenderId != giveUpDefence.PlayerId)
-        {
-            throw new InvalidOperationException("The player is not the defender.");
-        }
-
-        if (state.CurrentRound.ActivePlayerId != giveUpDefence.PlayerId)
-        {
-            throw new InvalidOperationException("It's the other player's turn now");
-        }
-
-        return new GameEvents.DefenceGivenUp(giveUpDefence.PlayerId);
+        game.GiveUpDefence(command.PlayerId);
     }
 
-    public GameEvents.RoundStarted Decide(GameState state, GameCommands.StartNextRound startNextRound)
+    public void Handle(GameAggregate game, GameCommands.JoinLobby command)
     {
-        if (state.CurrentRound != null)
-        {
-            throw new InvalidOperationException("Current round is not finished.");
-        }
-
-        if (state.PlayedRounds.Count == 0)
-        {
-            throw new InvalidOperationException("No rounds have been played yet.");
-        }
-
-        var previousRound = state.PlayedRounds.Last();
-
-        var newAttacker = attackerFinder.FindFirstAttackerForNextRound(state, previousRound);
-
-        var newDefender = defenderFinder.FindFirstDefender(state, newAttacker);
-
-        return new GameEvents.RoundStarted(newAttacker.Id, newDefender.Id);
+        game.JoinLobby(command.PlayerId);
     }
 
-    public GameEvents.FoolDeclared? Decide(GameState state, GameCommands.DeclareFool declareFool)
+    public void Handle(GameAggregate game, GameCommands.PlayAttackCard command)
     {
-        if (state.FoolId is not null)
-        {
-            throw new InvalidOperationException("Fool has already been declared.");
-        }
-
-        return new GameEvents.FoolDeclared(declareFool.PlayerId);
+        game.PlayAttackCard(cardMoveValidator, command.PlayerId, command.CardId);
     }
 
-    public GameEvents.ActivePlayerChanged Decide(GameState state, GameCommands.ChangeActivePlayer changeActivePlayer)
+    #endregion
+
+    #region Event handlers
+
+    public void OnEvent(GameAggregate game, GameEvents.PlayerJoined @event)
     {
-        if (state.CurrentRound == null)
+        if (game.State.Lobby is LobbyFilled)
         {
-            throw new InvalidOperationException("There is no round.");
+            game.ShuffleCardsInTalon(shuffledPositionsGenerator);
+
+            foreach (var player in game.State.Players)
+            {
+                game.TopUpHand(player.Id);
+            }
+
+            game.ChooseCommonTrumpSuit();
+
+            game.StartFirstRound(attackerFinder, defenderFinder);
         }
-
-        if (state.CurrentRound.ActivePlayerId == changeActivePlayer.PlayerId)
-        {
-            throw new InvalidOperationException("The player is already the active player.");
-        }
-
-        var possibleMoves = possibleMovesFinder.FindPossibleMoves(state, changeActivePlayer.PlayerId);
-
-        return new GameEvents.ActivePlayerChanged(changeActivePlayer.PlayerId, possibleMoves.ToArray());
     }
 
-    public GameEvents.RoundFinished Decide(GameState state, GameCommands.FinishCurrentRound finishCurrentRound)
+    public void OnEvent(GameAggregate game, GameEvents.AttackCardPlayed @event)
     {
-        if (state.CurrentRound == null)
+        var fool = foolFinder.TryFindFool(game.State);
+
+        if (fool is not null)
         {
-            throw new InvalidOperationException("There is no round.");
+            game.DeclareFool(fool.Id);
+
+            return;
         }
 
-        return new GameEvents.RoundFinished();
+        if (game.State.IsPlayerHandEmpty(@event.PlayerId))
+        {
+            // todo: если подкидной, то переводим атаку на другого игрока
+
+            game.ChangeActivePlayer(possibleMovesFinder, game.State.CurrentRound!.CurrentDefenderId);
+        }
+        else
+        {
+            // todo: если подкидной, то игрок продолжает ходить
+
+            game.ChangeActivePlayer(possibleMovesFinder, game.State.CurrentRound!.CurrentDefenderId!);
+        }
     }
+
+    public void OnEvent(GameAggregate game, GameEvents.AttackCardBeaten @event)
+    {
+        var fool = foolFinder.TryFindFool(game.State);
+
+        if (fool is not null)
+        {
+            game.DeclareFool(fool.Id);
+
+            return;
+        }
+
+        if (game.State.AreAllCardsBeaten())
+        {
+            // todo: если подкидной, то ставим атакующим первого игрока или следующего после него
+
+            game.FinishCurrentRound();
+        }
+    }
+
+    public void OnEvent(GameAggregate game, GameEvents.DefenceGivenUp @event)
+    {
+        // todo: если подкидной, то переводим ход на атакующего
+
+        game.FinishCurrentRound();
+    }
+
+    public void OnEvent(GameAggregate game, GameEvents.RoundStarted @event)
+    {
+        game.ChangeActivePlayer(possibleMovesFinder, @event.AttackerId);
+    }
+
+    public void OnEvent(GameAggregate game, GameEvents.RoundFinished @event)
+    {
+        var round = game.State.PlayedRounds.First(round => round.RoundNumber == @event.RoundNumber);
+
+        if (round.DefenceGivenUp)
+        {
+            game.TakeCardsFromTable(round.CurrentDefenderId);
+        }
+        else
+        {
+            game.DiscardCardsOnTable();
+        }
+
+        game.TopUpHand(round.FirstAttackerId);
+
+        // todo: раздать карты всем атакующим (раздавать всем по часовой от первого атакующего или хранить в раунде историю кто в какой очереди атаковал?)
+
+        game.TopUpHand(round.CurrentDefenderId);
+
+        game.StartNextRound(attackerFinder, defenderFinder);
+    }
+
+    public void OnEvent(GameAggregate game, object @event) { }
+
+    #endregion
 }

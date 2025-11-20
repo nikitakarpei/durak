@@ -1,40 +1,35 @@
 namespace GameService.Domain;
 
-public abstract record GameEvent;
-
 public static class GameEvents
 {
-    public record ActivePlayerChanged(string PlayerId, PossibleMove[] PossibleMoves) : GameEvent;
+    public record ActivePlayerChanged(string PlayerId, PossibleMove[] PossibleMoves);
 
-    public record AttackCardBeaten(string PlayerId, string AttackerCardId, string DefenderCardId, DateTime PlayedAt)
-        : GameEvent;
+    public record AttackCardBeaten(string PlayerId, string AttackerCardId, string DefenderCardId, DateTime PlayedAt);
 
-    public record AttackCardPlayed(string PlayerId, string CardId, DateTime PlayedAt) : GameEvent;
+    public record AttackCardPlayed(string PlayerId, string CardId, DateTime PlayedAt);
 
-    public record CardsDealtToPlayer(string PlayerId, string[] CardIds) : GameEvent;
+    public record CardsDealtToPlayer(string PlayerId, string[] CardIds);
 
-    public record CardDiscarded(string CardId) : GameEvent;
+    public record CardsOnTableDiscarded(string[] CardIds);
 
-    public record CardsInTalonShuffled(CardsInTalonShuffled.CardInTalon[] Cards, byte[] NewRandomSeed) : GameEvent
+    public record CardsInTalonShuffled(CardsInTalonShuffled.CardInTalon[] Cards, byte[] NewRandomSeed)
     {
         public record CardInTalon(string Id, int NewPosition);
     }
 
-    public record CommonTrumpCardChosen(string CardId) : GameEvent;
+    public record CommonTrumpCardChosen(string CardId);
 
-    public record DefenceGivenUp(string PlayerId) : GameEvent;
+    public record DefenceGivenUp(string PlayerId);
 
-    public record FoolDeclared(string PlayerId) : GameEvent;
+    public record FoolDeclared(string PlayerId);
 
-    public record GameCreated(byte[] RandomSeed, GameOption[] Options, Card[] Cards) : GameEvent;
+    public record GameCreated(byte[] RandomSeed, GameOption[] Options, Card[] Cards);
 
-    public record LobbyOpened() : GameEvent;
+    public record PlayerJoined(string PlayerId, int Seat);
 
-    public record LobbyClosed() : GameEvent;
+    public record PlayerTookCardsFromTable(string PlayerId, string[] CardIds);
 
-    public record PlayerJoined(string PlayerId, int Seat) : GameEvent;
+    public record RoundFinished(int RoundNumber);
 
-    public record RoundFinished() : GameEvent;
-
-    public record RoundStarted(string AttackerId, string DefenderId) : GameEvent;
+    public record RoundStarted(int RoundNumber, string AttackerId, string DefenderId);
 }

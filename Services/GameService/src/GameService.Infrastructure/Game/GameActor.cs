@@ -7,18 +7,29 @@ namespace GameService.Infrastructure;
 
 public class GameActor : ReceiveActor, ILogReceive
 {
+    private readonly IServiceScope _scope;
     private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
-    private readonly IServiceProvider _serviceProvider;
+    private readonly Domain.GameService _gameService;
+    private readonly EventStore.IEventStore _eventStore;
+    private readonly MediatR.IMediator _mediator;
 
     private readonly string _gameId;
-    private Domain.GameState _state = new();
+    private readonly List<object> _events = [];
 
     public GameActor(IServiceProvider serviceProvider, string gameId)
     {
-        _serviceProvider = serviceProvider;
+        _scope = serviceProvider.CreateScope();
+        _gameService = _scope.ServiceProvider.GetRequiredService<Domain.GameService>();
+        _eventStore = _scope.ServiceProvider.GetRequiredService<EventStore.IEventStore>();
+        _mediator = _scope.ServiceProvider.GetRequiredService<MediatR.IMediator>();
         _gameId = gameId;
 
         ReceiveAsync<ExecuteCommandMessage>(HandleMessage);
+    }
+
+    protected override void PostStop()
+    {
+        _scope.Dispose();
     }
 
     // Message types
@@ -28,30 +39,23 @@ public class GameActor : ReceiveActor, ILogReceive
     {
         try
         {
-            using var scope = _serviceProvider.CreateScope();
+            var game = new Domain.GameAggregate();
 
-            var gameService = scope.ServiceProvider.GetRequiredService<Domain.GameService>();
+            game.Load(_events);
 
-            var oldState = _state;
+            _gameService.Handle(game, (dynamic)message.Command);
 
-            var @event = (Domain.GameEvent?)gameService.Decide(oldState, (dynamic)message.Command);
+            ProcessEvents(game, _gameService);
 
-            if (@event is null)
+            await PersistEvents(game.Changes, CancellationToken.None);
+
+            // FIXME: implement at-least-once processing of events
+            foreach (var @event in game.Changes)
             {
-                return;
+                await _mediator.Publish(CreateDomainEventNotification(@event));
             }
 
-            var newState = oldState.When(@event);
-
-            var eventStore = scope.ServiceProvider.GetRequiredService<EventStore.IEventStore>();
-
-            await PersistEvent(eventStore, @event, CancellationToken.None);
-
-            var mediator = scope.ServiceProvider.GetRequiredService<MediatR.IMediator>();
-
-            await mediator.Publish(CreateDomainEventNotification(oldState, newState, @event));
-
-            _state = newState;
+            _events.AddRange(game.Changes);
         }
         catch (Exception e)
         {
@@ -59,33 +63,53 @@ public class GameActor : ReceiveActor, ILogReceive
         }
     }
 
-    private async Task PersistEvent(
-        EventStore.IEventStore eventStore,
-        object @event,
-        CancellationToken cancellationToken
-    )
+    private static void ProcessEvents(Domain.GameAggregate game, Domain.GameService gameService)
     {
-        var eventType = @event.GetType();
-        var eventData = new EventStore.EventData(
-            Guid.NewGuid(),
-            eventType.Name,
-            JsonSerializer.Serialize(@event, eventType)
-        );
-        var streamName = Application.GameEventStreams.DomainEvents(_gameId);
-        await eventStore.AppendToStreamAsync(streamName, new[] { eventData }, cancellationToken);
+        var processedEventCount = 0;
+        const int maxIterations = 100; // Safety limit to prevent infinite loops
+        var iteration = 0;
+
+        while (processedEventCount < game.Changes.Count)
+        {
+            if (++iteration > maxIterations)
+            {
+                var eventNames = string.Join(", ", game.Changes.Select(e => e.GetType().Name));
+                throw new InvalidOperationException(
+                    $"Event processing exceeded {maxIterations} iterations - possible infinite loop. "
+                        + $"Events processed: {eventNames}"
+                );
+            }
+
+            var eventsToProcess = game.Changes.Skip(processedEventCount).ToList();
+
+            foreach (var @event in eventsToProcess)
+            {
+                gameService.OnEvent(game, (dynamic)@event);
+            }
+
+            processedEventCount = game.Changes.Count;
+        }
     }
 
-    private MediatR.INotification CreateDomainEventNotification(
-        Domain.GameState oldState,
-        Domain.GameState newState,
-        object @event
-    )
+    private async Task PersistEvents(IEnumerable<object> events, CancellationToken cancellationToken)
+    {
+        var streamName = Application.GameEventStreams.DomainEvents(_gameId);
+        var eventDatas = events.Select(@event => new EventStore.EventData(
+            Guid.NewGuid(),
+            @event.GetType().Name,
+            JsonSerializer.Serialize(@event, @event.GetType())
+        ));
+
+        await _eventStore.AppendToStreamAsync(streamName, eventDatas, cancellationToken);
+    }
+
+    private MediatR.INotification CreateDomainEventNotification(object @event)
     {
         var eventType = @event.GetType();
         var notificationType = typeof(Application.GameDomainEventNotification<>).MakeGenericType(eventType);
 
         var notification =
-            Activator.CreateInstance(notificationType, _gameId, oldState, newState, @event)
+            Activator.CreateInstance(notificationType, _gameId, @event)
             ?? throw new InvalidOperationException($"Failed to create notification for event: {eventType.Name}");
 
         return (MediatR.INotification)notification;

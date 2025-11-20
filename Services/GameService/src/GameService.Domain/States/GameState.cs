@@ -14,20 +14,23 @@ public record GameState : State<GameState>
                     Options = @event.Options.ToImmutableList(),
                     Cards = @event.Cards.ToImmutableHashSet(),
                     RandomSeed = @event.RandomSeed,
+                    Lobby = new OpenedLobby(),
                 }
         );
-
-        On<GameEvents.LobbyOpened>(static (state, @event) => state with { Lobby = new OpenedLobby() });
 
         On<GameEvents.PlayerJoined>(
             static (state, @event) =>
-                state with
-                {
-                    Players = state.Players.Add(new Player(@event.PlayerId, @event.Seat)),
-                }
-        );
+            {
+                var newState = state with { Players = state.Players.Add(new Player(@event.PlayerId, @event.Seat)) };
 
-        On<GameEvents.LobbyClosed>(static (state, @event) => state with { Lobby = new ClosedLobby() });
+                if (newState.Players.Count == state.Options.OfType<GameOptions.AmountOfPlayers>().First().Count)
+                {
+                    newState = newState with { Lobby = new LobbyFilled() };
+                }
+
+                return newState;
+            }
+        );
 
         On<GameEvents.CardsInTalonShuffled>(
             static (state, @event) =>
@@ -86,6 +89,7 @@ public record GameState : State<GameState>
                 state with
                 {
                     CurrentRound = new Round(
+                        @event.RoundNumber,
                         @event.AttackerId,
                         @event.DefenderId,
                         @event.AttackerId,
@@ -152,16 +156,20 @@ public record GameState : State<GameState>
                 }
         );
 
-        On<GameEvents.CardDiscarded>(
+        On<GameEvents.CardsOnTableDiscarded>(
             static (state, @event) =>
             {
-                var oldCard = state.Cards.First(card => card.Id == @event.CardId);
-                var newCard = oldCard with { Location = new CardLocations.DiscardPile() };
+                var newState = state;
 
-                return state with
+                foreach (var cardId in @event.CardIds)
                 {
-                    Cards = state.Cards.Remove(oldCard).Add(newCard),
-                };
+                    var oldCard = state.Cards.First(card => card.Id == cardId);
+                    var newCard = oldCard with { Location = new CardLocations.DiscardPile() };
+
+                    newState = newState with { Cards = newState.Cards.Remove(oldCard).Add(newCard) };
+                }
+
+                return newState;
             }
         );
 
@@ -241,6 +249,11 @@ public record GameState : State<GameState>
     public Player GetNextPlayerClockwise(int seat)
     {
         return Players.First(player => player.Seat == GetNextSeatClockwise(seat));
+    }
+
+    public IEnumerable<Card> CardsOnTable()
+    {
+        return Cards.Where(card => card.Location is CardLocations.Table);
     }
 
     public IEnumerable<Card> CardsOnTableByPlayOrder()

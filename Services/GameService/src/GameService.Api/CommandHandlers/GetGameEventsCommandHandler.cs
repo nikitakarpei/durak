@@ -192,10 +192,10 @@ public class GetGameEventsCommandHandler(
     private Google.Protobuf.WellKnownTypes.Any ConvertToApiEvent(
         string playerId,
         Domain.GameState currentState,
-        Domain.GameEvents.CardDiscarded @event
+        Domain.GameEvents.CardsOnTableDiscarded @event
     )
     {
-        var eventDto = new GameEvents.CardDiscarded { CardId = @event.CardId };
+        var eventDto = new GameEvents.CardsOnTableDiscarded { CardIds = { @event.CardIds } };
 
         return Google.Protobuf.WellKnownTypes.Any.Pack(eventDto);
     }
@@ -289,28 +289,6 @@ public class GetGameEventsCommandHandler(
     private Google.Protobuf.WellKnownTypes.Any ConvertToApiEvent(
         string playerId,
         Domain.GameState currentState,
-        Domain.GameEvents.LobbyOpened @event
-    )
-    {
-        var eventDto = new GameEvents.LobbyOpened();
-
-        return Google.Protobuf.WellKnownTypes.Any.Pack(eventDto);
-    }
-
-    private Google.Protobuf.WellKnownTypes.Any ConvertToApiEvent(
-        string playerId,
-        Domain.GameState currentState,
-        Domain.GameEvents.LobbyClosed @event
-    )
-    {
-        var eventDto = new GameEvents.LobbyClosed();
-
-        return Google.Protobuf.WellKnownTypes.Any.Pack(eventDto);
-    }
-
-    private Google.Protobuf.WellKnownTypes.Any ConvertToApiEvent(
-        string playerId,
-        Domain.GameState currentState,
         Domain.GameEvents.PlayerJoined @event
     )
     {
@@ -340,6 +318,21 @@ public class GetGameEventsCommandHandler(
         {
             AttackerPlayerId = @event.AttackerId,
             DefenderPlayerId = @event.DefenderId,
+        };
+
+        return Google.Protobuf.WellKnownTypes.Any.Pack(eventDto);
+    }
+
+    private Google.Protobuf.WellKnownTypes.Any ConvertToApiEvent(
+        string playerId,
+        Domain.GameState currentState,
+        Domain.GameEvents.PlayerTookCardsFromTable @event
+    )
+    {
+        var eventDto = new GameEvents.PlayerTookCardsFromTable
+        {
+            PlayerId = @event.PlayerId,
+            CardIds = { @event.CardIds },
         };
 
         return Google.Protobuf.WellKnownTypes.Any.Pack(eventDto);

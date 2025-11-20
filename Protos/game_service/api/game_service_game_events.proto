@@ -37,9 +37,9 @@ message CardsDealtToPlayer
   repeated google.protobuf.Any dealt_cards = 2;
 }
 
-message CardDiscarded
+message CardsOnTableDiscarded
 {
-  string card_id = 1;
+  repeated string card_ids = 1;
 }
 
 message CardsInTalonShuffled
@@ -80,14 +80,6 @@ message GameCreated
   repeated CardInTalon cards_in_talon = 2;
 }
 
-message LobbyOpened
-{
-}
-
-message LobbyClosed
-{
-}
-
 message PlayerJoined
 {
   string player_id = 1;
@@ -102,4 +94,10 @@ message RoundStarted
 {
   string attacker_player_id = 1;
   string defender_player_id = 2;
+}
+
+message PlayerTookCardsFromTable
+{
+  string player_id = 1;
+  repeated string card_ids = 2;
 }
