@@ -11,9 +11,9 @@ public class FoolFinder : IFoolFinder
     {
         if (state.IsCardTalonEmpty())
         {
-            var unfinishedPlayers = state.PlayersWithEmptyHand().ToArray();
+            var unfinishedPlayers = state.PlayersWithEmptyHand();
 
-            if (unfinishedPlayers.Length == 1)
+            if (unfinishedPlayers.Count() == 1)
             {
                 return unfinishedPlayers.First();
             }
