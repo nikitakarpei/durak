@@ -43,7 +43,7 @@ public class GameActor : ReceiveActor, ILogReceive
 
             game.Load(_events);
 
-            _gameService.Handle(game, (dynamic)message.Command);
+            _gameService.HandleCommand(game, (dynamic)message.Command);
 
             ProcessEvents(game, _gameService);
 
@@ -84,7 +84,7 @@ public class GameActor : ReceiveActor, ILogReceive
 
             foreach (var @event in eventsToProcess)
             {
-                gameService.OnEvent(game, (dynamic)@event);
+                gameService.HandleEvent(game, (dynamic)@event);
             }
 
             processedEventCount = game.Changes.Count;

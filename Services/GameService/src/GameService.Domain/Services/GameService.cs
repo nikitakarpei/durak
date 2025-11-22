@@ -12,41 +12,46 @@ public class GameService(
 {
     #region Command handlers
 
-    public void Handle(GameAggregate game, GameCommands.CreateGame command)
+    public void HandleCommand(GameAggregate game, GameCommands.CreateGame command)
     {
         game.Create(talonCreator, command.RandomSeed, command.Options);
     }
 
-    public void Handle(GameAggregate game, GameCommands.BeatAttackCard command)
+    public void HandleCommand(GameAggregate game, GameCommands.BeatAttackCard command)
     {
         game.BeatAttackCard(cardMoveValidator, command.PlayerId, command.AttackerCardId, command.DefenderCardId);
     }
 
-    public void Handle(GameAggregate game, GameCommands.ConcludeAttack command)
+    public void HandleCommand(GameAggregate game, GameCommands.ConcludeAttack command)
     {
         throw new NotImplementedException();
     }
 
-    public void Handle(GameAggregate game, GameCommands.GiveUpDefence command)
+    public void HandleCommand(GameAggregate game, GameCommands.GiveUpDefence command)
     {
         game.GiveUpDefence(command.PlayerId);
     }
 
-    public void Handle(GameAggregate game, GameCommands.JoinLobby command)
+    public void HandleCommand(GameAggregate game, GameCommands.JoinLobby command)
     {
         game.JoinLobby(command.PlayerId);
     }
 
-    public void Handle(GameAggregate game, GameCommands.PlayAttackCard command)
+    public void HandleCommand(GameAggregate game, GameCommands.PlayAttackCard command)
     {
         game.PlayAttackCard(cardMoveValidator, command.PlayerId, command.CardId);
+    }
+
+    public void HandleCommand(GameAggregate game, object command)
+    {
+        throw new InvalidOperationException($"Unknown command type: {command.GetType().Name}");
     }
 
     #endregion
 
     #region Event handlers
 
-    public void OnEvent(GameAggregate game, GameEvents.PlayerJoined @event)
+    public void HandleEvent(GameAggregate game, GameEvents.PlayerJoined @event)
     {
         if (game.State.Lobby is LobbyFilled)
         {
@@ -63,7 +68,7 @@ public class GameService(
         }
     }
 
-    public void OnEvent(GameAggregate game, GameEvents.AttackCardPlayed @event)
+    public void HandleEvent(GameAggregate game, GameEvents.AttackCardPlayed @event)
     {
         var fool = foolFinder.TryFindFool(game.State);
 
@@ -88,7 +93,7 @@ public class GameService(
         }
     }
 
-    public void OnEvent(GameAggregate game, GameEvents.AttackCardBeaten @event)
+    public void HandleEvent(GameAggregate game, GameEvents.AttackCardBeaten @event)
     {
         var fool = foolFinder.TryFindFool(game.State);
 
@@ -107,19 +112,19 @@ public class GameService(
         }
     }
 
-    public void OnEvent(GameAggregate game, GameEvents.DefenceGivenUp @event)
+    public void HandleEvent(GameAggregate game, GameEvents.DefenceGivenUp @event)
     {
         // todo: если подкидной, то переводим ход на атакующего
 
         game.FinishCurrentRound();
     }
 
-    public void OnEvent(GameAggregate game, GameEvents.RoundStarted @event)
+    public void HandleEvent(GameAggregate game, GameEvents.RoundStarted @event)
     {
         game.ChangeActivePlayer(possibleMovesFinder, @event.AttackerId);
     }
 
-    public void OnEvent(GameAggregate game, GameEvents.RoundFinished @event)
+    public void HandleEvent(GameAggregate game, GameEvents.RoundFinished @event)
     {
         var round = game.State.PlayedRounds.First(round => round.RoundNumber == @event.RoundNumber);
 
@@ -141,7 +146,7 @@ public class GameService(
         game.StartNextRound(attackerFinder, defenderFinder);
     }
 
-    public void OnEvent(GameAggregate game, object @event) { }
+    public void HandleEvent(GameAggregate game, object @event) { }
 
     #endregion
 }
