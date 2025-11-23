@@ -84,6 +84,11 @@ public class GameAggregate : Aggregate<GameState>
             .OrderByDescending(card => ((CardLocations.Talon)card.Location).Position)
             .Take(cardsToDraw);
 
+        if (!cards.Any())
+        {
+            throw new InvalidOperationException("No cards to draw.");
+        }
+
         Apply(new GameEvents.CardsDealtToPlayer(PlayerId, cards.Select(card => card.Id).ToArray()));
     }
 

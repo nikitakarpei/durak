@@ -137,11 +137,17 @@ public class GameService(
             game.DiscardCardsOnTable();
         }
 
-        game.TopUpHand(round.FirstAttackerId);
+        if (!game.State.IsCardTalonEmpty())
+        {
+            game.TopUpHand(round.FirstAttackerId);
+        }
 
         // todo: раздать карты всем атакующим (раздавать всем по часовой от первого атакующего или хранить в раунде историю кто в какой очереди атаковал?)
 
-        game.TopUpHand(round.CurrentDefenderId);
+        if (!game.State.IsCardTalonEmpty())
+        {
+            game.TopUpHand(round.CurrentDefenderId);
+        }
 
         game.StartNextRound(attackerFinder, defenderFinder);
     }

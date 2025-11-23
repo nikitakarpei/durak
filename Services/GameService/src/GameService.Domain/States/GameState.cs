@@ -58,14 +58,18 @@ public record GameState : State<GameState>
         On<GameEvents.CardsDealtToPlayer>(
             static (state, @event) =>
             {
-                var newState = state with { LastDealtCardId = @event.CardIds.Last() };
+                var newState = state;
 
                 foreach (var cardId in @event.CardIds)
                 {
                     var oldCard = state.Cards.First(card => card.Id == cardId);
                     var newCard = oldCard with { Location = new CardLocations.Hand(@event.PlayerId) };
 
-                    newState = newState with { Cards = newState.Cards.Remove(oldCard).Add(newCard) };
+                    newState = newState with
+                    {
+                        Cards = newState.Cards.Remove(oldCard).Add(newCard),
+                        LastDealtCardId = cardId,
+                    };
                 }
 
                 return newState;
@@ -94,7 +98,7 @@ public record GameState : State<GameState>
                         @event.DefenderId,
                         @event.AttackerId,
                         @event.DefenderId,
-                        @event.AttackerId,
+                        null,
                         false
                     ),
                 }
@@ -181,6 +185,23 @@ public record GameState : State<GameState>
                     PlayedRounds = state.PlayedRounds.Add(state.CurrentRound!),
                     CurrentRound = null,
                 }
+        );
+
+        On<GameEvents.PlayerTookCardsFromTable>(
+            static (state, @event) =>
+            {
+                var newState = state;
+
+                foreach (var cardId in @event.CardIds)
+                {
+                    var oldCard = state.Cards.First(card => card.Id == cardId);
+                    var newCard = oldCard with { Location = new CardLocations.Hand(@event.PlayerId) };
+
+                    newState = newState with { Cards = newState.Cards.Remove(oldCard).Add(newCard) };
+                }
+
+                return newState;
+            }
         );
     }
 

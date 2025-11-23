@@ -81,13 +81,12 @@ public class GameActor : ReceiveActor, ILogReceive
             }
 
             var eventsToProcess = game.Changes.Skip(processedEventCount).ToList();
+            processedEventCount = game.Changes.Count;
 
             foreach (var @event in eventsToProcess)
             {
                 gameService.HandleEvent(game, (dynamic)@event);
             }
-
-            processedEventCount = game.Changes.Count;
         }
     }
 
