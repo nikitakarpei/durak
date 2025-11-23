@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <EnableDynamicLoading>true</EnableDynamicLoading>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Akka" Version="1.5.42" />
+        <PackageReference Include="Akka.DependencyInjection" Version="1.5.42" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\BotService.Application\BotService.Application.csproj" />
+        <ProjectReference Include="..\BotService.Domain\BotService.Domain.csproj" />
+        <ProjectReference Include="$(SolutionDir)\Libraries\LibRpc\src\LibRpc.Net\LibRpc.Net.csproj" />
+    </ItemGroup>
+</Project>
+
