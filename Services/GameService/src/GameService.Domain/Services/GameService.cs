@@ -53,7 +53,7 @@ public class GameService(
 
     public void HandleEvent(GameAggregate game, GameEvents.PlayerJoined @event)
     {
-        if (game.State.Lobby is LobbyFilled)
+        if (@event.IsLastPlayer)
         {
             game.ShuffleCardsInTalon(shuffledPositionsGenerator);
 

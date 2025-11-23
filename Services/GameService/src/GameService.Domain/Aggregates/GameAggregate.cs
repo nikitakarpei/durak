@@ -30,7 +30,9 @@ public class GameAggregate : Aggregate<GameState>
 
         var seat = State.Players.Count;
 
-        Apply(new GameEvents.PlayerJoined(PlayerId, seat));
+        var isLastPlayer = State.Players.Count == State.Options.OfType<GameOptions.AmountOfPlayers>().First().Count - 1;
+
+        Apply(new GameEvents.PlayerJoined(PlayerId, seat, isLastPlayer));
     }
 
     public void ShuffleCardsInTalon(IShuffledPositionsGenerator shuffledPositionsGenerator)

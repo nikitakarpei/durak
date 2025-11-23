@@ -23,7 +23,7 @@ public record GameState : State<GameState>
             {
                 var newState = state with { Players = state.Players.Add(new Player(@event.PlayerId, @event.Seat)) };
 
-                if (newState.Players.Count == state.Options.OfType<GameOptions.AmountOfPlayers>().First().Count)
+                if (@event.IsLastPlayer)
                 {
                     newState = newState with { Lobby = new LobbyFilled() };
                 }

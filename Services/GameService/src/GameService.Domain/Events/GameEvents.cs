@@ -25,7 +25,7 @@ public static class GameEvents
 
     public record GameCreated(byte[] RandomSeed, GameOption[] Options, Card[] Cards);
 
-    public record PlayerJoined(string PlayerId, int Seat);
+    public record PlayerJoined(string PlayerId, int Seat, bool IsLastPlayer);
 
     public record PlayerTookCardsFromTable(string PlayerId, string[] CardIds);
 
