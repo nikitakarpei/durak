@@ -18,7 +18,12 @@ public sealed class HttpPlayerIdentityServiceClientFactory(
         try
         {
             httpClient = httpClientFactory.CreateClient("HttpPlayerIdentityServiceClient");
-            connection = new ClientHttpConnection(Guid.NewGuid(), httpClient, serviceUrl);
+            connection = new ClientHttpConnection(
+                loggerFactory.CreateLogger<ClientHttpConnection>(),
+                Guid.NewGuid(),
+                httpClient,
+                serviceUrl
+            );
             rpcClient = new RpcClient(connection, loggerFactory.CreateLogger<RpcClient>());
         }
         catch

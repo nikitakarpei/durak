@@ -1,3 +1,5 @@
+using System.Buffers.Binary;
+
 namespace GameService.Web.Endpoints;
 
 internal class RpcEndpointHandler(
@@ -48,7 +50,12 @@ internal class RpcEndpointHandler(
 
         await foreach (var response in requestHandler.HandleAsync(packet, context.RequestAborted))
         {
-            await context.Response.Body.WriteAsync(response.AsRawBytes(), context.RequestAborted);
+            var responseBytes = response.AsRawBytes();
+            var lengthPrefix = new byte[4];
+            BinaryPrimitives.WriteInt32LittleEndian(lengthPrefix, responseBytes.Length);
+
+            await context.Response.Body.WriteAsync(lengthPrefix, context.RequestAborted);
+            await context.Response.Body.WriteAsync(responseBytes, context.RequestAborted);
             await context.Response.Body.FlushAsync(context.RequestAborted);
         }
 
