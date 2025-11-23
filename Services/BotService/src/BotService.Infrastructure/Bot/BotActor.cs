@@ -1,4 +1,5 @@
 using Akka.Actor;
+using Akka.Event;
 using BotService.Api.ApiExtensions;
 using Microsoft.Extensions.Logging;
 
@@ -6,7 +7,7 @@ namespace BotService.Infrastructure.Bot;
 
 public partial class BotActor : ReceiveActor, ILogReceive
 {
-    private readonly ILogger<BotActor> _logger;
+    private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
     private readonly Rpc.Client.IClient _gameClient;
     private readonly Domain.Interfaces.IGameEventsProjector<Domain.GameState> _gameStateProjector;
     private readonly Domain.Interfaces.IMoveChooser _moveChooser;
@@ -17,7 +18,6 @@ public partial class BotActor : ReceiveActor, ILogReceive
     private string? _gameAccessToken;
 
     public BotActor(
-        ILogger<BotActor> logger,
         Rpc.Client.IClient gameClient,
         Domain.Interfaces.IGameEventsProjector<Domain.GameState> gameStateProjector,
         Domain.Interfaces.IMoveChooser moveChooser,
@@ -25,7 +25,6 @@ public partial class BotActor : ReceiveActor, ILogReceive
         string playerId
     )
     {
-        _logger = logger;
         _gameClient = gameClient;
         _gameStateProjector = gameStateProjector;
         _moveChooser = moveChooser;
@@ -128,13 +127,13 @@ public partial class BotActor : ReceiveActor, ILogReceive
         >("GetGameEvents", request);
 
         var self = Self;
-        Task.Run(async () => await ProcessGameEventsStream(_logger, self, responseStream));
+        Task.Run(async () => await ProcessGameEventsStream(_log, self, responseStream));
 
         return Task.CompletedTask;
     }
 
     private static async Task ProcessGameEventsStream(
-        ILogger<BotActor> logger,
+        ILoggingAdapter log,
         IActorRef self,
         IAsyncEnumerable<GameService.Api.Commands.GetGameEventsCommand.Types.StreamResponse> responseStream
     )
@@ -177,8 +176,7 @@ public partial class BotActor : ReceiveActor, ILogReceive
         }
         catch (Exception e)
         {
-            logger.LogError(e, "[GetGameEvents] Unexpected error");
-            Console.WriteLine($"[GetGameEvents] Unexpected error: {e}");
+            log.Error(e, "[GetGameEvents] Unexpected error");
 
             // todo: stop actor
         }
@@ -242,7 +240,7 @@ public partial class BotActor : ReceiveActor, ILogReceive
         {
             if (task.IsFaulted)
             {
-                Console.WriteLine($"[Act] Unexpected error: {task.Exception}");
+                _log.Error(task.Exception, "[Act] Unexpected error");
 
                 // todo: stop actor
             }

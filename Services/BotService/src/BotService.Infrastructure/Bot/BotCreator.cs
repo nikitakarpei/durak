@@ -1,9 +1,8 @@
 using Akka.Actor;
-using Microsoft.Extensions.Logging;
 
 namespace BotService.Infrastructure.Bot;
 
-public class BotCreator(IActorRefFactory actorRefFactory, ILoggerFactory loggerFactory) : Application.Bot.IBotCreator
+public class BotCreator(IActorRefFactory actorRefFactory) : Application.Bot.IBotCreator
 {
     public void Create(
         Rpc.Client.IClient gameClient,
@@ -13,9 +12,8 @@ public class BotCreator(IActorRefFactory actorRefFactory, ILoggerFactory loggerF
         string playerId
     )
     {
-        var logger = loggerFactory.CreateLogger<BotActor>();
         var bot = actorRefFactory.ActorOf(
-            Props.Create<BotActor>(logger, gameClient, gameStateProjector, moveChooser, gameId, playerId),
+            Props.Create<BotActor>(gameClient, gameStateProjector, moveChooser, gameId, playerId),
             GetBotActorName(gameId, playerId)
         );
         bot.Tell(new BotActor.EnterGameMessage());
