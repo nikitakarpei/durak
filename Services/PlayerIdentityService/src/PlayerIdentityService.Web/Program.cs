@@ -52,6 +52,12 @@ builder.Services.AddScoped(_ =>
     )
 );
 
+builder.Services.AddScoped(_ =>
+    database.GetCollection<PlayerIdentityService.Infrastructure.Persistence.Models.MongoDb.CustomIdLinkModel>(
+        "customIdLinks"
+    )
+);
+
 builder.Services.Configure<PlayerIdentityService.Infrastructure.Authentication.PlayerIdentityTokenIssuerOptions>(
     builder.Configuration.GetSection("PlayerIdentityTokenIssuerOptions")
 );
@@ -70,6 +76,10 @@ builder.Services.AddScoped<
     PlayerIdentityService.Infrastructure.Persistence.Repositories.MongoDb.IosDeviceIdLinkRepository
 >();
 builder.Services.AddScoped<
+    PlayerIdentityService.Application.ICustomIdLinkRepository,
+    PlayerIdentityService.Infrastructure.Persistence.Repositories.MongoDb.CustomIdLinkRepository
+>();
+builder.Services.AddScoped<
     PlayerIdentityService.Application.IPlayerRepository,
     PlayerIdentityService.Infrastructure.Persistence.Repositories.MongoDb.PlayerRepository
 >();
@@ -77,9 +87,11 @@ builder.Services.AddScoped<
 builder.Services.AddScoped<PlayerIdentityService.Application.PlayerService>();
 builder.Services.AddScoped<PlayerIdentityService.Application.AndroidDeviceIdLinkService>();
 builder.Services.AddScoped<PlayerIdentityService.Application.IosDeviceIdLinkService>();
+builder.Services.AddScoped<PlayerIdentityService.Application.CustomIdLinkService>();
 
 builder.Services.AddScoped<PlayerIdentityService.Api.LoginWithAndroidDeviceIdCommandHandler>();
 builder.Services.AddScoped<PlayerIdentityService.Api.LoginWithIosDeviceIdCommandHandler>();
+builder.Services.AddScoped<PlayerIdentityService.Api.LoginWithCustomIdCommandHandler>();
 builder.Services.AddScoped<PlayerIdentityService.Api.GetIdentityTokenPublicKeyCommandHandler>();
 
 Rpc.Server.CallHandlerRegistryBuilder callHandlerRegistryBuilder = Rpc.Server.CallHandlerRegistry.CreateBuilder();
@@ -95,6 +107,12 @@ callHandlerRegistryBuilder.AddUnaryCall<
     PlayerIdentityService.Api.Commands.LoginWithIosDeviceIdCommand.Types.Response,
     PlayerIdentityService.Api.LoginWithIosDeviceIdCommandHandler
 >("LoginWithIosDeviceId");
+
+callHandlerRegistryBuilder.AddUnaryCall<
+    PlayerIdentityService.Api.Commands.LoginWithCustomIdCommand.Types.Request,
+    PlayerIdentityService.Api.Commands.LoginWithCustomIdCommand.Types.Response,
+    PlayerIdentityService.Api.LoginWithCustomIdCommandHandler
+>("LoginWithCustomId");
 
 callHandlerRegistryBuilder.AddUnaryCall<
     PlayerIdentityService.Api.Commands.GetIdentityTokenPublicKeyCommand.Types.Request,

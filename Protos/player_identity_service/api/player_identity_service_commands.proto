@@ -28,6 +28,19 @@ message LoginWithIosDeviceIdCommand
     }
 }
 
+message LoginWithCustomIdCommand
+{
+    message Request
+    {
+        string custom_id = 1;
+    }
+
+    message Response
+    {
+        data.LoginResult result = 1;
+    }
+}
+
 message GetIdentityTokenPublicKeyCommand
 {
     message Request
