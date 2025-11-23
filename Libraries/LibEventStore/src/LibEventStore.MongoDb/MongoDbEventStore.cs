@@ -83,7 +83,7 @@ public sealed class MongoDbEventStore : IEventStore
             && change.DocumentKey["_id"].AsString == streamId
         );
 
-        using var cursor = await _streamCollection.WatchAsync(pipeline, null, cancellationToken);
+        using var cursor = await _streamCollection.WatchAsync(pipeline, cancellationToken: cancellationToken);
 
         Guid? lastProcessedEventId = anchor;
 
