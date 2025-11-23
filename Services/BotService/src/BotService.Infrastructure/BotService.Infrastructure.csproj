@@ -10,8 +10,11 @@
     <ItemGroup>
         <PackageReference Include="Akka" Version="1.5.42" />
         <PackageReference Include="Akka.DependencyInjection" Version="1.5.42" />
+        <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.0" />
     </ItemGroup>
     <ItemGroup>
+        <ProjectReference Include="..\BotService.Api\BotService.Api.csproj" />
         <ProjectReference Include="..\BotService.Application\BotService.Application.csproj" />
         <ProjectReference Include="..\BotService.Domain\BotService.Domain.csproj" />
         <ProjectReference Include="$(SolutionDir)\Libraries\LibRpc\src\LibRpc.Net\LibRpc.Net.csproj" />

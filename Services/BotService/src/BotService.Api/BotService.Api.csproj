@@ -8,6 +8,15 @@
         <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
     </PropertyGroup>
     <ItemGroup>
+        <PackageReference Include="Grpc.Tools" Version="2.72.0" />
+        <PackageReference Include="Google.Protobuf" Version="3.31.0" />
+    </ItemGroup>
+    <ItemGroup>
+        <Protobuf Include="$(SolutionDir)Protos\bot_service\api\**\*.proto" GrpcServices="None" />
+        <Protobuf Include="$(SolutionDir)Protos\game_service\api\**\*.proto" GrpcServices="None" />
+        <Protobuf Include="$(SolutionDir)Protos\player_identity_service\api\**\*.proto" GrpcServices="None" />
+    </ItemGroup>
+    <ItemGroup>
         <ProjectReference Include="..\BotService.Application\BotService.Application.csproj" />
         <ProjectReference Include="..\BotService.Domain\BotService.Domain.csproj" />
     </ItemGroup>

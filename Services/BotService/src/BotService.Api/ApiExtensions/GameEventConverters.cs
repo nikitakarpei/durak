@@ -1,6 +1,6 @@
-using BotService.Application.DomainExtensions;
+using BotService.Api.DomainExtensions;
 
-namespace BotService.Application.ApiExtensions;
+namespace BotService.Api.ApiExtensions;
 
 public static class GameEventConverters
 {
@@ -14,8 +14,8 @@ public static class GameEventConverters
             _ when @event.Is(GameService.Api.GameEvents.CardsInTalonShuffled.Descriptor) => @event
                 .Unpack<GameService.Api.GameEvents.CardsInTalonShuffled>()
                 .ConvertToDomainEvent(),
-            _ when @event.Is(GameService.Api.GameEvents.CardDealtToPlayer.Descriptor) => @event
-                .Unpack<GameService.Api.GameEvents.CardDealtToPlayer>()
+            _ when @event.Is(GameService.Api.GameEvents.CardsDealtToPlayer.Descriptor) => @event
+                .Unpack<GameService.Api.GameEvents.CardsDealtToPlayer>()
                 .ConvertToDomainEvent(),
             _ when @event.Is(GameService.Api.GameEvents.CommonTrumpCardChosen.Descriptor) => @event
                 .Unpack<GameService.Api.GameEvents.CommonTrumpCardChosen>()
@@ -35,11 +35,8 @@ public static class GameEventConverters
             _ when @event.Is(GameService.Api.GameEvents.AttackCardBeaten.Descriptor) => @event
                 .Unpack<GameService.Api.GameEvents.AttackCardBeaten>()
                 .ConvertToDomainEvent(),
-            _ when @event.Is(GameService.Api.GameEvents.AllPlayersJoined.Descriptor) => @event
-                .Unpack<GameService.Api.GameEvents.AllPlayersJoined>()
-                .ConvertToDomainEvent(),
-            _ when @event.Is(GameService.Api.GameEvents.CardDiscarded.Descriptor) => @event
-                .Unpack<GameService.Api.GameEvents.CardDiscarded>()
+            _ when @event.Is(GameService.Api.GameEvents.CardsOnTableDiscarded.Descriptor) => @event
+                .Unpack<GameService.Api.GameEvents.CardsOnTableDiscarded>()
                 .ConvertToDomainEvent(),
             _ when @event.Is(GameService.Api.GameEvents.DefenceGivenUp.Descriptor) => @event
                 .Unpack<GameService.Api.GameEvents.DefenceGivenUp>()
@@ -47,17 +44,14 @@ public static class GameEventConverters
             _ when @event.Is(GameService.Api.GameEvents.FoolDeclared.Descriptor) => @event
                 .Unpack<GameService.Api.GameEvents.FoolDeclared>()
                 .ConvertToDomainEvent(),
-            _ when @event.Is(GameService.Api.GameEvents.LobbyOpened.Descriptor) => @event
-                .Unpack<GameService.Api.GameEvents.LobbyOpened>()
-                .ConvertToDomainEvent(),
-            _ when @event.Is(GameService.Api.GameEvents.PlayerFinished.Descriptor) => @event
-                .Unpack<GameService.Api.GameEvents.PlayerFinished>()
-                .ConvertToDomainEvent(),
             _ when @event.Is(GameService.Api.GameEvents.PlayerJoined.Descriptor) => @event
                 .Unpack<GameService.Api.GameEvents.PlayerJoined>()
                 .ConvertToDomainEvent(),
             _ when @event.Is(GameService.Api.GameEvents.RoundFinished.Descriptor) => @event
                 .Unpack<GameService.Api.GameEvents.RoundFinished>()
+                .ConvertToDomainEvent(),
+            _ when @event.Is(GameService.Api.GameEvents.PlayerTookCardsFromTable.Descriptor) => @event
+                .Unpack<GameService.Api.GameEvents.PlayerTookCardsFromTable>()
                 .ConvertToDomainEvent(),
             _ => throw new ArgumentException($"Unknown event type: {@event.TypeUrl}"),
         };
@@ -88,14 +82,14 @@ public static class GameEventConverters
         };
     }
 
-    public static Domain.GameEvents.CardDealtToPlayer ConvertToDomainEvent(
-        this GameService.Api.GameEvents.CardDealtToPlayer cardDealtToPlayer
+    public static Domain.GameEvents.CardsDealtToPlayer ConvertToDomainEvent(
+        this GameService.Api.GameEvents.CardsDealtToPlayer cardsDealtToPlayer
     )
     {
-        return new Domain.GameEvents.CardDealtToPlayer
+        return new Domain.GameEvents.CardsDealtToPlayer
         {
-            PlayerId = cardDealtToPlayer.PlayerId,
-            DealtCard = cardDealtToPlayer.DealtCard.ToDomainCardDealtToPlayerCard(),
+            PlayerId = cardsDealtToPlayer.PlayerId,
+            DealtCards = cardsDealtToPlayer.DealtCards.Select(card => card.ToDomainCardsDealtToPlayerCard()).ToArray(),
         };
     }
 
@@ -162,18 +156,11 @@ public static class GameEventConverters
         };
     }
 
-    public static Domain.GameEvents.AllPlayersJoined ConvertToDomainEvent(
-        this GameService.Api.GameEvents.AllPlayersJoined allPlayersJoined
+    public static Domain.GameEvents.CardsOnTableDiscarded ConvertToDomainEvent(
+        this GameService.Api.GameEvents.CardsOnTableDiscarded cardsOnTableDiscarded
     )
     {
-        return new Domain.GameEvents.AllPlayersJoined();
-    }
-
-    public static Domain.GameEvents.CardDiscarded ConvertToDomainEvent(
-        this GameService.Api.GameEvents.CardDiscarded cardDiscarded
-    )
-    {
-        return new Domain.GameEvents.CardDiscarded(cardDiscarded.CardId);
+        return new Domain.GameEvents.CardsOnTableDiscarded(cardsOnTableDiscarded.CardIds.ToArray());
     }
 
     public static Domain.GameEvents.DefenceGivenUp ConvertToDomainEvent(
@@ -190,20 +177,6 @@ public static class GameEventConverters
         return new Domain.GameEvents.FoolDeclared(foolDeclared.PlayerId);
     }
 
-    public static Domain.GameEvents.LobbyOpened ConvertToDomainEvent(
-        this GameService.Api.GameEvents.LobbyOpened lobbyOpened
-    )
-    {
-        return new Domain.GameEvents.LobbyOpened();
-    }
-
-    public static Domain.GameEvents.PlayerFinished ConvertToDomainEvent(
-        this GameService.Api.GameEvents.PlayerFinished playerFinished
-    )
-    {
-        return new Domain.GameEvents.PlayerFinished(playerFinished.PlayerId);
-    }
-
     public static Domain.GameEvents.PlayerJoined ConvertToDomainEvent(
         this GameService.Api.GameEvents.PlayerJoined playerJoined
     )
@@ -216,5 +189,15 @@ public static class GameEventConverters
     )
     {
         return new Domain.GameEvents.RoundFinished();
+    }
+
+    public static Domain.GameEvents.PlayerTookCardsFromTable ConvertToDomainEvent(
+        this GameService.Api.GameEvents.PlayerTookCardsFromTable playerTookCardsFromTable
+    )
+    {
+        return new Domain.GameEvents.PlayerTookCardsFromTable(
+            playerTookCardsFromTable.PlayerId,
+            playerTookCardsFromTable.CardIds.ToArray()
+        );
     }
 }

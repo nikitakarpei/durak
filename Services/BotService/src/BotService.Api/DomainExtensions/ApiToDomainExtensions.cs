@@ -1,4 +1,4 @@
-namespace BotService.Application.DomainExtensions;
+namespace BotService.Api.DomainExtensions;
 
 public static class ApiToDomainExtensions
 {
@@ -41,14 +41,14 @@ public static class ApiToDomainExtensions
         throw new ArgumentException($"Unknown game option type: {apiOption.TypeUrl}");
     }
 
-    public static Domain.GameEvents.CardDealtToPlayer.Card ToDomainCardDealtToPlayerCard(
+    public static Domain.GameEvents.CardsDealtToPlayer.Card ToDomainCardsDealtToPlayerCard(
         this Google.Protobuf.WellKnownTypes.Any apiCard
     )
     {
         if (apiCard.Is(GameService.Api.Data.RegularCard.Descriptor))
         {
             var regularCard = apiCard.Unpack<GameService.Api.Data.RegularCard>();
-            return new Domain.GameEvents.CardDealtToPlayer.RegularCard(
+            return new Domain.GameEvents.CardsDealtToPlayer.RegularCard(
                 regularCard.Id,
                 regularCard.Suit.ToDomainCardSuit(),
                 regularCard.Rank.ToDomainCardRank()
@@ -58,7 +58,7 @@ public static class ApiToDomainExtensions
         if (apiCard.Is(GameService.Api.Data.JokerCard.Descriptor))
         {
             var jokerCard = apiCard.Unpack<GameService.Api.Data.JokerCard>();
-            return new Domain.GameEvents.CardDealtToPlayer.JokerCard(
+            return new Domain.GameEvents.CardsDealtToPlayer.JokerCard(
                 jokerCard.Id,
                 jokerCard.Color.ToDomainJokerColor()
             );
@@ -67,7 +67,7 @@ public static class ApiToDomainExtensions
         if (apiCard.Is(GameService.Api.Data.UnrevealedCard.Descriptor))
         {
             var unrevealedCard = apiCard.Unpack<GameService.Api.Data.UnrevealedCard>();
-            return new Domain.GameEvents.CardDealtToPlayer.UnrevealedCard(unrevealedCard.Id);
+            return new Domain.GameEvents.CardsDealtToPlayer.UnrevealedCard(unrevealedCard.Id);
         }
 
         throw new ArgumentException($"Unknown card type: {apiCard.TypeUrl}");
@@ -141,3 +141,4 @@ public static class ApiToDomainExtensions
         throw new ArgumentException($"Unknown possible move type: {apiPossibleMove.TypeUrl}");
     }
 }
+

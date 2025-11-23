@@ -1,73 +1,54 @@
-using Microsoft.Extensions.DependencyInjection;
+using Akka.Actor;
+using BotService.Api.ApiExtensions;
+using Microsoft.Extensions.Logging;
 
-namespace BotService.Application.Actors;
+namespace BotService.Infrastructure.Bot;
 
-public partial class BotActor : Akka.Actor.ReceiveActor, Akka.Actor.ILogReceive
+public partial class BotActor : ReceiveActor, ILogReceive
 {
-    private readonly IServiceScope _scope;
-    private readonly GameIntegration.IGameServiceClientFactory _gameServiceClientFactory;
-
-    private readonly string _gameId;
+    private readonly ILogger<BotActor> _logger;
+    private readonly Rpc.Client.IClient _gameClient;
     private readonly Domain.Interfaces.IGameEventsProjector<Domain.GameState> _gameStateProjector;
     private readonly Domain.Interfaces.IMoveChooser _moveChooser;
+    private readonly string _gameId;
     private readonly string _playerId;
-    private readonly string _playerIdToken;
-    private Domain.GameState _gameState = new();
 
-    private readonly Rpc.Client.IClient _gameClient;
+    private Domain.GameState _gameState = new();
     private string? _gameAccessToken;
 
     public BotActor(
-        IServiceProvider serviceProvider,
+        ILogger<BotActor> logger,
+        Rpc.Client.IClient gameClient,
+        Domain.Interfaces.IGameEventsProjector<Domain.GameState> gameStateProjector,
+        Domain.Interfaces.IMoveChooser moveChooser,
         string gameId,
-        string playerId,
-        string playerIdToken,
-        Domain.Interfaces.IGameEventsProjector<Domain.GameState> gameEventsProjector,
-        Domain.Interfaces.IMoveChooser moveChooser
+        string playerId
     )
     {
-        _scope = serviceProvider.CreateScope();
-        _gameServiceClientFactory =
-            _scope.ServiceProvider.GetRequiredService<GameIntegration.IGameServiceClientFactory>();
-
-        _gameId = gameId;
-        _gameStateProjector = gameEventsProjector;
+        _logger = logger;
+        _gameClient = gameClient;
+        _gameStateProjector = gameStateProjector;
         _moveChooser = moveChooser;
+        _gameId = gameId;
         _playerId = playerId;
-        _playerIdToken = playerIdToken;
 
-        ReceiveAsync<ProcessConnectedMessage>(HandleMessage);
-        Receive<ProcessDisconnectedMessage>(HandleMessage);
-        Receive<ProcessDomainEventMessage>(HandleMessage);
-
-        var self = Self;
-        _gameClient = _gameServiceClientFactory.Create(() => OnConnected(self), () => OnDisconnected(self));
+        ReceiveAsync<EnterGameMessage>(HandleMessage);
+        Receive<ProcessOldDomainEventMessage>(HandleMessage);
+        Receive<ProcessNewDomainEventMessage>(HandleMessage);
     }
 
     protected override void PostStop()
     {
         _gameClient.Dispose();
-
-        _scope.Dispose();
     }
 
-    public record struct ProcessConnectedMessage();
+    public record struct EnterGameMessage();
 
-    public record struct ProcessDisconnectedMessage();
+    public record struct ProcessOldDomainEventMessage(object DomainEvent);
 
-    public record struct ProcessDomainEventMessage(object DomainEvent);
+    public record struct ProcessNewDomainEventMessage(object DomainEvent);
 
-    private static void OnConnected(Akka.Actor.IActorRef self)
-    {
-        Akka.Actor.ActorRefImplicitSenderExtensions.Tell(self, new ProcessConnectedMessage());
-    }
-
-    private static void OnDisconnected(Akka.Actor.IActorRef self)
-    {
-        Akka.Actor.ActorRefImplicitSenderExtensions.Tell(self, new ProcessDisconnectedMessage());
-    }
-
-    private async Task HandleMessage(ProcessConnectedMessage message)
+    private async Task HandleMessage(EnterGameMessage message)
     {
         try
         {
@@ -75,13 +56,23 @@ public partial class BotActor : Akka.Actor.ReceiveActor, Akka.Actor.ILogReceive
         }
         catch (Exception e)
         {
-            Sender.Tell(new Akka.Actor.Status.Failure(e), Self);
+            Sender.Tell(new Status.Failure(e), Self);
         }
     }
 
-    private void HandleMessage(ProcessDisconnectedMessage message) { }
+    private void HandleMessage(ProcessOldDomainEventMessage message)
+    {
+        try
+        {
+            _gameState = _gameStateProjector.Apply(_gameState, message.DomainEvent);
+        }
+        catch (Exception e)
+        {
+            Sender.Tell(new Status.Failure(e), Self);
+        }
+    }
 
-    private void HandleMessage(ProcessDomainEventMessage message)
+    private void HandleMessage(ProcessNewDomainEventMessage message)
     {
         try
         {
@@ -94,7 +85,7 @@ public partial class BotActor : Akka.Actor.ReceiveActor, Akka.Actor.ILogReceive
         }
         catch (Exception e)
         {
-            Sender.Tell(new Akka.Actor.Status.Failure(e), Self);
+            Sender.Tell(new Status.Failure(e), Self);
         }
     }
 
@@ -107,16 +98,12 @@ public partial class BotActor : Akka.Actor.ReceiveActor, Akka.Actor.ILogReceive
 
     private async Task GetGameAccessToken()
     {
-        var request = new GameService.Api.Commands.GetGameAccessTokenCommand.Types.Request
-        {
-            GameId = _gameId,
-            PlayerIdToken = _playerIdToken,
-        };
+        var request = new GameService.Api.Commands.GetGameAccessTokenCommand.Types.Request { GameId = _gameId };
 
         var response = await _gameClient.UnaryCall<
             GameService.Api.Commands.GetGameAccessTokenCommand.Types.Request,
             GameService.Api.Commands.GetGameAccessTokenCommand.Types.Response
-        >(nameof(GameService.Api.Commands.GetGameAccessTokenCommand), request);
+        >("GetGameAccessToken", request);
 
         if (
             response.ResultCase
@@ -133,24 +120,22 @@ public partial class BotActor : Akka.Actor.ReceiveActor, Akka.Actor.ILogReceive
 
     private Task SubscribeToGameEvents()
     {
-        var request = new GameService.Api.Commands.GetGameEventsCommand.Types.Request
-        {
-            AccessToken = _gameAccessToken,
-        };
+        var request = new GameService.Api.Commands.GetGameEventsCommand.Types.Request { GameId = _gameId };
 
         var responseStream = _gameClient.StreamingCall<
             GameService.Api.Commands.GetGameEventsCommand.Types.Request,
             GameService.Api.Commands.GetGameEventsCommand.Types.StreamResponse
-        >(nameof(GameService.Api.Commands.GetGameEventsCommand), request);
+        >("GetGameEvents", request);
 
         var self = Self;
-        Task.Run(async () => await ProcessGameEventsStream(self, responseStream));
+        Task.Run(async () => await ProcessGameEventsStream(_logger, self, responseStream));
 
         return Task.CompletedTask;
     }
 
     private static async Task ProcessGameEventsStream(
-        Akka.Actor.IActorRef self,
+        ILogger<BotActor> logger,
+        IActorRef self,
         IAsyncEnumerable<GameService.Api.Commands.GetGameEventsCommand.Types.StreamResponse> responseStream
     )
     {
@@ -158,21 +143,41 @@ public partial class BotActor : Akka.Actor.ReceiveActor, Akka.Actor.ILogReceive
         {
             await foreach (var response in responseStream)
             {
-                if (
-                    response.ResultCase
-                    != GameService.Api.Commands.GetGameEventsCommand.Types.StreamResponse.ResultOneofCase.NewEvent
-                )
+                switch (response.ResultCase)
                 {
-                    throw new Exception($"Unexpected response: {response}");
+                    case GameService.Api.Commands.GetGameEventsCommand.Types.StreamResponse.ResultOneofCase.OldEvent:
+                    {
+                        var domainEvent = GameEventConverters.ConvertToDomainEvent(response.OldEvent.Event);
+                        self.Tell(new ProcessOldDomainEventMessage(domainEvent));
+                        break;
+                    }
+                    case GameService
+                        .Api
+                        .Commands
+                        .GetGameEventsCommand
+                        .Types
+                        .StreamResponse
+                        .ResultOneofCase
+                        .OldEventsEnded:
+                    {
+                        break;
+                    }
+                    case GameService.Api.Commands.GetGameEventsCommand.Types.StreamResponse.ResultOneofCase.NewEvent:
+                    {
+                        var domainEvent = GameEventConverters.ConvertToDomainEvent(response.NewEvent.Event);
+                        self.Tell(new ProcessNewDomainEventMessage(domainEvent));
+                        break;
+                    }
+                    default:
+                    {
+                        throw new Exception($"Unexpected response: {response}");
+                    }
                 }
-
-                var domainEvent = ApiExtensions.GameEventConverters.ConvertToDomainEvent(response.NewEvent.Event);
-
-                Akka.Actor.ActorRefImplicitSenderExtensions.Tell(self, new ProcessDomainEventMessage(domainEvent));
             }
         }
         catch (Exception e)
         {
+            logger.LogError(e, "[GetGameEvents] Unexpected error");
             Console.WriteLine($"[GetGameEvents] Unexpected error: {e}");
 
             // todo: stop actor
@@ -186,7 +191,7 @@ public partial class BotActor : Akka.Actor.ReceiveActor, Akka.Actor.ILogReceive
         var response = await _gameClient.UnaryCall<
             GameService.Api.Commands.JoinLobbyCommand.Types.Request,
             GameService.Api.Commands.JoinLobbyCommand.Types.Response
-        >(nameof(GameService.Api.Commands.JoinLobbyCommand), request);
+        >("JoinLobby", request);
 
         if (response.ResultCase != GameService.Api.Commands.JoinLobbyCommand.Types.Response.ResultOneofCase.Success)
         {
@@ -204,14 +209,14 @@ public partial class BotActor : Akka.Actor.ReceiveActor, Akka.Actor.ILogReceive
                 GameService.Api.Commands.GiveUpDefenceCommand.Types.Request,
                 GameService.Api.Commands.GiveUpDefenceCommand.Types.Response
             >(
-                nameof(GameService.Api.Commands.GiveUpDefenceCommand),
+                "GiveUpDefence",
                 new GameService.Api.Commands.GiveUpDefenceCommand.Types.Request { AccessToken = _gameAccessToken! }
             ),
             Domain.PossibleMoves.PlayAttackCard playAttackCard => _gameClient.UnaryCall<
                 GameService.Api.Commands.PlayAttackCardCommand.Types.Request,
                 GameService.Api.Commands.PlayAttackCardCommand.Types.Response
             >(
-                nameof(GameService.Api.Commands.PlayAttackCardCommand),
+                "PlayAttackCard",
                 new GameService.Api.Commands.PlayAttackCardCommand.Types.Request
                 {
                     AccessToken = _gameAccessToken!,
@@ -222,7 +227,7 @@ public partial class BotActor : Akka.Actor.ReceiveActor, Akka.Actor.ILogReceive
                 GameService.Api.Commands.BeatAttackCardCommand.Types.Request,
                 GameService.Api.Commands.BeatAttackCardCommand.Types.Response
             >(
-                nameof(GameService.Api.Commands.BeatAttackCardCommand),
+                "BeatAttackCard",
                 new GameService.Api.Commands.BeatAttackCardCommand.Types.Request
                 {
                     AccessToken = _gameAccessToken!,

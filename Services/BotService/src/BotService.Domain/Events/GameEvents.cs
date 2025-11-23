@@ -6,8 +6,6 @@ public static class GameEvents
 
     public record struct OpponentTurnStarted(string PlayerId);
 
-    public record struct AllPlayersJoined();
-
     public record struct AttackCardBeaten
     {
         public abstract record Card(string Id);
@@ -35,7 +33,7 @@ public static class GameEvents
         public Card PlayedCard { get; init; }
     }
 
-    public record struct CardDealtToPlayer
+    public record struct CardsDealtToPlayer
     {
         public abstract record Card(string Id);
 
@@ -46,10 +44,10 @@ public static class GameEvents
         public record JokerCard(string Id, JokerColor Color) : Card(Id);
 
         public string PlayerId { get; init; }
-        public Card DealtCard { get; init; }
+        public Card[] DealtCards { get; init; }
     }
 
-    public record struct CardDiscarded(string CardId);
+    public record struct CardsOnTableDiscarded(string[] CardIds);
 
     public record struct CardsInTalonShuffled
     {
@@ -77,11 +75,9 @@ public static class GameEvents
         public CardInTalon[] CardsInTalon { get; init; }
     }
 
-    public record struct LobbyOpened;
-
-    public record struct PlayerFinished(string PlayerId);
-
     public record struct PlayerJoined(string PlayerId, int Seat);
+
+    public record struct PlayerTookCardsFromTable(string PlayerId, string[] CardIds);
 
     public record struct RoundFinished;
 
