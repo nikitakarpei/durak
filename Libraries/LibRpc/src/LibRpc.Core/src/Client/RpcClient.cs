@@ -214,6 +214,8 @@ public class RpcClient : IClient
             return;
         }
 
+        _logger.LogDebug("Received unary call response for call {CallId}", response.CallId);
+
         unaryCall.SetResponse(response.Data);
     }
 
@@ -236,6 +238,8 @@ public class RpcClient : IClient
             return;
         }
 
+        _logger.LogDebug("Received streaming call response for call {CallId}", response.CallId);
+
         streamingCall.WriteResponse(response.Data);
     }
 
@@ -257,6 +261,8 @@ public class RpcClient : IClient
             pendingCall.SetException(new ProtocolViolationException());
             return;
         }
+
+        _logger.LogDebug("Received streaming call finished for call {CallId}", finished.CallId);
 
         streamingCall.Complete();
     }
