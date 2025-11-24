@@ -7,6 +7,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
+using Rpc.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -185,15 +186,13 @@ callHandlerRegistryBuilder.AddStreamingCall<
 builder.Services.AddSingleton(callHandlerRegistryBuilder.Build());
 
 builder.Services.AddScoped<Rpc.Server.RpcRequestHandler>();
-builder.Services.AddScoped<GameService.Web.Endpoints.RpcEndpointHandler>();
+builder.Services.AddScoped<GameService.Web.Middleware.PlayerIdentityVerificationMiddleware>();
 
 // Application Build & Configuration
 var app = builder.Build();
 
-app.MapPost(
-    "/",
-    (HttpContext context, GameService.Web.Endpoints.RpcEndpointHandler handler) => handler.HandleAsync(context)
-);
+app.UseMiddleware<GameService.Web.Middleware.PlayerIdentityVerificationMiddleware>();
+app.MapRpcEndpoint("/");
 
 app.Run();
 

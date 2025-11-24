@@ -11,6 +11,7 @@
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="$(SolutionDir)\Libraries\LibRpc\src\LibRpc.Core\LibRpc.Core.csproj" />
+        <ProjectReference Include="$(SolutionDir)\Libraries\LibRpc\src\LibRpc.AspNetCore\LibRpc.AspNetCore.csproj" />
         <ProjectReference Include="$(SolutionDir)\Libraries\LibSecrets\src\LibSecrets.Gcp\LibSecrets.Gcp.csproj" />
         <ProjectReference Include="$(SolutionDir)\Libraries\LibEventStore\src\LibEventStore.MongoDb\LibEventStore.MongoDb.csproj" />
         <ProjectReference Include="$(SolutionDir)\Libraries\LibPlayerIdentityVerify\src\LibPlayerIdentityVerify.Net\LibPlayerIdentityVerify.Net.csproj" />

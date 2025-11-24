@@ -11,6 +11,7 @@
     <ItemGroup>
         <ProjectReference Include="$(SolutionDir)\Libraries\LibRpc\src\LibRpc.Core\LibRpc.Core.csproj" />
         <ProjectReference Include="$(SolutionDir)\Libraries\LibRpc\src\LibRpc.Net\LibRpc.Net.csproj" />
+        <ProjectReference Include="$(SolutionDir)\Libraries\LibRpc\src\LibRpc.AspNetCore\LibRpc.AspNetCore.csproj" />
         <ProjectReference Include="$(SolutionDir)\Libraries\LibSecrets\src\LibSecrets.Gcp\LibSecrets.Gcp.csproj" />
         <ProjectReference Include="..\PlayerIdentityService.Infrastructure\PlayerIdentityService.Infrastructure.csproj" />
         <ProjectReference Include="..\PlayerIdentityService.Application\PlayerIdentityService.Application.csproj" />
