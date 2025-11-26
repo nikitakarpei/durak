@@ -8,10 +8,10 @@ namespace GameService.Infrastructure;
 public class GameActor : ReceiveActor, ILogReceive
 {
     private readonly IServiceScope _scope;
+    private readonly IServiceProvider _rootServiceProvider;
     private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
     private readonly Domain.GameService _gameService;
     private readonly EventStore.IEventStore _eventStore;
-    private readonly MediatR.IMediator _mediator;
 
     private readonly string _gameId;
     private readonly List<object> _events = [];
@@ -19,12 +19,17 @@ public class GameActor : ReceiveActor, ILogReceive
     public GameActor(IServiceProvider serviceProvider, string gameId)
     {
         _scope = serviceProvider.CreateScope();
+        _rootServiceProvider = serviceProvider;
         _gameService = _scope.ServiceProvider.GetRequiredService<Domain.GameService>();
         _eventStore = _scope.ServiceProvider.GetRequiredService<EventStore.IEventStore>();
-        _mediator = _scope.ServiceProvider.GetRequiredService<MediatR.IMediator>();
         _gameId = gameId;
 
         ReceiveAsync<ExecuteCommandMessage>(HandleMessage);
+    }
+
+    protected override void PreStart()
+    {
+        Context.ActorOf(Props.Create<GameEventForwarderActor>(_rootServiceProvider, _gameId), "game-event-forwarder");
     }
 
     protected override void PostStop()
@@ -34,6 +39,8 @@ public class GameActor : ReceiveActor, ILogReceive
 
     // Message types
     public record struct ExecuteCommandMessage(Domain.GameCommand Command);
+
+    public record struct ProcessEventMessage(EventStore.RecordedEvent Event);
 
     private async Task HandleMessage(ExecuteCommandMessage message)
     {
@@ -48,12 +55,6 @@ public class GameActor : ReceiveActor, ILogReceive
             ProcessEvents(game, _gameService);
 
             await PersistEvents(game.Changes, CancellationToken.None);
-
-            // FIXME: implement at-least-once processing of events
-            foreach (var @event in game.Changes)
-            {
-                await _mediator.Publish(CreateDomainEventNotification(@event));
-            }
 
             _events.AddRange(game.Changes);
         }
@@ -100,17 +101,5 @@ public class GameActor : ReceiveActor, ILogReceive
         ));
 
         await _eventStore.AppendToStreamAsync(streamName, eventDatas, cancellationToken);
-    }
-
-    private MediatR.INotification CreateDomainEventNotification(object @event)
-    {
-        var eventType = @event.GetType();
-        var notificationType = typeof(Application.GameDomainEventNotification<>).MakeGenericType(eventType);
-
-        var notification =
-            Activator.CreateInstance(notificationType, _gameId, @event)
-            ?? throw new InvalidOperationException($"Failed to create notification for event: {eventType.Name}");
-
-        return (MediatR.INotification)notification;
     }
 }
