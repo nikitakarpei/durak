@@ -45,7 +45,7 @@ public class GameEventForwarderActor : ReceivePersistentActor, ILogReceive
         _scope.Dispose();
     }
 
-    public record struct ProcessEventMessage(EventStore.RecordedEvent Event);
+    public record struct ProcessEventMessage(EventStore.RecordedEvent Event, int EventNumber);
 
     public record struct EventProcessedEvent();
 
@@ -53,7 +53,7 @@ public class GameEventForwarderActor : ReceivePersistentActor, ILogReceive
     {
         var domainEvent = DeserializeDomainEvent(message.Event);
 
-        await _mediator.Publish(CreateDomainEventNotification(message.Event.EventId, domainEvent));
+        await _mediator.Publish(CreateDomainEventNotification(message.Event.EventId, message.EventNumber, domainEvent));
 
         Persist(
             new EventProcessedEvent(),
@@ -115,13 +115,13 @@ public class GameEventForwarderActor : ReceivePersistentActor, ILogReceive
         return domainEvent;
     }
 
-    private MediatR.INotification CreateDomainEventNotification(Guid eventId, object @event)
+    private MediatR.INotification CreateDomainEventNotification(Guid eventId, int eventNumber, object @event)
     {
         var eventType = @event.GetType();
         var notificationType = typeof(Application.GameDomainEventNotification<>).MakeGenericType(eventType);
 
         var notification =
-            Activator.CreateInstance(notificationType, _gameId, eventId, @event)
+            Activator.CreateInstance(notificationType, _gameId, eventId, eventNumber, @event)
             ?? throw new InvalidOperationException($"Failed to create notification for event: {eventType.Name}");
 
         return (MediatR.INotification)notification;
@@ -137,9 +137,11 @@ public class GameEventForwarderActor : ReceivePersistentActor, ILogReceive
     {
         var oldEvents = await eventStore.ReadStreamAsync(streamId, cancellationToken);
 
-        foreach (var @event in oldEvents.Skip(alreadyProcessedCount))
+        var eventsToProcess = oldEvents.Skip(alreadyProcessedCount).ToList();
+        for (int i = 0; i < eventsToProcess.Count; i++)
         {
-            actorRef.Tell(new ProcessEventMessage(@event));
+            var eventNumber = alreadyProcessedCount + i + 1;
+            actorRef.Tell(new ProcessEventMessage(eventsToProcess[i], eventNumber));
         }
 
         var newEvents = eventStore.SubscribeToStreamAsync(
@@ -148,9 +150,11 @@ public class GameEventForwarderActor : ReceivePersistentActor, ILogReceive
             cancellationToken
         );
 
+        var currentEventNumber = oldEvents.Count;
         await foreach (var @event in newEvents)
         {
-            actorRef.Tell(new ProcessEventMessage(@event));
+            currentEventNumber++;
+            actorRef.Tell(new ProcessEventMessage(@event, currentEventNumber));
         }
     }
 }
