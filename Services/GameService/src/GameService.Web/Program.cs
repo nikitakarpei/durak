@@ -116,6 +116,12 @@ builder.Services.AddSingleton<GameService.Domain.ITalonCreator, GameService.Doma
 builder.Services.AddSingleton<GameService.Domain.IFoolFinder, GameService.Domain.FoolFinder>();
 builder.Services.AddSingleton<GameService.Domain.GameService>();
 
+// Game Timers Service
+builder.Services.AddSingleton<
+    GameService.Application.IGameTimersService,
+    GameService.Infrastructure.GameTimersService
+>();
+
 // Authentication & Authorization
 builder.Services.AddSingleton<GameService.Infrastructure.GameAccessTokenService>();
 builder.Services.AddSingleton<GameService.Application.IGameAccessTokenIssuer>(sp =>
