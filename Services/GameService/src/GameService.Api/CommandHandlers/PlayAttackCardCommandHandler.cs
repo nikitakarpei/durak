@@ -28,7 +28,10 @@ public class PlayAttackCardCommandHandler(
         }
 
         var game = gameCollection.Get(gameAccessToken.GameId);
-        game.Execute(new Domain.GameCommands.PlayAttackCard(playerIdentity.PlayerId, request.CardId));
+        await game.ExecuteAsync(
+            new Domain.GameCommands.PlayAttackCard(playerIdentity.PlayerId, request.CardId),
+            cancellationToken
+        );
 
         return new Commands.PlayAttackCardCommand.Types.Response()
         {

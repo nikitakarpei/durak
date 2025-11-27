@@ -28,7 +28,7 @@ public class GiveUpDefenceCommandHandler(
         }
 
         var game = gameCollection.Get(gameAccessToken.GameId);
-        game.Execute(new Domain.GameCommands.GiveUpDefence(playerIdentity.PlayerId));
+        await game.ExecuteAsync(new Domain.GameCommands.GiveUpDefence(playerIdentity.PlayerId), cancellationToken);
 
         return new Commands.GiveUpDefenceCommand.Types.Response()
         {

@@ -58,6 +58,8 @@ public class GameActor : ReceiveActor, ILogReceive
             await PersistEvents(game.Changes, CancellationToken.None);
 
             _events.AddRange(game.Changes);
+
+            Sender.Tell(new Status.Success(true), Self);
         }
         catch (Exception e)
         {

@@ -2,5 +2,5 @@ namespace GameService.Application;
 
 public interface IGame
 {
-    public void Execute(Domain.GameCommand command);
+    public Task ExecuteAsync(Domain.GameCommand command, CancellationToken cancellationToken);
 }

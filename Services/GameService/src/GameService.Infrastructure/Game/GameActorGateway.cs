@@ -4,8 +4,8 @@ namespace GameService.Infrastructure;
 
 public class GameActorGateway(ActorSelection gameActor) : Application.IGame
 {
-    public void Execute(Domain.GameCommand command)
+    public async Task ExecuteAsync(Domain.GameCommand command, CancellationToken cancellationToken)
     {
-        gameActor.Tell(new GameActor.ExecuteCommandMessage(command));
+        await gameActor.Ask(new GameActor.ExecuteCommandMessage(command), cancellationToken);
     }
 }

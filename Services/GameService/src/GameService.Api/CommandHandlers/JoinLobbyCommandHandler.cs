@@ -24,7 +24,7 @@ public class JoinLobbyCommandHandler(
         }
 
         var game = gameCollection.Get(gameAccessToken.GameId);
-        game.Execute(new Domain.GameCommands.JoinLobby(playerIdentity.PlayerId));
+        await game.ExecuteAsync(new Domain.GameCommands.JoinLobby(playerIdentity.PlayerId), cancellationToken);
 
         return new Commands.JoinLobbyCommand.Types.Response()
         {

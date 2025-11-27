@@ -28,12 +28,13 @@ public class BeatAttackCardCommandHandler(
         }
 
         var game = gameCollection.Get(gameAccessToken.GameId);
-        game.Execute(
+        await game.ExecuteAsync(
             new Domain.GameCommands.BeatAttackCard(
                 playerIdentity.PlayerId,
                 request.AttackerCardId,
                 request.DefenderCardId
-            )
+            ),
+            cancellationToken
         );
 
         return new Commands.BeatAttackCardCommand.Types.Response()

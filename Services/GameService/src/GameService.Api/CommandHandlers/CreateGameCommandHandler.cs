@@ -5,7 +5,7 @@ namespace GameService.Api;
 public class CreateGameCommandHandler(Application.IGameCollection gameCollection)
     : Rpc.Server.IUnaryCallHandler<Commands.CreateGameCommand.Types.Request, Commands.CreateGameCommand.Types.Response>
 {
-    public Task<Commands.CreateGameCommand.Types.Response> HandleAsync(
+    public async Task<Commands.CreateGameCommand.Types.Response> HandleAsync(
         Commands.CreateGameCommand.Types.Request request,
         CancellationToken cancellationToken
     )
@@ -16,13 +16,11 @@ public class CreateGameCommandHandler(Application.IGameCollection gameCollection
 
         var gameId = Guid.NewGuid().ToString();
 
-        gameCollection.Create(gameId, gameOptions, RandomNumberGenerator.GetBytes(32));
+        await gameCollection.CreateAsync(gameId, gameOptions, RandomNumberGenerator.GetBytes(32), cancellationToken);
 
-        return Task.FromResult(
-            new Commands.CreateGameCommand.Types.Response
-            {
-                Success = new Commands.CreateGameCommand.Types.Response.Types.Success() { GameId = gameId },
-            }
-        );
+        return new Commands.CreateGameCommand.Types.Response
+        {
+            Success = new Commands.CreateGameCommand.Types.Response.Types.Success() { GameId = gameId },
+        };
     }
 }
