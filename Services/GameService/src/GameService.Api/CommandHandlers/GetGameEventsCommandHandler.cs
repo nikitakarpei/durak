@@ -47,7 +47,8 @@ public class GetGameEventsCommandHandler(
             };
         }
 
-        var lastEventId = events.LastOrDefault()?.EventId;
+        int? lastEventNumber = events.LastOrDefault()?.EventNumber;
+        int? fromEventNumber = lastEventNumber.HasValue ? lastEventNumber.Value + 1 : null;
 
         yield return new Commands.GetGameEventsCommand.Types.StreamResponse()
         {
@@ -58,7 +59,7 @@ public class GetGameEventsCommandHandler(
         await foreach (
             var @event in eventStore.SubscribeToStreamAsync(
                 Application.GameEventStreams.DomainEvents(request.GameId),
-                lastEventId,
+                fromEventNumber,
                 cancellationToken
             )
         )

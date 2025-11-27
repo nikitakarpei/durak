@@ -135,26 +135,11 @@ public class GameEventForwarderActor : ReceivePersistentActor, ILogReceive
         CancellationToken cancellationToken
     )
     {
-        var oldEvents = await eventStore.ReadStreamAsync(streamId, cancellationToken);
+        var events = eventStore.SubscribeToStreamAsync(streamId, alreadyProcessedCount, cancellationToken);
 
-        var eventsToProcess = oldEvents.Skip(alreadyProcessedCount).ToList();
-        for (int i = 0; i < eventsToProcess.Count; i++)
+        await foreach (var @event in events)
         {
-            var eventNumber = alreadyProcessedCount + i + 1;
-            actorRef.Tell(new ProcessEventMessage(eventsToProcess[i], eventNumber));
-        }
-
-        var newEvents = eventStore.SubscribeToStreamAsync(
-            streamId,
-            oldEvents.LastOrDefault()?.EventId,
-            cancellationToken
-        );
-
-        var currentEventNumber = oldEvents.Count;
-        await foreach (var @event in newEvents)
-        {
-            currentEventNumber++;
-            actorRef.Tell(new ProcessEventMessage(@event, currentEventNumber));
+            actorRef.Tell(new ProcessEventMessage(@event, @event.EventNumber));
         }
     }
 }

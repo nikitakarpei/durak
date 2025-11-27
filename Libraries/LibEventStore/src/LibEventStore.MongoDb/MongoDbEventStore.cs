@@ -66,12 +66,14 @@ public sealed class MongoDbEventStore : IEventStore
             return [];
         }
 
-        return streamDoc.Events.Select(evt => new RecordedEvent(evt.EventId, evt.Type, evt.Data.ToJson())).ToList();
+        return streamDoc
+            .Events.Select((evt, index) => new RecordedEvent(evt.EventId, index, evt.Type, evt.Data.ToJson()))
+            .ToList();
     }
 
     public async IAsyncEnumerable<RecordedEvent> SubscribeToStreamAsync(
         string streamId,
-        Guid? anchor,
+        int? fromEventNumber,
         [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
@@ -85,9 +87,9 @@ public sealed class MongoDbEventStore : IEventStore
 
         using var cursor = await _streamCollection.WatchAsync(pipeline, cancellationToken: cancellationToken);
 
-        Guid? lastProcessedEventId = anchor;
+        int? lastProcessedEventNumber = fromEventNumber.HasValue ? fromEventNumber.Value - 1 : null;
 
-        if (anchor.HasValue)
+        if (fromEventNumber.HasValue)
         {
             var streamDoc = await _streamCollection
                 .Find(Builders<StreamDocument>.Filter.Eq(s => s.StreamId, streamId))
@@ -95,12 +97,14 @@ public sealed class MongoDbEventStore : IEventStore
 
             if (streamDoc is not null)
             {
-                var eventsToYield = streamDoc.Events.SkipWhile(e => e.EventId != anchor.Value).Skip(1);
+                var eventsToYield = streamDoc.Events.Skip(fromEventNumber.Value);
+                int currentEventNumber = fromEventNumber.Value;
 
                 foreach (var evt in eventsToYield)
                 {
-                    yield return new RecordedEvent(evt.EventId, evt.Type, evt.Data.ToJson());
-                    lastProcessedEventId = evt.EventId;
+                    yield return new RecordedEvent(evt.EventId, currentEventNumber, evt.Type, evt.Data.ToJson());
+                    lastProcessedEventNumber = currentEventNumber;
+                    currentEventNumber++;
                 }
             }
         }
@@ -109,38 +113,41 @@ public sealed class MongoDbEventStore : IEventStore
         {
             foreach (var change in cursor.Current)
             {
-                IEnumerable<StoredEvent> allEvents;
+                List<(StoredEvent evt, int index)> allEventsWithIndices;
 
                 if (change.FullDocument is not null)
                 {
-                    allEvents = change.FullDocument.Events;
+                    allEventsWithIndices = change.FullDocument.Events.Select((evt, idx) => (evt, idx)).ToList();
                 }
                 else
                 {
-                    allEvents = change
+                    allEventsWithIndices = change
                         .UpdateDescription.UpdatedFields.Where(field => field.Name.StartsWith("Events."))
-                        .OrderBy(field => int.Parse(field.Name.Split('.')[1]))
-                        .Select(field => BsonSerializer.Deserialize<StoredEvent>(field.Value.AsBsonDocument))
+                        .Select(field =>
+                        {
+                            var index = int.Parse(field.Name.Split('.')[1]);
+                            var evt = BsonSerializer.Deserialize<StoredEvent>(field.Value.AsBsonDocument);
+                            return (evt, index);
+                        })
+                        .OrderBy(x => x.index)
                         .ToList();
                 }
 
-                IEnumerable<StoredEvent> eventsToYield;
+                IEnumerable<(StoredEvent evt, int index)> eventsToYield;
 
-                if (lastProcessedEventId.HasValue && allEvents.Any(e => e.EventId == lastProcessedEventId.Value))
+                if (lastProcessedEventNumber.HasValue)
                 {
-                    // lastProcessedEventId is in this batch - skip up to and including it
-                    eventsToYield = allEvents.SkipWhile(e => e.EventId != lastProcessedEventId.Value).Skip(1);
+                    eventsToYield = allEventsWithIndices.Where(x => x.index > lastProcessedEventNumber.Value);
                 }
                 else
                 {
-                    // Either no anchor, or we're already past it - yield all events
-                    eventsToYield = allEvents;
+                    eventsToYield = allEventsWithIndices;
                 }
 
-                foreach (var evt in eventsToYield)
+                foreach (var (evt, index) in eventsToYield)
                 {
-                    yield return new RecordedEvent(evt.EventId, evt.Type, evt.Data.ToJson());
-                    lastProcessedEventId = evt.EventId;
+                    yield return new RecordedEvent(evt.EventId, index, evt.Type, evt.Data.ToJson());
+                    lastProcessedEventNumber = index;
                 }
             }
         }

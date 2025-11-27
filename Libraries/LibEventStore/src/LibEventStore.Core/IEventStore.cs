@@ -12,11 +12,12 @@ public interface IEventStore
     public Task<IList<RecordedEvent>> ReadStreamAsync(string streamId, CancellationToken cancellationToken);
 
     /// Subscribes to new events in the stream.
-    /// If anchor is null, only yields new events as they are appended.
-    /// If anchor is provided, yields all events after the specified event ID (both existing and new).
+    /// If fromEventNumber is null, only yields new events as they are appended.
+    /// If fromEventNumber is provided, yields all events starting from that event number (both existing and new).
+    /// Pass 0 to get all events from the beginning of the stream.
     public IAsyncEnumerable<RecordedEvent> SubscribeToStreamAsync(
         string streamId,
-        Guid? anchor,
+        int? fromEventNumber,
         CancellationToken cancellationToken
     );
 }

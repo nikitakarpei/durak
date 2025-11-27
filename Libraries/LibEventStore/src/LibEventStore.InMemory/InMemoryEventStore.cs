@@ -48,14 +48,14 @@ public sealed class InMemoryEventStore : IEventStore
             snapshot = state.Events;
         }
 
-        var events = snapshot.Select(e => new RecordedEvent(e.EventId, e.Type, e.JsonData)).ToList();
+        var events = snapshot.Select((e, index) => new RecordedEvent(e.EventId, index, e.Type, e.JsonData)).ToList();
 
         return Task.FromResult<IList<RecordedEvent>>(events);
     }
 
     public async IAsyncEnumerable<RecordedEvent> SubscribeToStreamAsync(
         string streamId,
-        Guid? anchor,
+        int? fromEventNumber,
         [EnumeratorCancellation] CancellationToken cancellationToken
     )
     {
@@ -71,8 +71,8 @@ public sealed class InMemoryEventStore : IEventStore
 
         try
         {
-            // If anchor is provided, yield existing events after the anchor
-            if (anchor.HasValue)
+            // If fromEventNumber is provided, yield existing events starting from that event number
+            if (fromEventNumber.HasValue)
             {
                 ImmutableList<EventData> snapshot;
                 lock (state)
@@ -80,27 +80,41 @@ public sealed class InMemoryEventStore : IEventStore
                     snapshot = state.Events;
                 }
 
-                bool foundAnchor = false;
-                foreach (var eventData in snapshot)
+                // Skip events before fromEventNumber
+                var eventsToYield = snapshot.Skip(fromEventNumber.Value);
+                int currentEventNumber = fromEventNumber.Value;
+
+                foreach (var eventData in eventsToYield)
                 {
-                    if (foundAnchor)
-                    {
-                        yield return new RecordedEvent(eventData.EventId, eventData.Type, eventData.JsonData);
-                    }
-                    else if (eventData.EventId == anchor.Value)
-                    {
-                        foundAnchor = true;
-                    }
+                    yield return new RecordedEvent(
+                        eventData.EventId,
+                        currentEventNumber,
+                        eventData.Type,
+                        eventData.JsonData
+                    );
+                    currentEventNumber++;
                 }
             }
 
             // Yield new events from channel
             var reader = channel.Reader;
+            int nextEventNumber;
+            lock (state)
+            {
+                nextEventNumber = state.Events.Count;
+            }
+
             while (await reader.WaitToReadAsync(cancellationToken))
             {
                 while (reader.TryRead(out var eventData))
                 {
-                    yield return new RecordedEvent(eventData.EventId, eventData.Type, eventData.JsonData);
+                    yield return new RecordedEvent(
+                        eventData.EventId,
+                        nextEventNumber,
+                        eventData.Type,
+                        eventData.JsonData
+                    );
+                    nextEventNumber++;
                 }
             }
         }

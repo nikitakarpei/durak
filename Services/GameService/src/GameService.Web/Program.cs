@@ -40,8 +40,6 @@ var mongoDbOptions =
 
 var mongoClient = new MongoClient(mongoDbOptions.ConnectionString);
 
-BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
-
 builder.Services.AddSingleton<IMongoClient>(mongoClient);
 builder.Services.AddSingleton<IMongoDatabase>(sp => mongoClient.GetDatabase(mongoDbOptions.DatabaseName));
 
