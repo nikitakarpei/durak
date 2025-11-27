@@ -30,6 +30,7 @@ public class GameActor : ReceiveActor, ILogReceive
     protected override void PreStart()
     {
         Context.ActorOf(Props.Create<GameEventForwarderActor>(_rootServiceProvider, _gameId), "game-event-forwarder");
+        Context.ActorOf(Props.Create<GameTimersActor>(_rootServiceProvider, _gameId), "game-timers");
     }
 
     protected override void PostStop()
