@@ -144,41 +144,28 @@ public class GameTimersActor : ReceivePersistentActor, ILogReceive, IWithTimers
 
     private async Task HandleCommand(HandleTimerExpiredCommand command)
     {
-        try
+        if (!_activeTimersByType.TryGetValue(command.TimerType, out var activeTimer))
         {
-            if (!_activeTimersByType.TryGetValue(command.TimerType, out var activeTimer))
-            {
-                _log.Warning("Timer expired for type {TimerType} but no active timer found", command.TimerType);
-                return;
-            }
-
-            if (activeTimer.TimerGeneration != command.TimerGeneration)
-            {
-                _log.Warning(
-                    $"Timer expired for type {command.TimerType} but generation mismatch. Expected {command.TimerGeneration}, got {activeTimer.TimerGeneration}"
-                );
-                return;
-            }
-
-            await _mediator.Publish(
-                new Application.GameTimerExpiredNotification(_gameId, command.TimerType, command.TimerGeneration)
-            );
-
-            _activeTimersByType.Remove(command.TimerType);
-
-            var evt = new TimerExpiredEvent(command.TimerType);
-            Persist(
-                evt,
-                @event =>
-                {
-                    Sender.Tell(new Status.Success(true), Self);
-                }
-            );
+            _log.Warning("Timer expired for type {TimerType} but no active timer found", command.TimerType);
+            return;
         }
-        catch (Exception e)
+
+        if (activeTimer.TimerGeneration != command.TimerGeneration)
         {
-            Sender.Tell(new Status.Failure(e), Self);
+            _log.Warning(
+                $"Timer expired for type {command.TimerType} but generation mismatch. Expected {command.TimerGeneration}, got {activeTimer.TimerGeneration}"
+            );
+            return;
         }
+
+        await _mediator.Publish(
+            new Application.GameTimerExpiredNotification(_gameId, command.TimerType, command.TimerGeneration)
+        );
+
+        _activeTimersByType.Remove(command.TimerType);
+
+        var evt = new TimerExpiredEvent(command.TimerType);
+        Persist(evt, @event => { });
     }
 
     private void HandleRecover(TimerStartedEvent evt)
