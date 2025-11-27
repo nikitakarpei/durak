@@ -1,6 +1,6 @@
 namespace GameService.Application;
 
-public class FoolDeclaredHandler(IGameCollection gameCollection)
+public class DeleteGameOnFoolDeclaredHandler(IGameCollection gameCollection)
     : MediatR.INotificationHandler<GameDomainEventNotification<Domain.GameEvents.FoolDeclared>>
 {
     public Task Handle(
