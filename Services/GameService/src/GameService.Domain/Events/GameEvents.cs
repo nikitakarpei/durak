@@ -2,7 +2,13 @@ namespace GameService.Domain;
 
 public static class GameEvents
 {
-    public record ActivePlayerChanged(string PlayerId, PossibleMove[] PossibleMoves);
+    public record ActivePlayerChanged(
+        string PlayerId,
+        PossibleMove[] PossibleMoves,
+        TimeSpan PlayerAfkTimerDuration,
+        int? CurrentPlayerAfkTimerGeneration,
+        int NextPlayerAfkTimerGeneration
+    );
 
     public record AttackCardBeaten(string PlayerId, string AttackerCardId, string DefenderCardId, DateTime PlayedAt);
 
@@ -29,7 +35,7 @@ public static class GameEvents
 
     public record PlayerTookCardsFromTable(string PlayerId, string[] CardIds);
 
-    public record RoundFinished(int RoundNumber);
+    public record RoundFinished(int RoundNumber, int PlayerAfkTimerGeneration);
 
     public record RoundStarted(int RoundNumber, string AttackerId, string DefenderId);
 }

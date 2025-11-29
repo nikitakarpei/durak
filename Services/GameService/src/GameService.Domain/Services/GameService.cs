@@ -42,6 +42,48 @@ public class GameService(
         game.PlayAttackCard(cardMoveValidator, command.PlayerId, command.CardId);
     }
 
+    public void HandleCommand(GameAggregate game, GameCommands.HandlePlayerAfkTimerExpired command)
+    {
+        switch (game.State.PlayerAfkTimer)
+        {
+            case ActivePlayerAfkTimer activeTimer:
+            {
+                if (command.TimerGeneration < activeTimer.TimerGeneration)
+                {
+                    return;
+                }
+
+                if (command.TimerGeneration > activeTimer.TimerGeneration)
+                {
+                    throw new InvalidOperationException(
+                        $"Passed timer generation {command.TimerGeneration} is greater than the current timer generation {activeTimer.TimerGeneration}."
+                    );
+                }
+
+                // todo: decide what to do
+
+                return;
+            }
+
+            case InactivePlayerAfkTimer inactiveTimer:
+            {
+                if (command.TimerGeneration > inactiveTimer.LastTimerGeneration)
+                {
+                    throw new InvalidOperationException(
+                        $"Passed timer generation {command.TimerGeneration} is greater than the last timer generation {inactiveTimer.LastTimerGeneration}."
+                    );
+                }
+
+                return;
+            }
+
+            default:
+                throw new InvalidOperationException(
+                    "Player AFK timer is not active or inactive. This should not happen."
+                );
+        }
+    }
+
     public void HandleCommand(GameAggregate game, object command)
     {
         throw new InvalidOperationException($"Unknown command type: {command.GetType().Name}");

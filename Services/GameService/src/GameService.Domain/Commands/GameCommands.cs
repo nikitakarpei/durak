@@ -15,4 +15,6 @@ public static class GameCommands
     public record JoinLobby(string PlayerId) : GameCommand;
 
     public record PlayAttackCard(string PlayerId, string CardId) : GameCommand;
+
+    public record HandlePlayerAfkTimerExpired(int TimerGeneration) : GameCommand;
 }

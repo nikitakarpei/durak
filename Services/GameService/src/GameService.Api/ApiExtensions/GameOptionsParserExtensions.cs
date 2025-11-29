@@ -28,6 +28,12 @@ internal static class GameOptionsParserExtensions
             return new Domain.GameOptions.MinHandSize(minHandSize.Count);
         }
 
+        if (apiOption.Is(Data.GameOptions.PlayerAfkTimerDuration.Descriptor))
+        {
+            var playerAfkTimerDuration = apiOption.Unpack<Data.GameOptions.PlayerAfkTimerDuration>();
+            return new Domain.GameOptions.PlayerAfkTimerDuration(playerAfkTimerDuration.Duration.ToTimeSpan());
+        }
+
         throw new ArgumentException($"Unknown game option type: {apiOption.TypeUrl}");
     }
 }

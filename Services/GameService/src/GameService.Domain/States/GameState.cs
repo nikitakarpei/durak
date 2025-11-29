@@ -109,6 +109,7 @@ public record GameState : State<GameState>
                 state with
                 {
                     CurrentRound = state.CurrentRound! with { ActivePlayerId = @event.PlayerId },
+                    PlayerAfkTimer = new ActivePlayerAfkTimer(@event.PlayerId, @event.NextPlayerAfkTimerGeneration),
                 }
         );
 
@@ -157,6 +158,7 @@ public record GameState : State<GameState>
                 {
                     PlayedRounds = state.PlayedRounds.Add(state.CurrentRound!),
                     CurrentRound = null,
+                    PlayerAfkTimer = new InactivePlayerAfkTimer(@event.PlayerAfkTimerGeneration),
                 }
         );
 
@@ -213,6 +215,7 @@ public record GameState : State<GameState>
     public string? LastDealtCardId { get; init; }
     public CardSuit? CommonTrumpSuit { get; init; }
     public Round? CurrentRound { get; init; }
+    public PlayerAfkTimer? PlayerAfkTimer { get; init; }
     public string? FoolId { get; init; }
     public byte[] RandomSeed { get; init; } = Array.Empty<byte>();
 

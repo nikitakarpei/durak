@@ -1,5 +1,6 @@
 syntax = "proto3";
 package game_service.api.data.game_options;
+import "google/protobuf/duration.proto";
 import "game_service_data.proto";
 
 message AmountOfPlayers
@@ -15,4 +16,9 @@ message CardRanksInTalon
 message MinHandSize
 {
   int32 count = 1;
+}
+
+message PlayerAfkTimerDuration
+{
+  google.protobuf.Duration duration = 1;
 }

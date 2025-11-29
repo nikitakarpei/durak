@@ -38,6 +38,12 @@ public static class ApiToDomainExtensions
             return new Domain.GameOptions.MinHandSize(minHandSize.Count);
         }
 
+        if (apiOption.Is(GameService.Api.Data.GameOptions.PlayerAfkTimerDuration.Descriptor))
+        {
+            var playerAfkTimerDuration = apiOption.Unpack<GameService.Api.Data.GameOptions.PlayerAfkTimerDuration>();
+            return new Domain.GameOptions.PlayerAfkTimerDuration(playerAfkTimerDuration.Duration.ToTimeSpan());
+        }
+
         throw new ArgumentException($"Unknown game option type: {apiOption.TypeUrl}");
     }
 
@@ -141,4 +147,3 @@ public static class ApiToDomainExtensions
         throw new ArgumentException($"Unknown possible move type: {apiPossibleMove.TypeUrl}");
     }
 }
-

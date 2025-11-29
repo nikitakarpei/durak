@@ -270,7 +270,22 @@ public class GameAggregate : Aggregate<GameState>
             throw new InvalidOperationException("The player has no possible moves.");
         }
 
-        Apply(new GameEvents.ActivePlayerChanged(PlayerId, possibleMoves.ToArray()));
+        var playerAfkTimerDuration = State.Options.OfType<GameOptions.PlayerAfkTimerDuration>().First().Duration;
+
+        var currentPlayerAfkTimerGeneration = (State.PlayerAfkTimer as ActivePlayerAfkTimer)?.TimerGeneration;
+        var nextPlayerAfkTimerGeneration = currentPlayerAfkTimerGeneration.HasValue
+            ? currentPlayerAfkTimerGeneration.Value + 1
+            : 1;
+
+        Apply(
+            new GameEvents.ActivePlayerChanged(
+                PlayerId,
+                possibleMoves.ToArray(),
+                playerAfkTimerDuration,
+                currentPlayerAfkTimerGeneration,
+                nextPlayerAfkTimerGeneration
+            )
+        );
     }
 
     public void FinishCurrentRound()
@@ -280,7 +295,14 @@ public class GameAggregate : Aggregate<GameState>
             throw new InvalidOperationException("There is no round.");
         }
 
-        Apply(new GameEvents.RoundFinished(State.CurrentRound.RoundNumber));
+        if (State.PlayerAfkTimer is not ActivePlayerAfkTimer activePlayerAfkTimer)
+        {
+            throw new InvalidOperationException("Player AFK timer is not active. This should not happen.");
+        }
+
+        var playerAfkTimerGeneration = activePlayerAfkTimer.TimerGeneration;
+
+        Apply(new GameEvents.RoundFinished(State.CurrentRound.RoundNumber, playerAfkTimerGeneration));
     }
 
     public void DiscardCardsOnTable()
