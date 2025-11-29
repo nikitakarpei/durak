@@ -44,44 +44,38 @@ public class GameService(
 
     public void HandleCommand(GameAggregate game, GameCommands.HandlePlayerAfkTimerExpired command)
     {
-        switch (game.State.PlayerAfkTimer)
+        if (game.State.PlayerAfkTimer is ActivePlayerAfkTimer activeTimer)
         {
-            case ActivePlayerAfkTimer activeTimer:
+            if (command.TimerGeneration < activeTimer.TimerGeneration)
             {
-                if (command.TimerGeneration < activeTimer.TimerGeneration)
-                {
-                    return;
-                }
-
-                if (command.TimerGeneration > activeTimer.TimerGeneration)
-                {
-                    throw new InvalidOperationException(
-                        $"Passed timer generation {command.TimerGeneration} is greater than the current timer generation {activeTimer.TimerGeneration}."
-                    );
-                }
-
-                // todo: decide what to do
-
                 return;
             }
 
-            case InactivePlayerAfkTimer inactiveTimer:
+            if (command.TimerGeneration > activeTimer.TimerGeneration)
             {
-                if (command.TimerGeneration > inactiveTimer.LastTimerGeneration)
-                {
-                    throw new InvalidOperationException(
-                        $"Passed timer generation {command.TimerGeneration} is greater than the last timer generation {inactiveTimer.LastTimerGeneration}."
-                    );
-                }
-
-                return;
-            }
-
-            default:
                 throw new InvalidOperationException(
-                    "Player AFK timer is not active or inactive. This should not happen."
+                    $"Passed timer generation {command.TimerGeneration} is greater than the current timer generation {activeTimer.TimerGeneration}."
                 );
+            }
+
+            // todo: decide what to do
+
+            return;
         }
+
+        if (game.State.PlayerAfkTimer is InactivePlayerAfkTimer inactiveTimer)
+        {
+            if (command.TimerGeneration > inactiveTimer.LastTimerGeneration)
+            {
+                throw new InvalidOperationException(
+                    $"Passed timer generation {command.TimerGeneration} is greater than the last timer generation {inactiveTimer.LastTimerGeneration}."
+                );
+            }
+
+            return;
+        }
+
+        throw new InvalidOperationException("Player AFK timer is not active or inactive. This should not happen.");
     }
 
     public void HandleCommand(GameAggregate game, object command)
