@@ -114,7 +114,11 @@ public class GameTimersActor : ReceivePersistentActor, ILogReceive, IWithTimers
 
             if (!_activeTimersByType.TryGetValue(command.TimerType, out var activeTimer))
             {
-                throw new InvalidOperationException($"Timer is not running for type {command.TimerType}");
+                _log.Warning(
+                    $"Attempted to cancel timer of type {command.TimerType} but it was not active (may have already expired or been cancelled)"
+                );
+                Sender.Tell(new Status.Success(true), Self);
+                return;
             }
 
             Timers.Cancel(command.TimerType);
