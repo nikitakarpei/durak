@@ -1,12 +1,15 @@
 using System.Text.Json;
 using Akka.Actor;
 using Akka.Event;
+using Akka.Persistence;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GameService.Infrastructure;
 
-public class GameActor : ReceiveActor, ILogReceive
+public class GameActor : ReceivePersistentActor, ILogReceive
 {
+    public override string PersistenceId => $"game-{_gameId}";
+
     private readonly IServiceScope _scope;
     private readonly IServiceProvider _rootServiceProvider;
     private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
@@ -24,7 +27,7 @@ public class GameActor : ReceiveActor, ILogReceive
         _eventStore = _scope.ServiceProvider.GetRequiredService<EventStore.IEventStore>();
         _gameId = gameId;
 
-        ReceiveAsync<ExecuteCommandMessage>(HandleMessage);
+        CommandAsync<ExecuteCommandMessage>(HandleCommand);
     }
 
     protected override void PreStart()
@@ -43,7 +46,7 @@ public class GameActor : ReceiveActor, ILogReceive
 
     public record struct ProcessEventMessage(EventStore.RecordedEvent Event);
 
-    private async Task HandleMessage(ExecuteCommandMessage message)
+    private async Task HandleCommand(ExecuteCommandMessage message)
     {
         try
         {

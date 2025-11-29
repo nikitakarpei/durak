@@ -7,13 +7,12 @@ namespace GameService.Infrastructure;
 
 public class GameTimersActor : ReceivePersistentActor, ILogReceive, IWithTimers
 {
+    public override string PersistenceId => $"game-timers-{_gameId}";
     public ITimerScheduler Timers { get; set; } = null!;
     private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
     private readonly IServiceScope _scope;
     private readonly MediatR.IMediator _mediator;
     private readonly string _gameId;
-
-    public override string PersistenceId => $"game-timers-{_gameId}";
 
     private record ActiveTimer(int TimerGeneration, DateTime ExpiresAt);
 

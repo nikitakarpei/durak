@@ -8,13 +8,13 @@ namespace GameService.Infrastructure;
 
 public class GameEventForwarderActor : ReceivePersistentActor, ILogReceive
 {
+    public override string PersistenceId => $"game-event-forwarder-{_gameId}";
+
     private readonly ILoggingAdapter _log = Logging.GetLogger(Context);
     private readonly IServiceScope _scope;
     private readonly EventStore.IEventStore _eventStore;
     private readonly MediatR.IMediator _mediator;
     private readonly string _gameId;
-
-    public override string PersistenceId => $"game-event-forwarder-{_gameId}";
 
     private Task _eventSubscriptionTask = Task.CompletedTask;
     private CancellationTokenSource _eventSubscriptionCancellationTokenSource = new();
