@@ -1,5 +1,5 @@
-using System.Buffers.Binary;
 using System.Net.Http.Headers;
+using System.Net.ServerSentEvents;
 using Microsoft.Extensions.Logging;
 using Rpc.Transport;
 
@@ -33,6 +33,7 @@ public class ClientHttpConnection(
             Version = minimumHttpVersion ?? new Version(1, 1),
             VersionPolicy = HttpVersionPolicy.RequestVersionOrHigher,
         };
+        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/event-stream"));
 
         var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
         response.EnsureSuccessStatusCode();
@@ -43,77 +44,35 @@ public class ClientHttpConnection(
                 try
                 {
                     await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+                    var parser = SseParser.Create(stream);
 
-                    while (!cancellationToken.IsCancellationRequested)
+                    await foreach (var item in parser.EnumerateAsync(cancellationToken))
                     {
-                        var packetBytes = await ReadPacketAsync(stream, cancellationToken);
-                        if (packetBytes == null)
+                        if (string.IsNullOrEmpty(item.Data))
                         {
-                            logger.LogDebug("[{Id}] End of stream", Id);
-                            break;
+                            continue;
                         }
 
+                        var packetBytes = Convert.FromBase64String(item.Data);
                         var responsePacket = Protocol.RpcPacket.FromRawBytes(packetBytes);
-                        logger.LogDebug("[{Id}] Received packet from stream", Id);
+                        logger.LogDebug("[{Id}] Received packet from SSE stream", Id);
                         PacketReceived?.Invoke(responsePacket);
                     }
+
+                    logger.LogDebug("[{Id}] End of SSE stream", Id);
                 }
                 catch (OperationCanceledException e)
                 {
-                    logger.LogDebug(e, "[{Id}] Operation canceled while reading packet from stream", Id);
+                    logger.LogDebug(e, "[{Id}] Operation canceled while reading SSE stream", Id);
                 }
                 catch (Exception e)
                 {
-                    logger.LogError(e, "[{Id}] Error reading packet from stream", Id);
+                    logger.LogError(e, "[{Id}] Error reading SSE stream", Id);
                     Closed?.Invoke();
                 }
             },
             cancellationToken
         );
-    }
-
-    private static async Task<byte[]?> ReadPacketAsync(Stream stream, CancellationToken cancellationToken)
-    {
-        var lengthBuffer = new byte[4];
-        var bytesRead = await stream.ReadAsync(lengthBuffer.AsMemory(0, 4), cancellationToken);
-
-        if (bytesRead == 0)
-        {
-            return null; // End of stream
-        }
-
-        if (bytesRead < 4)
-        {
-            throw new InvalidOperationException("Incomplete length prefix in stream");
-        }
-
-        var length = BinaryPrimitives.ReadInt32LittleEndian(lengthBuffer);
-
-        if (length <= 0 || length > 100 * 1024 * 1024) // 100 MB sanity check
-        {
-            throw new InvalidOperationException($"Invalid packet length: {length}");
-        }
-
-        // Read packet data
-        var packetBuffer = new byte[length];
-        var totalBytesRead = 0;
-
-        while (totalBytesRead < length)
-        {
-            bytesRead = await stream.ReadAsync(
-                packetBuffer.AsMemory(totalBytesRead, length - totalBytesRead),
-                cancellationToken
-            );
-
-            if (bytesRead == 0)
-            {
-                throw new InvalidOperationException("Unexpected end of stream while reading packet data");
-            }
-
-            totalBytesRead += bytesRead;
-        }
-
-        return packetBuffer;
     }
 
     public void Dispose()

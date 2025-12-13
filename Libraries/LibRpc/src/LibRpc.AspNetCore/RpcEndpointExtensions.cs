@@ -1,4 +1,3 @@
-using System.Buffers.Binary;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -17,22 +16,19 @@ public static class RpcEndpointExtensions
             {
                 var requestHandler = context.RequestServices.GetRequiredService<RpcRequestHandler>();
 
-                using var reader = new MemoryStream(new byte[context.Request.ContentLength ?? 0]);
-                await context.Request.Body.CopyToAsync(reader, context.RequestAborted);
+                using var ms = new MemoryStream();
+                await context.Request.Body.CopyToAsync(ms, context.RequestAborted);
 
-                var packet = Protocol.RpcPacket.FromRawBytes(reader.ToArray());
+                var packet = Protocol.RpcPacket.FromRawBytes(ms.ToArray());
 
-                context.Response.StatusCode = StatusCodes.Status200OK;
-                context.Response.ContentType = "application/octet-stream";
+                context.Response.ContentType = "text/event-stream";
+                context.Response.Headers.CacheControl = "no-cache";
 
                 await foreach (var response in requestHandler.HandleAsync(packet, context.RequestAborted))
                 {
-                    var responseBytes = response.AsRawBytes();
-                    var lengthPrefix = new byte[4];
-                    BinaryPrimitives.WriteInt32LittleEndian(lengthPrefix, responseBytes.Length);
+                    var payload = Convert.ToBase64String(response.AsRawBytes());
 
-                    await context.Response.Body.WriteAsync(lengthPrefix, context.RequestAborted);
-                    await context.Response.Body.WriteAsync(responseBytes, context.RequestAborted);
+                    await context.Response.WriteAsync($"data: {payload}\n\n", context.RequestAborted);
                     await context.Response.Body.FlushAsync(context.RequestAborted);
                 }
 
