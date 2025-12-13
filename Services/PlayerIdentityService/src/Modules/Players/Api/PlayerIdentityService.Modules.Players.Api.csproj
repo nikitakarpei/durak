@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <EnableDynamicLoading>true</EnableDynamicLoading>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\Protos\PlayerIdentityService.Protos.csproj" />
+        <ProjectReference Include="..\Application\PlayerIdentityService.Modules.Players.Application.csproj" />
+        <ProjectReference Include="$(SolutionDir)\Libraries\LibRpc\src\LibRpc.Core\LibRpc.Core.csproj" />
+    </ItemGroup>
+</Project>

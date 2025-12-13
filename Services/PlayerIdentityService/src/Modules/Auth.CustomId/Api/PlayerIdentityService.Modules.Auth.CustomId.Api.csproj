@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <EnableDynamicLoading>true</EnableDynamicLoading>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+        <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="MediatR" Version="12.4.1" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\Protos\PlayerIdentityService.Protos.csproj" />
+        <ProjectReference Include="..\..\Players\Contracts\PlayerIdentityService.Modules.Players.Contracts.csproj" />
+        <ProjectReference Include="..\Application\PlayerIdentityService.Modules.Auth.CustomId.Application.csproj" />
+        <ProjectReference Include="$(SolutionDir)\Libraries\LibRpc\src\LibRpc.Core\LibRpc.Core.csproj" />
+    </ItemGroup>
+</Project>

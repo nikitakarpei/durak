@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Google.Api.Gax" Version="4.12.1" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="$(SolutionDir)\Libraries\LibRpc\src\LibRpc.Core\LibRpc.Core.csproj" />
+        <ProjectReference Include="$(SolutionDir)\Libraries\LibRpc\src\LibRpc.Net\LibRpc.Net.csproj" />
+        <ProjectReference Include="$(SolutionDir)\Libraries\LibRpc\src\LibRpc.AspNetCore\LibRpc.AspNetCore.csproj" />
+        <ProjectReference Include="$(SolutionDir)\Libraries\LibSecrets\src\LibSecrets.Gcp\LibSecrets.Gcp.csproj" />
+        <ProjectReference Include="..\Protos\PlayerIdentityService.Protos.csproj" />
+        <ProjectReference Include="..\BuildingBlocks\Infrastructure\PlayerIdentityService.BuildingBlocks.Infrastructure.csproj" />
+        <ProjectReference Include="..\Modules\Players\Contracts\PlayerIdentityService.Modules.Players.Contracts.csproj" />
+        <ProjectReference Include="..\Modules\Players\Domain\PlayerIdentityService.Modules.Players.Domain.csproj" />
+        <ProjectReference Include="..\Modules\Players\Application\PlayerIdentityService.Modules.Players.Application.csproj" />
+        <ProjectReference Include="..\Modules\Players\Infrastructure\PlayerIdentityService.Modules.Players.Infrastructure.csproj" />
+        <ProjectReference Include="..\Modules\Players\Api\PlayerIdentityService.Modules.Players.Api.csproj" />
+        <ProjectReference Include="..\Modules\Auth.CustomId\Domain\PlayerIdentityService.Modules.Auth.CustomId.Domain.csproj" />
+        <ProjectReference Include="..\Modules\Auth.CustomId\Application\PlayerIdentityService.Modules.Auth.CustomId.Application.csproj" />
+        <ProjectReference Include="..\Modules\Auth.CustomId\Infrastructure\PlayerIdentityService.Modules.Auth.CustomId.Infrastructure.csproj" />
+        <ProjectReference Include="..\Modules\Auth.CustomId\Api\PlayerIdentityService.Modules.Auth.CustomId.Api.csproj" />
+        <ProjectReference Include="..\Modules\Auth.AndroidDeviceId\Domain\PlayerIdentityService.Modules.Auth.AndroidDeviceId.Domain.csproj" />
+        <ProjectReference Include="..\Modules\Auth.AndroidDeviceId\Application\PlayerIdentityService.Modules.Auth.AndroidDeviceId.Application.csproj" />
+        <ProjectReference Include="..\Modules\Auth.AndroidDeviceId\Infrastructure\PlayerIdentityService.Modules.Auth.AndroidDeviceId.Infrastructure.csproj" />
+        <ProjectReference Include="..\Modules\Auth.AndroidDeviceId\Api\PlayerIdentityService.Modules.Auth.AndroidDeviceId.Api.csproj" />
+        <ProjectReference Include="..\Modules\Auth.IosDeviceId\Domain\PlayerIdentityService.Modules.Auth.IosDeviceId.Domain.csproj" />
+        <ProjectReference Include="..\Modules\Auth.IosDeviceId\Application\PlayerIdentityService.Modules.Auth.IosDeviceId.Application.csproj" />
+        <ProjectReference Include="..\Modules\Auth.IosDeviceId\Infrastructure\PlayerIdentityService.Modules.Auth.IosDeviceId.Infrastructure.csproj" />
+        <ProjectReference Include="..\Modules\Auth.IosDeviceId\Api\PlayerIdentityService.Modules.Auth.IosDeviceId.Api.csproj" />
+    </ItemGroup>
+</Project>
