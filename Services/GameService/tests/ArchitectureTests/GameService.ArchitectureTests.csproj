@@ -15,7 +15,7 @@
         <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\..\src\GameService.Application\GameService.Application.csproj" />
-        <ProjectReference Include="..\..\src\GameService.Domain\GameService.Domain.csproj" />
+        <ProjectReference Include="..\..\src\Application\GameService.Application.csproj" />
+        <ProjectReference Include="..\..\src\Domain\GameService.Domain.csproj" />
     </ItemGroup>
 </Project>

@@ -17,8 +17,7 @@
         <Protobuf Include="$(SolutionDir)Protos\player_identity_service\api\**\*.proto" GrpcServices="None" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\BotService.Application\BotService.Application.csproj" />
-        <ProjectReference Include="..\BotService.Domain\BotService.Domain.csproj" />
+        <ProjectReference Include="..\Application\BotService.Application.csproj" />
+        <ProjectReference Include="..\Domain\BotService.Domain.csproj" />
     </ItemGroup>
 </Project>
-

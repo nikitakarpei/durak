@@ -16,8 +16,8 @@
         <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.0" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\GameService.Domain\GameService.Domain.csproj" />
-        <ProjectReference Include="..\GameService.Application\GameService.Application.csproj" />
+        <ProjectReference Include="..\Domain\GameService.Domain.csproj" />
+        <ProjectReference Include="..\Application\GameService.Application.csproj" />
         <ProjectReference Include="$(SolutionDir)\Libraries\LibSecrets\src\LibSecrets.Core\LibSecrets.Core.csproj" />
     </ItemGroup>
 </Project>

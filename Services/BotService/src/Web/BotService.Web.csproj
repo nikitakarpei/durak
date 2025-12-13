@@ -10,8 +10,8 @@
         <ProjectReference Include="$(SolutionDir)\Libraries\LibRpc\src\LibRpc.Net\LibRpc.Net.csproj" />
         <ProjectReference Include="$(SolutionDir)\Libraries\LibRpc\src\LibRpc.AspNetCore\LibRpc.AspNetCore.csproj" />
         <ProjectReference Include="$(SolutionDir)\Libraries\LibSecrets\src\LibSecrets.Gcp\LibSecrets.Gcp.csproj" />
-        <ProjectReference Include="..\BotService.Infrastructure\BotService.Infrastructure.csproj" />
-        <ProjectReference Include="..\BotService.Application\BotService.Application.csproj" />
-        <ProjectReference Include="..\BotService.Api\BotService.Api.csproj" />
+        <ProjectReference Include="..\Infrastructure\BotService.Infrastructure.csproj" />
+        <ProjectReference Include="..\Application\BotService.Application.csproj" />
+        <ProjectReference Include="..\Api\BotService.Api.csproj" />
     </ItemGroup>
 </Project>

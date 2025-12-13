@@ -14,8 +14,8 @@
         <ProjectReference Include="$(SolutionDir)\Libraries\LibSecrets\src\LibSecrets.Gcp\LibSecrets.Gcp.csproj" />
         <ProjectReference Include="$(SolutionDir)\Libraries\LibEventStore\src\LibEventStore.MongoDb\LibEventStore.MongoDb.csproj" />
         <ProjectReference Include="$(SolutionDir)\Libraries\LibPlayerIdentityVerify\src\LibPlayerIdentityVerify.Net\LibPlayerIdentityVerify.Net.csproj" />
-        <ProjectReference Include="..\GameService.Infrastructure\GameService.Infrastructure.csproj" />
-        <ProjectReference Include="..\GameService.Application\GameService.Application.csproj" />
-        <ProjectReference Include="..\GameService.Api\GameService.Api.csproj" />
+        <ProjectReference Include="..\Infrastructure\GameService.Infrastructure.csproj" />
+        <ProjectReference Include="..\Application\GameService.Application.csproj" />
+        <ProjectReference Include="..\Api\GameService.Api.csproj" />
     </ItemGroup>
 </Project>

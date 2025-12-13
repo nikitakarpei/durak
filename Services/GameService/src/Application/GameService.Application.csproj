@@ -8,17 +8,12 @@
         <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Grpc.Tools" Version="2.72.0" />
-        <PackageReference Include="Google.Protobuf" Version="3.31.0" />
+        <PackageReference Include="MediatR" Version="12.4.1" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
     </ItemGroup>
     <ItemGroup>
-        <Protobuf Include="$(SolutionDir)Protos\game_service\**\*.proto" GrpcServices="None" />
-    </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\GameService.Application\GameService.Application.csproj" />
-        <ProjectReference Include="..\GameService.Domain\GameService.Domain.csproj" />
+        <ProjectReference Include="..\Domain\GameService.Domain.csproj" />
         <ProjectReference Include="$(SolutionDir)\Libraries\LibEventStore\src\LibEventStore.Core\LibEventStore.Core.csproj" />
-        <ProjectReference Include="$(SolutionDir)\Libraries\LibRpc\src\LibRpc.Core\LibRpc.Core.csproj" />
         <ProjectReference Include="$(SolutionDir)\Libraries\LibPlayerIdentityVerify\src\LibPlayerIdentityVerify.Core\LibPlayerIdentityVerify.Core.csproj" />
     </ItemGroup>
 </Project>

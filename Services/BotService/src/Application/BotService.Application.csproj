@@ -8,7 +8,7 @@
         <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
     </PropertyGroup>
     <ItemGroup>
-        <ProjectReference Include="..\BotService.Domain\BotService.Domain.csproj" />
+        <ProjectReference Include="..\Domain\BotService.Domain.csproj" />
         <ProjectReference Include="$(SolutionDir)\Libraries\LibRpc\src\LibRpc.Core\LibRpc.Core.csproj" />
     </ItemGroup>
 </Project>
