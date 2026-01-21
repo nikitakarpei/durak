@@ -3,7 +3,6 @@ package game_service.api.game_events;
 import "google/protobuf/any.proto";
 import "google/protobuf/timestamp.proto";
 import "game_service_data.proto";
-import "game_service_possible_moves.proto";
 
 message YourTurnStarted
 {

@@ -1,7 +1,6 @@
 syntax = "proto3";
 package game_service.api.commands;
 import "google/protobuf/any.proto";
-import "game_service_data.proto";
 
 message CreateGameCommand
 {
