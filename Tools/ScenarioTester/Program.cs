@@ -167,6 +167,7 @@ public class ScenarioRunner
 
         using var httpClient = _httpClientFactory.CreateClient();
         using var connection = new Rpc.Net.Transport.ClientHttpConnection(
+            _loggerFactory.CreateLogger<Rpc.Net.Transport.ClientHttpConnection>(),
             Guid.NewGuid(),
             httpClient,
             new Uri(playerServiceUrl)
@@ -296,6 +297,7 @@ public class ScenarioRunner
     {
         using var httpClient = _httpClientFactory.CreateClient();
         using var connection = new Rpc.Net.Transport.ClientHttpConnection(
+            _loggerFactory.CreateLogger<Rpc.Net.Transport.ClientHttpConnection>(),
             Guid.NewGuid(),
             httpClient,
             new Uri(GetPlayerIdentityServiceUrl())
@@ -322,6 +324,7 @@ public class ScenarioRunner
     {
         using var httpClient = _httpClientFactory.CreateClient();
         using var connection = new Rpc.Net.Transport.ClientHttpConnection(
+            _loggerFactory.CreateLogger<Rpc.Net.Transport.ClientHttpConnection>(),
             Guid.NewGuid(),
             httpClient,
             new Uri(GetGameServiceUrl(playerIdToken))
@@ -369,6 +372,7 @@ public class ScenarioRunner
     {
         using var httpClient = _httpClientFactory.CreateClient();
         using var connection = new Rpc.Net.Transport.ClientHttpConnection(
+            _loggerFactory.CreateLogger<Rpc.Net.Transport.ClientHttpConnection>(),
             Guid.NewGuid(),
             httpClient,
             new Uri(GetGameServiceUrl(playerIdToken))

@@ -15,8 +15,7 @@ public class MongoDbEventStoreTests : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        _mongoContainer = new MongoDbBuilder()
-            .WithImage("mongo:7.0")
+        _mongoContainer = new MongoDbBuilder("mongo:7.0")
             .WithReplicaSet("rs0") // Required for Change Streams
             .Build();
 

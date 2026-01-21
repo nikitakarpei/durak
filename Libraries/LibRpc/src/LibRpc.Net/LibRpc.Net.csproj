@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net9.0</TargetFramework>
+        <TargetFramework>net10.0</TargetFramework>
         <EnableDynamicLoading>true</EnableDynamicLoading>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
@@ -8,10 +8,9 @@
         <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Google.Protobuf" Version="3.31.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
-        <PackageReference Include="System.Linq.Async" Version="6.0.1" />
-        <PackageReference Include="System.Net.ServerSentEvents" Version="10.0.1" />
+        <PackageReference Include="Google.Protobuf" Version="3.33.4" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.2" />
+        <PackageReference Include="System.Linq.Async" Version="7.0.0" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\LibRpc.Core\LibRpc.Core.csproj" />
