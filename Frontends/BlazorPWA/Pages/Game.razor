@@ -147,9 +147,22 @@
             return Enumerable.Empty<OpponentSeatView>();
         }
 
-        return Enumerable.Range(0, totalSeats)
+        var visibleSeats = Enumerable.Range(0, totalSeats)
             .Where(seat => localSeat is null || seat != localSeat.Value)
-            .Select(seat =>
+            .ToList();
+
+        if (localSeat is null && State.LocalPlayerId is not null && seatCountFromGame > 0 && visibleSeats.Count > 0)
+        {
+            var reservedLocalSeat = visibleSeats.FirstOrDefault(seat => !joinedBySeat.ContainsKey(seat));
+            if (joinedBySeat.ContainsKey(reservedLocalSeat))
+            {
+                reservedLocalSeat = visibleSeats[^1];
+            }
+
+            visibleSeats.Remove(reservedLocalSeat);
+        }
+
+        return visibleSeats.Select(seat =>
             {
                 if (joinedBySeat.TryGetValue(seat, out var player))
                 {

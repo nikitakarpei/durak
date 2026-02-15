@@ -46,3 +46,6 @@
 - Derive visible seat count from `GameCreated` player configuration (`AmountOfPlayers`) instead of fixed max seats.
   - Why: fixed max seats overstates lobby size for smaller games and confuses players.
   - Alternatives considered: keep fixed 6 seats (rejected; inconsistent with server-defined game setup), infer only from joined players (rejected; does not show expected empty seats before joins).
+- Hide one reserved local seat immediately when local identity is known but local seat assignment event has not arrived yet.
+  - Why: prevents temporary over-rendering of opponent slots during join-event ordering.
+  - Alternatives considered: wait for local `PlayerJoined` event before correcting count (rejected; user-visible flicker/incorrect slot count).

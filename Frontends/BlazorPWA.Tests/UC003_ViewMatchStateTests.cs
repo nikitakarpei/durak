@@ -93,6 +93,22 @@ public class UC003_ViewMatchStateTests : TestContext
     }
 
     [Fact]
+    public void OpponentsSectionDoesNotRenderLocalSlotBeforeLocalSeatIsKnown()
+    {
+        _gameState.LocalPlayerId = "player-1";
+        _gameState.Players["player-2"] = new PlayerState("player-2", 2) { CardCount = 4 };
+
+        var created = new GameCreated();
+        created.Options.Add(Any.Pack(new AmountOfPlayers { Count = 3 }));
+        GameStateReducer.Apply(_gameState, Any.Pack(created));
+
+        var cut = RenderComponent<Game>();
+
+        var opponents = cut.FindAll("div.opponent");
+        opponents.Should().HaveCount(2);
+    }
+
+    [Fact]
     public void TableSectionRendersCardPairs()
     {
         var attackCard = new Card("atk-1", CardSuit.Clubs, CardRank.Seven);
