@@ -151,7 +151,8 @@
     transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
 }
 
-.hand .card.playable {
+.hand .card.playable,
+.card.beatable {
     border-color: #86efac;
     background: #f0fdf4;
 }
@@ -191,7 +192,3 @@
     cursor: not-allowed;
 }
 
-.card.beatable {
-    outline: 2px solid #22c55e;
-    outline-offset: 3px;
-}
