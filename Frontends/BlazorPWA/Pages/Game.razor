@@ -51,7 +51,7 @@
                     <div class="pair">
                         @if (pair.Defence is null)
                         {
-                            <button class="card @(selectedAttackCardId == pair.Attack.Id ? "selected" : "")" @onclick="() => SelectAttackCard(pair.Attack.Id)">@RenderCardLabel(pair.Attack)</button>
+                            <button class="card @(selectedAttackCardId == pair.Attack.Id ? "selected" : "") @(IsAttackCardBeatable(pair.Attack.Id) ? "beatable" : "")" @onclick="() => SelectAttackCard(pair.Attack.Id)">@RenderCardLabel(pair.Attack)</button>
                         }
                         else
                         {
@@ -68,7 +68,7 @@
                 <div class="hand-cards">
                     @foreach (var card in State.YourHand)
                     {
-                        <button class="card @(selectedCardId == card.Id ? "selected" : "") @(IsCardPlayable(card.Id) ? "playable" : "")" @onclick="() => SelectCard(card.Id)">
+                        <button class="card @(selectedCardId == card.Id ? "selected" : "") @(IsCardPlayable(card.Id) ? "playable" : "") @(IsHandCardBeatable(card.Id) ? "beatable" : "")" @onclick="() => SelectCard(card.Id)">
                             @RenderCardLabel(card)
                         </button>
                     }
@@ -176,6 +176,20 @@
 
     private bool IsCardPlayable(string cardId) =>
         State.YourPossibleMoves.Any(m => m.YourCardId == cardId);
+
+    private bool IsAttackCardBeatable(string attackCardId) =>
+        !string.IsNullOrWhiteSpace(selectedCardId) &&
+        State.YourPossibleMoves.Any(m =>
+            m.Type == PossibleMoveType.BeatAttackCard &&
+            m.YourCardId == selectedCardId &&
+            m.TargetCardId == attackCardId);
+
+    private bool IsHandCardBeatable(string handCardId) =>
+        !string.IsNullOrWhiteSpace(selectedAttackCardId) &&
+        State.YourPossibleMoves.Any(m =>
+            m.Type == PossibleMoveType.BeatAttackCard &&
+            m.TargetCardId == selectedAttackCardId &&
+            m.YourCardId == handCardId);
 
     private void SelectCard(string cardId)
     {

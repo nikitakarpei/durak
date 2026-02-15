@@ -160,6 +160,63 @@ public class UC005_BeatAttackCardTests : TestContext
     }
 
     [Fact]
+    public void SelectingHandCard_BeatableAttackCardsGetBeatableClass()
+    {
+        var cut = RenderComponent<Game>();
+
+        cut.Find("section.hand button.card").Click();
+
+        cut.Find("section.table button.card").ClassList.Should().Contain("beatable");
+    }
+
+    [Fact]
+    public void SelectingAttackCard_HandCardsThatCanBeatItGetBeatableClass()
+    {
+        var cut = RenderComponent<Game>();
+
+        cut.Find("section.table button.card").Click();
+
+        cut.Find("section.hand button.card").ClassList.Should().Contain("beatable");
+    }
+
+    [Fact]
+    public void SelectingHandCard_AttackCardWithNoBeatMoveDoesNotGetBeatableClass()
+    {
+        _gameState.Table.Add(new TablePair(new Card("atk-2", CardSuit.Hearts, CardRank.King), null));
+
+        var cut = RenderComponent<Game>();
+
+        cut.Find("section.hand button.card").Click();
+
+        var tableButtons = cut.FindAll("section.table button.card");
+        tableButtons[0].ClassList.Should().Contain("beatable");    // atk-1 is beatable
+        tableButtons[1].ClassList.Should().NotContain("beatable"); // atk-2 has no move
+    }
+
+    [Fact]
+    public void SelectingAttackCard_HandCardWithNoBeatMoveDoesNotGetBeatableClass()
+    {
+        _gameState.YourHand.Add(new Card("def-2", CardSuit.Clubs, CardRank.Two));
+
+        var cut = RenderComponent<Game>();
+
+        cut.Find("section.table button.card").Click();
+
+        var handCards = cut.FindAll("section.hand button.card");
+        handCards[0].ClassList.Should().Contain("beatable");    // def-1 can beat atk-1
+        handCards[1].ClassList.Should().NotContain("beatable"); // def-2 has no move for atk-1
+    }
+
+    [Fact]
+    public void WhenNoCardSelected_NoBeatableClassOnAnyCard()
+    {
+        var cut = RenderComponent<Game>();
+
+        cut.Find("section.table button.card").ClassList.Should().NotContain("beatable");
+        cut.Find("section.hand button.card").ClassList.Should().NotContain("beatable");
+    }
+
+    [Fact]
     public void AfterStateUpdate_DefenderAppearsInChosenTablePair()
     {
         _connectionMock

@@ -190,3 +190,8 @@
     opacity: 0.4;
     cursor: not-allowed;
 }
+
+.card.beatable {
+    outline: 2px solid #22c55e;
+    outline-offset: 3px;
+}
