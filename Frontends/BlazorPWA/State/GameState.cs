@@ -5,6 +5,7 @@ namespace BlazorPWA.State;
 public sealed class GameState
 {
     public string GameId { get; set; } = string.Empty;
+    public int? TotalPlayerSeats { get; set; }
     public string? LocalPlayerId { get; set; }
     public Dictionary<string, PlayerState> Players { get; } = new();
     public Dictionary<string, Card> CardsById { get; } = new();

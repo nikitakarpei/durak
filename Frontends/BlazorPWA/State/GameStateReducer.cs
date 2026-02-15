@@ -1,4 +1,5 @@
 using GameService.Api.Data;
+using GameService.Api.Data.GameOptions;
 using GameService.Api.GameEvents;
 using GameService.Api.PossibleMoves;
 using Google.Protobuf.WellKnownTypes;
@@ -92,6 +93,18 @@ public static class GameStateReducer
         state.YourHand.Clear();
         state.YourPossibleMoves.Clear();
         state.TalonCount = evt.CardsInTalon.Count;
+        state.TotalPlayerSeats = null;
+
+        foreach (var option in evt.Options)
+        {
+            if (!option.Is(AmountOfPlayers.Descriptor))
+            {
+                continue;
+            }
+
+            state.TotalPlayerSeats = Math.Max(0, option.Unpack<AmountOfPlayers>().Count);
+            break;
+        }
     }
 
     private static void Apply(GameState state, PlayerJoined evt)

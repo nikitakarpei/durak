@@ -4,6 +4,7 @@ using BlazorPWA.State;
 using Bunit;
 using FluentAssertions;
 using GameService.Api.Data;
+using GameService.Api.Data.GameOptions;
 using GameService.Api.GameEvents;
 using Google.Protobuf.WellKnownTypes;
 using Moq;
@@ -49,6 +50,7 @@ public class UC003_ViewMatchStateTests : TestContext
     [Fact]
     public void OpponentsSectionShowsAllOpponentSeatsAndMarksNotJoined()
     {
+        _gameState.TotalPlayerSeats = 6;
         _gameState.LocalPlayerId = "player-1";
         _gameState.Players["player-1"] = new PlayerState("player-1", 0);
         _gameState.Players["player-2"] = new PlayerState("player-2", 1) { CardCount = 5 };
@@ -70,6 +72,24 @@ public class UC003_ViewMatchStateTests : TestContext
         opponents[3].TextContent.Should().Contain("Seat 4");
         opponents[4].TextContent.Should().Contain("Not joined");
         opponents[4].TextContent.Should().Contain("Seat 5");
+    }
+
+    [Fact]
+    public void OpponentsSectionUsesSeatCountFromGameCreatedAmountOfPlayers()
+    {
+        _gameState.LocalPlayerId = "player-1";
+        _gameState.Players["player-1"] = new PlayerState("player-1", 0);
+
+        var created = new GameCreated();
+        created.Options.Add(Any.Pack(new AmountOfPlayers { Count = 2 }));
+        GameStateReducer.Apply(_gameState, Any.Pack(created));
+
+        var cut = RenderComponent<Game>();
+
+        var opponents = cut.FindAll("div.opponent");
+        opponents.Should().HaveCount(1);
+        opponents[0].TextContent.Should().Contain("Seat 1");
+        opponents[0].TextContent.Should().Contain("Not joined");
     }
 
     [Fact]

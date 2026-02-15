@@ -43,3 +43,6 @@
 - Render all opponent seats even when not all players have joined, and label empty seats as `Not joined`.
   - Why: players need a stable, complete seat map before lobby is full.
   - Alternatives considered: render only joined players (rejected; hides available seats and causes layout/awareness issues).
+- Derive visible seat count from `GameCreated` player configuration (`AmountOfPlayers`) instead of fixed max seats.
+  - Why: fixed max seats overstates lobby size for smaller games and confuses players.
+  - Alternatives considered: keep fixed 6 seats (rejected; inconsistent with server-defined game setup), infer only from joined players (rejected; does not show expected empty seats before joins).

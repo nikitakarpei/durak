@@ -99,7 +99,6 @@
     private bool isConnecting;
     private string? selectedCardId;
     private string? selectedAttackCardId;
-    private const int MaxPlayers = 6;
 
     protected override void OnInitialized()
     {
@@ -135,7 +134,20 @@
             .GroupBy(p => p.Seat)
             .ToDictionary(g => g.Key, g => g.First());
 
-        return Enumerable.Range(0, MaxPlayers)
+        var highestKnownSeat = joinedBySeat.Keys.DefaultIfEmpty(-1).Max();
+        if (localSeat.HasValue)
+        {
+            highestKnownSeat = Math.Max(highestKnownSeat, localSeat.Value);
+        }
+
+        var seatCountFromGame = State.TotalPlayerSeats ?? 0;
+        var totalSeats = Math.Max(seatCountFromGame, highestKnownSeat + 1);
+        if (totalSeats <= 0)
+        {
+            return Enumerable.Empty<OpponentSeatView>();
+        }
+
+        return Enumerable.Range(0, totalSeats)
             .Where(seat => localSeat is null || seat != localSeat.Value)
             .Select(seat =>
             {
