@@ -3,6 +3,7 @@
 @using BlazorPWA.State
 @inject IGameConnectionService Connection
 @inject GameState State
+@inject IJSRuntime JS
 
 <main class="game-shell">
     <ErrorToast />
@@ -64,6 +65,13 @@
                 }
             </section>
 
+            <section class="event-log" id="event-log">
+                @foreach (var entry in State.EventLog)
+                {
+                    <div class="log-entry">@entry</div>
+                }
+            </section>
+
             <section class="hand">
                 <div class="hand-cards">
                     @foreach (var card in State.YourHand)
@@ -105,6 +113,14 @@
         Connection.StateChanged += OnConnectionStateChanged;
     }
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (State.EventLog.Count > 0)
+        {
+            await JS.InvokeVoidAsync("scrollElementToBottom", "event-log");
+        }
+    }
+
     private void OnConnectionStateChanged()
     {
         InvokeAsync(StateHasChanged);
@@ -139,40 +155,10 @@
             return "-";
         }
 
-        return RenderCardLabel(new Card(card.Id, card.Suit, card.Rank));
+        return CardLabel.For(new Card(card.Id, card.Suit, card.Rank));
     }
 
-    private string RenderCardLabel(Card card)
-    {
-        return $"{RankToText(card.Rank)}{SuitToText(card.Suit)}";
-    }
-
-    private static string RankToText(GameService.Api.Data.CardRank rank) => rank switch
-    {
-        GameService.Api.Data.CardRank.Two => "2",
-        GameService.Api.Data.CardRank.Three => "3",
-        GameService.Api.Data.CardRank.Four => "4",
-        GameService.Api.Data.CardRank.Five => "5",
-        GameService.Api.Data.CardRank.Six => "6",
-        GameService.Api.Data.CardRank.Seven => "7",
-        GameService.Api.Data.CardRank.Eight => "8",
-        GameService.Api.Data.CardRank.Nine => "9",
-        GameService.Api.Data.CardRank.Ten => "10",
-        GameService.Api.Data.CardRank.Jack => "J",
-        GameService.Api.Data.CardRank.Queen => "Q",
-        GameService.Api.Data.CardRank.King => "K",
-        GameService.Api.Data.CardRank.Ace => "A",
-        _ => "?"
-    };
-
-    private static string SuitToText(GameService.Api.Data.CardSuit suit) => suit switch
-    {
-        GameService.Api.Data.CardSuit.Clubs => "♣",
-        GameService.Api.Data.CardSuit.Diamonds => "♦",
-        GameService.Api.Data.CardSuit.Hearts => "♥",
-        GameService.Api.Data.CardSuit.Spades => "♠",
-        _ => "?"
-    };
+    private string RenderCardLabel(Card card) => CardLabel.For(card);
 
     private bool IsCardPlayable(string cardId) =>
         State.YourPossibleMoves.Any(m => m.YourCardId == cardId);

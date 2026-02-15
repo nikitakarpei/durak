@@ -120,4 +120,167 @@ public class UC003_ViewMatchStateTests : TestContext
 
         _gameState.TalonCount.Should().Be(18);
     }
+
+    // ── EventLog tests ──────────────────────────────────────────────────────
+
+    [Fact]
+    public void RoundStarted_AppendsAttackerAndDefenderLog()
+    {
+        _gameState.LocalPlayerId = "alice";
+        var evt = new RoundStarted { AttackerPlayerId = "alice", DefenderPlayerId = "bob" };
+
+        GameStateReducer.Apply(_gameState, Any.Pack(evt));
+
+        _gameState.EventLog.Should().ContainSingle()
+            .Which.Should().Be("You attacks, bob defends");
+    }
+
+    [Fact]
+    public void RoundStarted_UsesPlayerIdWhenNotLocal()
+    {
+        _gameState.LocalPlayerId = "alice";
+        var evt = new RoundStarted { AttackerPlayerId = "charlie", DefenderPlayerId = "alice" };
+
+        GameStateReducer.Apply(_gameState, Any.Pack(evt));
+
+        _gameState.EventLog.Should().ContainSingle()
+            .Which.Should().Be("charlie attacks, You defends");
+    }
+
+    [Fact]
+    public void AttackCardPlayed_AppendsPlayerAndCardLog()
+    {
+        _gameState.LocalPlayerId = "alice";
+        var playedCard = new RegularCard { Id = "c1", Suit = CardSuit.Hearts, Rank = CardRank.Ace };
+        var evt = new AttackCardPlayed { PlayerId = "alice", PlayedCard = Any.Pack(playedCard) };
+
+        GameStateReducer.Apply(_gameState, Any.Pack(evt));
+
+        _gameState.EventLog.Should().ContainSingle()
+            .Which.Should().Be("You played A♥");
+    }
+
+    [Fact]
+    public void AttackCardPlayed_UsesPlayerIdWhenNotLocal()
+    {
+        _gameState.LocalPlayerId = "alice";
+        var playedCard = new RegularCard { Id = "c1", Suit = CardSuit.Clubs, Rank = CardRank.Seven };
+        var evt = new AttackCardPlayed { PlayerId = "bob", PlayedCard = Any.Pack(playedCard) };
+
+        GameStateReducer.Apply(_gameState, Any.Pack(evt));
+
+        _gameState.EventLog.Should().ContainSingle()
+            .Which.Should().Be("bob played 7♣");
+    }
+
+    [Fact]
+    public void AttackCardBeaten_AppendsPlayerAndBothCardsLog()
+    {
+        _gameState.LocalPlayerId = "alice";
+        var attackCard = new RegularCard { Id = "atk-1", Suit = CardSuit.Clubs, Rank = CardRank.Seven };
+        _gameState.CardsById["atk-1"] = new Card("atk-1", CardSuit.Clubs, CardRank.Seven);
+        _gameState.Table.Add(new TablePair(new Card("atk-1", CardSuit.Clubs, CardRank.Seven), null));
+
+        var defCard = new RegularCard { Id = "def-1", Suit = CardSuit.Spades, Rank = CardRank.King };
+        var evt = new AttackCardBeaten { PlayerId = "alice", AttackerCardId = "atk-1", DefenderCard = Any.Pack(defCard) };
+
+        GameStateReducer.Apply(_gameState, Any.Pack(evt));
+
+        _gameState.EventLog.Should().ContainSingle()
+            .Which.Should().Be("You beat 7♣ with K♠");
+    }
+
+    [Fact]
+    public void DefenceGivenUp_AppendsPlayerLog()
+    {
+        _gameState.LocalPlayerId = "alice";
+        var evt = new DefenceGivenUp { PlayerId = "alice" };
+
+        GameStateReducer.Apply(_gameState, Any.Pack(evt));
+
+        _gameState.EventLog.Should().ContainSingle()
+            .Which.Should().Be("You gave up defence");
+    }
+
+    [Fact]
+    public void PlayerTookCardsFromTable_AppendsPlayerAndCountLog()
+    {
+        _gameState.LocalPlayerId = "alice";
+        var card1 = new RegularCard { Id = "c1", Suit = CardSuit.Hearts, Rank = CardRank.Two };
+        var card2 = new RegularCard { Id = "c2", Suit = CardSuit.Clubs, Rank = CardRank.Three };
+        _gameState.CardsById["c1"] = new Card("c1", CardSuit.Hearts, CardRank.Two);
+        _gameState.CardsById["c2"] = new Card("c2", CardSuit.Clubs, CardRank.Three);
+
+        var evt = new PlayerTookCardsFromTable { PlayerId = "bob" };
+        evt.CardIds.Add("c1");
+        evt.CardIds.Add("c2");
+
+        GameStateReducer.Apply(_gameState, Any.Pack(evt));
+
+        _gameState.EventLog.Should().ContainSingle()
+            .Which.Should().Be("bob took 2 cards from the table");
+    }
+
+    [Fact]
+    public void CardsOnTableDiscarded_AppendsDiscardedLog()
+    {
+        var evt = new CardsOnTableDiscarded();
+
+        GameStateReducer.Apply(_gameState, Any.Pack(evt));
+
+        _gameState.EventLog.Should().ContainSingle()
+            .Which.Should().Be("Cards discarded — round over");
+    }
+
+    [Fact]
+    public void RoundFinished_AppendsRoundFinishedLog()
+    {
+        var evt = new RoundFinished();
+
+        GameStateReducer.Apply(_gameState, Any.Pack(evt));
+
+        _gameState.EventLog.Should().ContainSingle()
+            .Which.Should().Be("Round finished");
+    }
+
+    [Fact]
+    public void FoolDeclared_AppendsPlayerIsFoolLog()
+    {
+        _gameState.LocalPlayerId = "alice";
+        _gameState.Players["bob"] = new PlayerState("bob", 1);
+        var evt = new FoolDeclared { PlayerId = "bob" };
+
+        GameStateReducer.Apply(_gameState, Any.Pack(evt));
+
+        _gameState.EventLog.Should().ContainSingle()
+            .Which.Should().Be("bob is the fool!");
+    }
+
+    [Fact]
+    public void FoolDeclared_UsesYouWhenLocalPlayer()
+    {
+        _gameState.LocalPlayerId = "alice";
+        _gameState.Players["alice"] = new PlayerState("alice", 0);
+        var evt = new FoolDeclared { PlayerId = "alice" };
+
+        GameStateReducer.Apply(_gameState, Any.Pack(evt));
+
+        _gameState.EventLog.Should().ContainSingle()
+            .Which.Should().Be("You is the fool!");
+    }
+
+    [Fact]
+    public void EventLog_RendersInGamePage()
+    {
+        _gameState.EventLog.Add("You attacks, bob defends");
+        _gameState.EventLog.Add("You played A♥");
+
+        var cut = RenderComponent<Game>();
+
+        var logSection = cut.Find("section.event-log");
+        var entries = cut.FindAll("div.log-entry");
+        entries.Should().HaveCount(2);
+        entries[0].TextContent.Should().Contain("You attacks, bob defends");
+        entries[1].TextContent.Should().Contain("You played A♥");
+    }
 }
