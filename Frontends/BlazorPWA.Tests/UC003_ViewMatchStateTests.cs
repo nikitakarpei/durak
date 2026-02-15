@@ -47,7 +47,7 @@ public class UC003_ViewMatchStateTests : TestContext
     }
 
     [Fact]
-    public void OpponentsSectionShowsEachOpponent()
+    public void OpponentsSectionShowsAllOpponentSeatsAndMarksNotJoined()
     {
         _gameState.LocalPlayerId = "player-1";
         _gameState.Players["player-1"] = new PlayerState("player-1", 0);
@@ -57,13 +57,19 @@ public class UC003_ViewMatchStateTests : TestContext
         var cut = RenderComponent<Game>();
 
         var opponents = cut.FindAll("div.opponent");
-        opponents.Should().HaveCount(2);
+        opponents.Should().HaveCount(5);
         opponents[0].TextContent.Should().Contain("player-2");
         opponents[0].TextContent.Should().Contain("Seat 1");
         opponents[0].TextContent.Should().Contain("5");
         opponents[1].TextContent.Should().Contain("player-3");
         opponents[1].TextContent.Should().Contain("Seat 2");
         opponents[1].TextContent.Should().Contain("3");
+        opponents[2].TextContent.Should().Contain("Not joined");
+        opponents[2].TextContent.Should().Contain("Seat 3");
+        opponents[3].TextContent.Should().Contain("Not joined");
+        opponents[3].TextContent.Should().Contain("Seat 4");
+        opponents[4].TextContent.Should().Contain("Not joined");
+        opponents[4].TextContent.Should().Contain("Seat 5");
     }
 
     [Fact]

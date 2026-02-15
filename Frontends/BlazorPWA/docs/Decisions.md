@@ -40,3 +40,6 @@
 - Strengthen bUnit coverage for command preconditions and reflected state changes in UC-002/UC-004/UC-005/UC-006/UC-007.
   - Why: these are user-visible must-have behaviors and were previously only partially asserted.
   - Alternatives considered: postpone until full E2E suite exists (rejected; immediate regression protection needed now).
+- Render all opponent seats even when not all players have joined, and label empty seats as `Not joined`.
+  - Why: players need a stable, complete seat map before lobby is full.
+  - Alternatives considered: render only joined players (rejected; hides available seats and causes layout/awareness issues).

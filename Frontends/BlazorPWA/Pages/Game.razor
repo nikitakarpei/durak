@@ -38,9 +38,9 @@
                 @foreach (var opponent in GetOpponents())
                 {
                     <div class="opponent">
-                        <div class="name">@opponent.PlayerId</div>
+                        <div class="name">@(opponent.IsJoined ? opponent.PlayerId : "Not joined")</div>
                         <div class="meta">Seat @opponent.Seat</div>
-                        <div class="count">Cards: @opponent.CardCount</div>
+                        <div class="count">@(opponent.IsJoined ? $"Cards: {opponent.CardCount}" : "Waiting for player")</div>
                     </div>
                 }
             </section>
@@ -99,6 +99,7 @@
     private bool isConnecting;
     private string? selectedCardId;
     private string? selectedAttackCardId;
+    private const int MaxPlayers = 6;
 
     protected override void OnInitialized()
     {
@@ -122,14 +123,29 @@
         isConnecting = false;
     }
 
-    private IEnumerable<PlayerState> GetOpponents()
+    private IEnumerable<OpponentSeatView> GetOpponents()
     {
-        if (State.LocalPlayerId is null)
-        {
-            return State.Players.Values;
-        }
+        var localSeat = State.LocalPlayerId is not null &&
+                        State.Players.TryGetValue(State.LocalPlayerId, out var localPlayer)
+            ? localPlayer.Seat
+            : (int?)null;
 
-        return State.Players.Values.Where(p => p.PlayerId != State.LocalPlayerId).OrderBy(p => p.Seat);
+        var joinedBySeat = State.Players.Values
+            .Where(p => State.LocalPlayerId is null || p.PlayerId != State.LocalPlayerId)
+            .GroupBy(p => p.Seat)
+            .ToDictionary(g => g.Key, g => g.First());
+
+        return Enumerable.Range(0, MaxPlayers)
+            .Where(seat => localSeat is null || seat != localSeat.Value)
+            .Select(seat =>
+            {
+                if (joinedBySeat.TryGetValue(seat, out var player))
+                {
+                    return new OpponentSeatView(seat, player.PlayerId, player.CardCount, true);
+                }
+
+                return new OpponentSeatView(seat, null, 0, false);
+            });
     }
 
     private string RenderCardLabel(GameService.Api.Data.RegularCard? card)
@@ -235,4 +251,6 @@
 
         return Connection.GiveUpDefenceAsync(Connection.AccessToken, CancellationToken.None);
     }
+
+    private sealed record OpponentSeatView(int Seat, string? PlayerId, int CardCount, bool IsJoined);
 }

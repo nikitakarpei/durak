@@ -12,7 +12,7 @@
 
 ## Main Flow
 1. App shows game header information.
-2. App shows opponents with seats and card counts.
+2. App shows all opponent seats, including seats not yet occupied.
 3. App shows table cards.
 4. App shows player hand and action controls.
 
@@ -25,6 +25,7 @@
 ## Observable Changes
 - Turn, table, hand, trump, and talon information update over time.
 - The talon count decreases each time cards are dealt to a player.
+- Any unoccupied opponent seat is shown as "Not joined" until a player joins it.
 
 ## Out of Scope (MVP)
 - Rich card art
