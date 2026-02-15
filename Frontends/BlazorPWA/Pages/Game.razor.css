@@ -185,3 +185,8 @@
     border: 1px solid #d1d5db;
     background: #fff;
 }
+
+.actions button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
