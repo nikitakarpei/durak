@@ -1,6 +1,5 @@
 using BlazorPWA.Configuration;
 using BlazorPWA.Services.Api;
-using BlazorPWA.Services.Rpc;
 using BlazorPWA.State;
 using GameService.Api.Commands;
 using Google.Protobuf.WellKnownTypes;
@@ -10,12 +9,12 @@ namespace BlazorPWA.Services.Connection;
 
 public sealed class GameConnectionService : IGameConnectionService
 {
-    private readonly RpcClientFactory _rpcClientFactory;
+    private readonly Func<Uri, IGameServiceClient> _gameClientFactory;
+    private readonly Func<Uri, IPlayerIdentityServiceClient> _identityClientFactory;
     private readonly AppSettings _settings;
     private readonly GameState _state;
 
-    private PlayerIdentityServiceClient? _identityClient;
-    private GameServiceClient? _gameClient;
+    private IGameServiceClient? _gameClient;
     private CancellationTokenSource? _streamCts;
     private string? _accessToken;
 
@@ -25,9 +24,14 @@ public sealed class GameConnectionService : IGameConnectionService
 
     public event Action? StateChanged;
 
-    public GameConnectionService(RpcClientFactory rpcClientFactory, IOptions<AppSettings> options, GameState state)
+    public GameConnectionService(
+        Func<Uri, IGameServiceClient> gameClientFactory,
+        Func<Uri, IPlayerIdentityServiceClient> identityClientFactory,
+        IOptions<AppSettings> options,
+        GameState state)
     {
-        _rpcClientFactory = rpcClientFactory;
+        _gameClientFactory = gameClientFactory;
+        _identityClientFactory = identityClientFactory;
         _settings = options.Value;
         _state = state;
     }
@@ -43,14 +47,14 @@ public sealed class GameConnectionService : IGameConnectionService
             _state.GameId = gameId;
 
             var identityEndpoint = new Uri(_settings.Services.PlayerIdentityServiceUrl);
-            _identityClient = new PlayerIdentityServiceClient(_rpcClientFactory.Create(identityEndpoint));
+            var identityClient = _identityClientFactory(identityEndpoint);
 
             var effectiveCustomId = string.IsNullOrWhiteSpace(customId) ? _settings.Auth.CustomId : customId;
-            var loginResult = await _identityClient.LoginWithCustomIdAsync(effectiveCustomId, cancellationToken);
+            var loginResult = await identityClient.LoginWithCustomIdAsync(effectiveCustomId, cancellationToken);
             _state.LocalPlayerId = loginResult.PlayerId;
 
             var gameEndpoint = BuildGameServiceEndpoint(loginResult.PlayerIdToken);
-            _gameClient = new GameServiceClient(_rpcClientFactory.Create(gameEndpoint));
+            _gameClient = _gameClientFactory(gameEndpoint);
 
             var accessToken = await _gameClient.GetGameAccessTokenAsync(gameId, cancellationToken);
             _accessToken = accessToken;
@@ -58,9 +62,18 @@ public sealed class GameConnectionService : IGameConnectionService
             _streamCts?.Cancel();
             _streamCts = new CancellationTokenSource();
 
-            _ = Task.Run(() => ListenForEventsAsync(gameId, _streamCts.Token), _streamCts.Token);
+            var oldEventsEnded = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 
-            await _gameClient.JoinLobbyAsync(accessToken, cancellationToken);
+            _ = Task.Run(
+                () => ListenForEventsAsync(gameId, oldEventsEnded, _streamCts.Token),
+                _streamCts.Token);
+
+            await oldEventsEnded.Task.WaitAsync(cancellationToken);
+
+            if (!_state.Players.ContainsKey(_state.LocalPlayerId!))
+            {
+                await _gameClient.JoinLobbyAsync(accessToken, cancellationToken);
+            }
 
             Status = ConnectionStatus.Connected;
             NotifyStateChanged();
@@ -132,7 +145,10 @@ public sealed class GameConnectionService : IGameConnectionService
         NotifyStateChanged();
     }
 
-    private async Task ListenForEventsAsync(string gameId, CancellationToken cancellationToken)
+    private async Task ListenForEventsAsync(
+        string gameId,
+        TaskCompletionSource oldEventsEnded,
+        CancellationToken cancellationToken)
     {
         try
         {
@@ -148,12 +164,14 @@ public sealed class GameConnectionService : IGameConnectionService
                 }
                 else if (response.ResultCase == GetGameEventsCommand.Types.StreamResponse.ResultOneofCase.OldEventsEnded)
                 {
+                    oldEventsEnded.TrySetResult();
                     NotifyStateChanged();
                 }
             }
         }
         catch (Exception ex)
         {
+            oldEventsEnded.TrySetException(ex);
             Status = ConnectionStatus.Error;
             ErrorMessage = ex.Message;
             NotifyStateChanged();

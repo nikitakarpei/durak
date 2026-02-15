@@ -2,7 +2,7 @@ using Rpc.Client;
 
 namespace BlazorPWA.Services.Api;
 
-public sealed class PlayerIdentityServiceClient
+public sealed class PlayerIdentityServiceClient : IPlayerIdentityServiceClient
 {
     private const string LoginWithCustomIdMethod = "LoginWithCustomId";
 

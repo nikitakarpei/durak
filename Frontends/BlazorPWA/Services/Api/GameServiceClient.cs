@@ -2,7 +2,7 @@ using Rpc.Client;
 
 namespace BlazorPWA.Services.Api;
 
-public sealed class GameServiceClient
+public sealed class GameServiceClient : IGameServiceClient
 {
     private const string GetGameAccessTokenMethod = "GetGameAccessToken";
     private const string JoinLobbyMethod = "JoinLobby";
