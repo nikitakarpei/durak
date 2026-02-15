@@ -1,0 +1,219 @@
+@page "/game"
+@using BlazorPWA.Services.Connection
+@using BlazorPWA.State
+@inject IGameConnectionService Connection
+@inject GameState State
+
+<main class="game-shell">
+    <ErrorToast />
+    @if (State.GameId == string.Empty || Connection.Status == ConnectionStatus.Idle)
+    {
+        <section class="card-panel">
+            <h1>Join Game</h1>
+            <label class="field">
+                <span>Game ID</span>
+                <input @bind="gameId" placeholder="Enter game id" />
+            </label>
+            <label class="field">
+                <span>Custom ID</span>
+                <input @bind="customId" placeholder="Enter custom id" />
+            </label>
+            <button class="primary" @onclick="ConnectAsync" disabled="@isConnecting">Connect</button>
+            @if (Connection.Status == ConnectionStatus.Error && !string.IsNullOrWhiteSpace(Connection.ErrorMessage))
+            {
+                <div class="error">@Connection.ErrorMessage</div>
+            }
+        </section>
+    }
+    else
+    {
+        <section class="match">
+            <header class="top-bar">
+                <div class="pill">Game: @State.GameId</div>
+                <div class="pill">Trump: @RenderCardLabel(State.TrumpCard)</div>
+                <div class="pill">Talon: @State.TalonCount</div>
+            </header>
+
+            <section class="opponents">
+                @foreach (var opponent in GetOpponents())
+                {
+                    <div class="opponent">
+                        <div class="name">@opponent.PlayerId</div>
+                        <div class="meta">Seat @opponent.Seat</div>
+                        <div class="count">Cards: @opponent.CardCount</div>
+                    </div>
+                }
+            </section>
+
+            <section class="table">
+                @foreach (var pair in State.Table)
+                {
+                    <div class="pair">
+                        @if (pair.Defence is null)
+                        {
+                            <button class="card @(selectedAttackCardId == pair.Attack.Id ? "selected" : "")" @onclick="() => SelectAttackCard(pair.Attack.Id)">@RenderCardLabel(pair.Attack)</button>
+                        }
+                        else
+                        {
+                            <div class="card">@RenderCardLabel(pair.Attack)</div>
+                        }
+                        <div class="card defence">
+                            @(pair.Defence is null ? "" : RenderCardLabel(pair.Defence))
+                        </div>
+                    </div>
+                }
+            </section>
+
+            <section class="hand">
+                <div class="hand-cards">
+                    @foreach (var card in State.YourHand)
+                    {
+                        <button class="card @(selectedCardId == card.Id ? "selected" : "") @(IsCardPlayable(card.Id) ? "playable" : "")" @onclick="() => SelectCard(card.Id)">
+                            @RenderCardLabel(card)
+                        </button>
+                    }
+                </div>
+            </section>
+
+            <section class="actions">
+                @if (State.YourPossibleMoves.Any(m => m.Type == PossibleMoveType.PlayAttackCard))
+                {
+                    <button @onclick="PlayAttackAsync" disabled="@string.IsNullOrWhiteSpace(selectedCardId)">Play Attack</button>
+                }
+                @if (State.YourPossibleMoves.Any(m => m.Type == PossibleMoveType.BeatAttackCard))
+                {
+                    <button @onclick="BeatAttackAsync" disabled="@(string.IsNullOrWhiteSpace(selectedCardId) || string.IsNullOrWhiteSpace(selectedAttackCardId))">Beat Attack</button>
+                }
+                @if (State.YourPossibleMoves.Any(m => m.Type == PossibleMoveType.GiveUpDefence))
+                {
+                    <button @onclick="GiveUpAsync">Give Up Defence</button>
+                }
+            </section>
+        </section>
+    }
+</main>
+
+@code {
+    private string gameId = string.Empty;
+    private string customId = string.Empty;
+    private bool isConnecting;
+    private string? selectedCardId;
+    private string? selectedAttackCardId;
+
+    protected override void OnInitialized()
+    {
+        Connection.StateChanged += OnConnectionStateChanged;
+    }
+
+    private void OnConnectionStateChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private async Task ConnectAsync()
+    {
+        if (string.IsNullOrWhiteSpace(gameId))
+        {
+            return;
+        }
+
+        isConnecting = true;
+        await Connection.ConnectAsync(gameId.Trim(), customId.Trim(), CancellationToken.None);
+        isConnecting = false;
+    }
+
+    private IEnumerable<PlayerState> GetOpponents()
+    {
+        if (State.LocalPlayerId is null)
+        {
+            return State.Players.Values;
+        }
+
+        return State.Players.Values.Where(p => p.PlayerId != State.LocalPlayerId).OrderBy(p => p.Seat);
+    }
+
+    private string RenderCardLabel(GameService.Api.Data.RegularCard? card)
+    {
+        if (card is null)
+        {
+            return "-";
+        }
+
+        return RenderCardLabel(new Card(card.Id, card.Suit, card.Rank));
+    }
+
+    private string RenderCardLabel(Card card)
+    {
+        return $"{RankToText(card.Rank)}{SuitToText(card.Suit)}";
+    }
+
+    private static string RankToText(GameService.Api.Data.CardRank rank) => rank switch
+    {
+        GameService.Api.Data.CardRank.Two => "2",
+        GameService.Api.Data.CardRank.Three => "3",
+        GameService.Api.Data.CardRank.Four => "4",
+        GameService.Api.Data.CardRank.Five => "5",
+        GameService.Api.Data.CardRank.Six => "6",
+        GameService.Api.Data.CardRank.Seven => "7",
+        GameService.Api.Data.CardRank.Eight => "8",
+        GameService.Api.Data.CardRank.Nine => "9",
+        GameService.Api.Data.CardRank.Ten => "10",
+        GameService.Api.Data.CardRank.Jack => "J",
+        GameService.Api.Data.CardRank.Queen => "Q",
+        GameService.Api.Data.CardRank.King => "K",
+        GameService.Api.Data.CardRank.Ace => "A",
+        _ => "?"
+    };
+
+    private static string SuitToText(GameService.Api.Data.CardSuit suit) => suit switch
+    {
+        GameService.Api.Data.CardSuit.Clubs => "♣",
+        GameService.Api.Data.CardSuit.Diamonds => "♦",
+        GameService.Api.Data.CardSuit.Hearts => "♥",
+        GameService.Api.Data.CardSuit.Spades => "♠",
+        _ => "?"
+    };
+
+    private bool IsCardPlayable(string cardId) =>
+        State.YourPossibleMoves.Any(m => m.YourCardId == cardId);
+
+    private void SelectCard(string cardId)
+    {
+        selectedCardId = selectedCardId == cardId ? null : cardId;
+    }
+
+    private void SelectAttackCard(string cardId)
+    {
+        selectedAttackCardId = selectedAttackCardId == cardId ? null : cardId;
+    }
+
+    private Task PlayAttackAsync()
+    {
+        if (string.IsNullOrWhiteSpace(selectedCardId) || Connection.AccessToken is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        return Connection.PlayAttackCardAsync(Connection.AccessToken, selectedCardId, CancellationToken.None);
+    }
+
+    private Task BeatAttackAsync()
+    {
+        if (string.IsNullOrWhiteSpace(selectedCardId) || string.IsNullOrWhiteSpace(selectedAttackCardId) || Connection.AccessToken is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        return Connection.BeatAttackCardAsync(Connection.AccessToken, selectedAttackCardId, selectedCardId, CancellationToken.None);
+    }
+
+    private Task GiveUpAsync()
+    {
+        if (Connection.AccessToken is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        return Connection.GiveUpDefenceAsync(Connection.AccessToken, CancellationToken.None);
+    }
+}

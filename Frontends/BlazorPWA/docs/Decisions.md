@@ -1,0 +1,42 @@
+# Decision Log
+
+## 2026-02-15
+- Keep MVP as join-only by existing `game_id`; do not include game creation in current scope.
+  - Why: current milestone is playable match screen for an existing game.
+  - Alternatives considered: include create-game flow now (rejected; deferred).
+- Keep only player-visible use cases in `docs/use-cases/`.
+  - Why: use cases are product requirements, not technical decomposition.
+  - Alternatives considered: include internal/orchestration use cases as standalone items (rejected).
+- Require explicit attack-target selection for defence.
+  - Why: avoids ambiguous behaviour when multiple attack cards are present.
+  - Alternatives considered: implicitly target first attack card (rejected).
+- Do not include a dedicated disconnect use case in MVP.
+  - Why: no player-facing disconnect flow is required for current milestone.
+  - Alternatives considered: add disconnect for completeness (rejected for now).
+- Use one file per use case under `docs/use-cases/`.
+  - Why: improves traceability and maintainability.
+  - Alternatives considered: single consolidated use-case document (rejected).
+- Standardize use-case structure via `docs/use-cases/_template.md`.
+  - Why: ensures consistent required fields across all use cases.
+  - Alternatives considered: free-form per-file structure (rejected).
+- Keep use-case language implementation-agnostic (no RPC/event/service internals).
+  - Why: requirements stay stable if technical implementation changes.
+  - Alternatives considered: embed API/event details directly in use cases (rejected).
+- Mark all current MVP use cases as `Must`.
+  - Why: all currently documented use cases are in the committed MVP scope.
+  - Alternatives considered: split priorities into `Must`/`Should`/`Could` now (rejected).
+- Clarify attacker behaviour explicitly: attacker can play one selected card from their hand.
+  - Why: removed ambiguity in attack flow requirements.
+  - Alternatives considered: separate extra attacker-specific use case (rejected; merged into attack use case).
+- Show visual selection feedback on hand cards and table attack cards (raised + coloured border + subtle shadow).
+  - Why: without visible feedback clicking a card feels broken; the two-step select-then-submit flow requires the player to know what is currently selected.
+  - Alternatives considered: auto-submit on card click with no explicit action button (rejected; keeps submit explicit as per UC-004/UC-005).
+- Add a use-case traceability matrix in `docs/use-cases/TRACEABILITY.md`.
+  - Why: makes it explicit which tests verify each MVP use case and where gaps remain.
+  - Alternatives considered: rely on test file names only (rejected; too implicit and easy to drift).
+- Keep UC-001 offline shell validation as manual/E2E coverage for now.
+  - Why: PWA cache/offline startup behavior cannot be validated reliably in current bUnit unit tests.
+  - Alternatives considered: force a mocked unit test for offline behavior (rejected; low confidence and not representative).
+- Strengthen bUnit coverage for command preconditions and reflected state changes in UC-002/UC-004/UC-005/UC-006/UC-007.
+  - Why: these are user-visible must-have behaviors and were previously only partially asserted.
+  - Alternatives considered: postpone until full E2E suite exists (rejected; immediate regression protection needed now).

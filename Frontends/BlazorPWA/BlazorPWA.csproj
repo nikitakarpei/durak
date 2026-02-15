@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.3" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.2" />
+    <PackageReference Include="Google.Protobuf" Version="3.33.4" />
+    <PackageReference Include="Grpc.Tools" Version="2.76.0" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../Libraries/LibRpc/src/LibRpc.Core/LibRpc.Core.csproj" />
+    <ProjectReference Include="../../Libraries/LibRpc/src/LibRpc.Net/LibRpc.Net.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="../../Protos/game_service/api/**/*.proto" GrpcServices="None" />
+    <Protobuf Include="../../Protos/player_identity_service/api/**/*.proto" GrpcServices="None" />
+  </ItemGroup>
+
+</Project>

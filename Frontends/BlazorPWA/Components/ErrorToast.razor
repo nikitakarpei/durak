@@ -1,0 +1,19 @@
+@using BlazorPWA.Services.Connection
+@inject IGameConnectionService Connection
+
+@if (Connection.Status == ConnectionStatus.Error && !string.IsNullOrWhiteSpace(Connection.ErrorMessage))
+{
+    <div class="toast">@Connection.ErrorMessage</div>
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        Connection.StateChanged += OnStateChanged;
+    }
+
+    private void OnStateChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+}
