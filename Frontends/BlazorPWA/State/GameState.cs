@@ -16,7 +16,6 @@ public sealed class GameState
     public RegularCard? TrumpCard { get; set; }
     public int TalonCount { get; set; }
     public List<PossibleMove> YourPossibleMoves { get; } = new();
-    public List<string> EventLog { get; } = new();
 }
 
 public sealed record PlayerState(string PlayerId, int Seat)

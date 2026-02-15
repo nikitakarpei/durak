@@ -142,10 +142,6 @@ public static class GameStateReducer
         state.AttackerPlayerId = evt.AttackerPlayerId;
         state.DefenderPlayerId = evt.DefenderPlayerId;
         state.Table.Clear();
-
-        var attacker = PlayerLabel(state, evt.AttackerPlayerId);
-        var defender = PlayerLabel(state, evt.DefenderPlayerId);
-        state.EventLog.Add($"{attacker} attacks, {defender} defends");
     }
 
     private static void Apply(GameState state, YourTurnStarted evt)
@@ -195,18 +191,12 @@ public static class GameStateReducer
         {
             state.YourHand.RemoveAt(handIndex);
         }
-
-        state.EventLog.Add($"{PlayerLabel(state, evt.PlayerId)} played {CardLabel.For(card)}");
     }
 
     private static void Apply(GameState state, AttackCardBeaten evt)
     {
         var defender = ParseRegularCard(evt.DefenderCard);
         state.CardsById[defender.Id] = defender;
-
-        var attackCardLabel = state.CardsById.TryGetValue(evt.AttackerCardId, out var attackCard)
-            ? CardLabel.For(attackCard)
-            : evt.AttackerCardId;
 
         var pairIndex = state.Table.FindIndex(p => p.Attack.Id == evt.AttackerCardId);
         if (pairIndex >= 0)
@@ -224,8 +214,6 @@ public static class GameStateReducer
         {
             state.YourHand.RemoveAt(handIndex);
         }
-
-        state.EventLog.Add($"{PlayerLabel(state, evt.PlayerId)} beat {attackCardLabel} with {CardLabel.For(defender)}");
     }
 
     private static void Apply(GameState state, PlayerTookCardsFromTable evt)
@@ -247,27 +235,22 @@ public static class GameStateReducer
         {
             player.CardCount = Math.Max(0, player.CardCount + evt.CardIds.Count);
         }
-
-        state.EventLog.Add($"{PlayerLabel(state, evt.PlayerId)} took {evt.CardIds.Count} cards from the table");
     }
 
     private static void Apply(GameState state, CardsOnTableDiscarded evt)
     {
         state.Table.Clear();
-        state.EventLog.Add("Cards discarded — round over");
     }
 
     private static void Apply(GameState state, DefenceGivenUp evt)
     {
         state.CurrentTurnPlayerId = evt.PlayerId;
-        state.EventLog.Add($"{PlayerLabel(state, evt.PlayerId)} gave up defence");
     }
 
     private static void Apply(GameState state, RoundFinished evt)
     {
         state.Table.Clear();
         state.YourPossibleMoves.Clear();
-        state.EventLog.Add("Round finished");
     }
 
     private static void Apply(GameState state, FoolDeclared evt)
@@ -276,12 +259,7 @@ public static class GameStateReducer
         {
             player.IsFool = true;
         }
-
-        state.EventLog.Add($"{PlayerLabel(state, evt.PlayerId)} is the fool!");
     }
-
-    private static string PlayerLabel(GameState state, string playerId) =>
-        playerId == state.LocalPlayerId ? "You" : playerId;
 
     private static Card ParseRegularCard(Any anyCard)
     {
