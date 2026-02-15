@@ -107,6 +107,46 @@ public class UC003_ViewMatchStateTests : TestContext
     }
 
     [Fact]
+    public void RedSuitHandCard_HasSuitRedClass()
+    {
+        _gameState.YourHand.Add(new Card("h1", CardSuit.Hearts, CardRank.Ace));
+        _gameState.YourHand.Add(new Card("h2", CardSuit.Diamonds, CardRank.King));
+
+        var cut = RenderComponent<Game>();
+
+        var handCards = cut.FindAll("section.hand button.card");
+        handCards[0].ClassList.Should().Contain("suit-red");
+        handCards[1].ClassList.Should().Contain("suit-red");
+    }
+
+    [Fact]
+    public void BlackSuitHandCard_DoesNotHaveSuitRedClass()
+    {
+        _gameState.YourHand.Add(new Card("h1", CardSuit.Clubs, CardRank.Ace));
+        _gameState.YourHand.Add(new Card("h2", CardSuit.Spades, CardRank.King));
+
+        var cut = RenderComponent<Game>();
+
+        var handCards = cut.FindAll("section.hand button.card");
+        handCards[0].ClassList.Should().NotContain("suit-red");
+        handCards[1].ClassList.Should().NotContain("suit-red");
+    }
+
+    [Fact]
+    public void RedSuitTableCard_HasSuitRedClass()
+    {
+        _gameState.Table.Add(new TablePair(
+            new Card("atk-1", CardSuit.Hearts, CardRank.Seven),
+            new Card("def-1", CardSuit.Diamonds, CardRank.Jack)));
+
+        var cut = RenderComponent<Game>();
+
+        var pair = cut.Find("div.pair");
+        pair.QuerySelector(".card:not(.defence)")!.ClassList.Should().Contain("suit-red");
+        pair.QuerySelector(".card.defence")!.ClassList.Should().Contain("suit-red");
+    }
+
+    [Fact]
     public void WhenCardsAreDealtFromTalon_TalonCountDecreases()
     {
         _gameState.TalonCount = 20;

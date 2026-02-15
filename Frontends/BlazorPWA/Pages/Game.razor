@@ -30,7 +30,7 @@
         <section class="match">
             <header class="top-bar">
                 <div class="pill">Game: @State.GameId</div>
-                <div class="pill">Trump: @RenderCardLabel(State.TrumpCard)</div>
+                <div class="pill">Trump: <span class="@(State.TrumpCard is not null ? SuitClass(State.TrumpCard.Suit) : "")">@RenderCardLabel(State.TrumpCard)</span></div>
                 <div class="pill">Talon: @State.TalonCount</div>
             </header>
 
@@ -51,13 +51,13 @@
                     <div class="pair">
                         @if (pair.Defence is null)
                         {
-                            <button class="card @(selectedAttackCardId == pair.Attack.Id ? "selected" : "") @(IsAttackCardBeatable(pair.Attack.Id) ? "beatable" : "")" @onclick="() => SelectAttackCard(pair.Attack.Id)">@RenderCardLabel(pair.Attack)</button>
+                            <button class="card @(selectedAttackCardId == pair.Attack.Id ? "selected" : "") @(IsAttackCardBeatable(pair.Attack.Id) ? "beatable" : "") @SuitClass(pair.Attack.Suit)" @onclick="() => SelectAttackCard(pair.Attack.Id)">@RenderCardLabel(pair.Attack)</button>
                         }
                         else
                         {
-                            <div class="card">@RenderCardLabel(pair.Attack)</div>
+                            <div class="card @SuitClass(pair.Attack.Suit)">@RenderCardLabel(pair.Attack)</div>
                         }
-                        <div class="card defence">
+                        <div class="card defence @(pair.Defence is not null ? SuitClass(pair.Defence.Suit) : "")">
                             @(pair.Defence is null ? "" : RenderCardLabel(pair.Defence))
                         </div>
                     </div>
@@ -68,7 +68,7 @@
                 <div class="hand-cards">
                     @foreach (var card in State.YourHand)
                     {
-                        <button class="card @(selectedCardId == card.Id ? "selected" : "") @(IsCardPlayable(card.Id) ? "playable" : "") @(IsHandCardBeatable(card.Id) ? "beatable" : "")" @onclick="() => SelectCard(card.Id)">
+                        <button class="card @(selectedCardId == card.Id ? "selected" : "") @(IsCardPlayable(card.Id) ? "playable" : "") @(IsHandCardBeatable(card.Id) ? "beatable" : "") @SuitClass(card.Suit)" @onclick="() => SelectCard(card.Id)">
                             @RenderCardLabel(card)
                         </button>
                     }
@@ -173,6 +173,11 @@
         GameService.Api.Data.CardSuit.Spades => "♠",
         _ => "?"
     };
+
+    private static string SuitClass(GameService.Api.Data.CardSuit suit) =>
+        suit is GameService.Api.Data.CardSuit.Hearts or GameService.Api.Data.CardSuit.Diamonds
+            ? "suit-red"
+            : "";
 
     private bool IsCardPlayable(string cardId) =>
         State.YourPossibleMoves.Any(m => m.YourCardId == cardId);

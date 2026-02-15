@@ -126,6 +126,11 @@
     text-align: center;
 }
 
+.card.suit-red,
+.pill .suit-red {
+    color: #dc2626;
+}
+
 .card.defence {
     background: #e2e8f0;
 }
