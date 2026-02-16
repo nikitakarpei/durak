@@ -126,6 +126,28 @@ public class UC003_ViewMatchStateTests : TestContext
     }
 
     [Fact]
+    public void EmptyDefenceSlot_HasEmptyClass()
+    {
+        _gameState.Table.Add(new TablePair(new Card("atk-1", CardSuit.Clubs, CardRank.Seven), null));
+
+        var cut = RenderComponent<Game>();
+
+        cut.Find("div.pair .card.defence").ClassList.Should().Contain("empty");
+    }
+
+    [Fact]
+    public void FilledDefenceSlot_DoesNotHaveEmptyClass()
+    {
+        _gameState.Table.Add(new TablePair(
+            new Card("atk-1", CardSuit.Clubs, CardRank.Seven),
+            new Card("def-1", CardSuit.Spades, CardRank.King)));
+
+        var cut = RenderComponent<Game>();
+
+        cut.Find("div.pair .card.defence").ClassList.Should().NotContain("empty");
+    }
+
+    [Fact]
     public void HandSectionRendersPlayerCards()
     {
         _gameState.YourHand.Add(new Card("h1", CardSuit.Hearts, CardRank.Queen));

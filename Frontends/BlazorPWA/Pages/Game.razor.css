@@ -147,8 +147,10 @@
     color: #dc2626;
 }
 
-.card.defence {
-    background: #f1f5f9;
+.card.defence.empty {
+    background: rgba(255, 255, 255, 0.35);
+    border: 2px dashed rgba(100, 116, 139, 0.45);
+    box-shadow: none;
 }
 
 .hand {

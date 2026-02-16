@@ -57,7 +57,7 @@
                         {
                             <div class="card @SuitClass(pair.Attack.Suit)"><span class="card-rank">@RankToText(pair.Attack.Rank)</span><span class="card-suit">@SuitToText(pair.Attack.Suit)</span></div>
                         }
-                        <div class="card defence @(pair.Defence is not null ? SuitClass(pair.Defence.Suit) : "")">@if (pair.Defence is not null) {<span class="card-rank">@RankToText(pair.Defence.Rank)</span><span class="card-suit">@SuitToText(pair.Defence.Suit)</span>}</div>
+                        <div class="card defence @(pair.Defence is null ? "empty" : SuitClass(pair.Defence.Suit))">@if (pair.Defence is not null) {<span class="card-rank">@RankToText(pair.Defence.Rank)</span><span class="card-suit">@SuitToText(pair.Defence.Suit)</span>}</div>
                     </div>
                 }
             </section>
