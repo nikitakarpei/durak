@@ -159,6 +159,7 @@
 
 .hand-cards {
     display: flex;
+    justify-content: center;
     overflow-x: auto;
     padding: 4px 4px 8px;
 }
@@ -188,7 +189,7 @@
 }
 
 .hand .card.selected {
-    z-index: 5;
+    z-index: 10;
     border-color: #4f46e5;
     background: #eef2ff;
     transform: translateY(-14px);
