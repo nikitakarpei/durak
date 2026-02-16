@@ -86,6 +86,28 @@ public class UC003_ViewMatchStateTests : TestContext
     }
 
     [Fact]
+    public void DeckArea_TrumpCard_NotRotated_WhenTalonEmpty()
+    {
+        _gameState.TrumpCard = new RegularCard { Id = "c1", Suit = CardSuit.Spades, Rank = CardRank.King };
+        _gameState.TalonCount = 0;
+
+        var cut = RenderComponent<Game>();
+
+        cut.Find(".trump-face").ClassList.Should().NotContain("trump-face--rotated");
+    }
+
+    [Fact]
+    public void DeckArea_TrumpCard_Rotated_WhenTalonPositive()
+    {
+        _gameState.TrumpCard = new RegularCard { Id = "c1", Suit = CardSuit.Spades, Rank = CardRank.King };
+        _gameState.TalonCount = 3;
+
+        var cut = RenderComponent<Game>();
+
+        cut.Find(".trump-face").ClassList.Should().Contain("trump-face--rotated");
+    }
+
+    [Fact]
     public void DeckArea_ShowsRemainingCardCount()
     {
         _gameState.TalonCount = 7;
