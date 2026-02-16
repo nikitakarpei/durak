@@ -28,20 +28,6 @@
     else
     {
         <section class="match">
-            <div class="deck-area">
-                <div class="deck-pile @(State.TalonCount > 0 ? "deck-pile--stacked" : "")">
-                    @if (State.TrumpCard is not null)
-                    {
-                        <div class="card trump-face @(State.TalonCount > 0 ? "trump-face--rotated" : "") @SuitClass(State.TrumpCard.Suit)"><span class="card-rank">@RankToText(State.TrumpCard.Rank)</span><span class="card-suit">@SuitToText(State.TrumpCard.Suit)</span></div>
-                    }
-                    @if (State.TalonCount > 0)
-                    {
-                        <div class="deck-back-card"></div>
-                    }
-                </div>
-                <span class="deck-count">@State.TalonCount left</span>
-            </div>
-
             <section class="opponents">
                 @foreach (var opponent in GetOpponents())
                 {
@@ -61,6 +47,7 @@
                 }
             </section>
 
+            <div class="play-area">
             <section class="table">
                 @foreach (var pair in State.Table)
                 {
@@ -77,6 +64,22 @@
                     </div>
                 }
             </section>
+
+            <div class="deck-area">
+                <div class="deck-pile @(State.TalonCount > 0 ? "deck-pile--stacked" : "")">
+                    @if (State.TrumpCard is not null)
+                    {
+                        <div class="card trump-face @(State.TalonCount > 0 ? "trump-face--rotated" : "") @SuitClass(State.TrumpCard.Suit)"><span class="card-rank">@RankToText(State.TrumpCard.Rank)</span><span class="card-suit">@SuitToText(State.TrumpCard.Suit)</span></div>
+                    }
+                    @if (State.TalonCount > 0)
+                    {
+                        <div class="deck-back-card">
+                            <span class="deck-count">@State.TalonCount</span>
+                        </div>
+                    }
+                </div>
+            </div>
+            </div>
 
             <section class="hand">
                 <div class="hand-cards">

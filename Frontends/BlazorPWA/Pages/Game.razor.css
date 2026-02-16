@@ -58,12 +58,17 @@
     gap: 16px;
 }
 
+.play-area {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
 .deck-area {
-    justify-self: end;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    flex-shrink: 0;
 }
 
 .deck-pile {
@@ -110,11 +115,20 @@
     z-index: 2;
 }
 
+/* Count badge overlaid on the deck-back-card (positioned within its absolute parent) */
 .deck-count {
-    font-size: 0.75rem;
-    color: #6b7280;
-    font-weight: 500;
-    letter-spacing: 0.01em;
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.62rem;
+    font-weight: 700;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.40);
+    border-radius: 3px;
+    padding: 1px 4px;
+    white-space: nowrap;
+    pointer-events: none;
 }
 
 .opponents {
@@ -192,6 +206,7 @@
 }
 
 .table {
+    flex: 1;
     min-height: 180px;
     display: flex;
     flex-wrap: wrap;
