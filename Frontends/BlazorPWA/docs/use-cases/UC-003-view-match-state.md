@@ -26,7 +26,9 @@
 - Turn, table, hand, trump, and talon information update over time.
 - The talon count decreases each time cards are dealt to a player.
 - Any unoccupied opponent seat within the configured seat count is shown as "Not joined" until a player joins it.
+- Cards in the player's hand are displayed as recognisable playing cards: white background, rounded corners, drop shadow, and the rank and suit shown in the top-left corner.
+- Red suits (Hearts, Diamonds) appear in red; black suits (Spades, Clubs) appear in dark.
+- Cards in hand overlap slightly in a fan layout to conserve horizontal space; the selected card lifts above the others.
 
 ## Out of Scope (MVP)
-- Rich card art
 - Desktop-first layout optimization

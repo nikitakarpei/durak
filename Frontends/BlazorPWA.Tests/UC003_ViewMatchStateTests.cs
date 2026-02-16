@@ -189,6 +189,36 @@ public class UC003_ViewMatchStateTests : TestContext
     }
 
     [Fact]
+    public void HandCard_HasSeparateRankAndSuitElements()
+    {
+        _gameState.YourHand.Add(new Card("h1", CardSuit.Hearts, CardRank.Queen));
+
+        var cut = RenderComponent<Game>();
+
+        var card = cut.Find("section.hand button.card");
+        card.QuerySelector(".card-rank")!.TextContent.Should().Be("Q");
+        card.QuerySelector(".card-suit")!.TextContent.Should().Be("♥");
+    }
+
+    [Fact]
+    public void TableCard_HasSeparateRankAndSuitElements()
+    {
+        _gameState.Table.Add(new TablePair(
+            new Card("atk-1", CardSuit.Clubs, CardRank.Seven),
+            new Card("def-1", CardSuit.Hearts, CardRank.King)));
+
+        var cut = RenderComponent<Game>();
+
+        var attackCard = cut.Find("div.pair .card:not(.defence)");
+        attackCard.QuerySelector(".card-rank")!.TextContent.Should().Be("7");
+        attackCard.QuerySelector(".card-suit")!.TextContent.Should().Be("♣");
+
+        var defenceCard = cut.Find("div.pair .card.defence");
+        defenceCard.QuerySelector(".card-rank")!.TextContent.Should().Be("K");
+        defenceCard.QuerySelector(".card-suit")!.TextContent.Should().Be("♥");
+    }
+
+    [Fact]
     public void WhenCardsAreDealtFromTalon_TalonCountDecreases()
     {
         _gameState.TalonCount = 20;

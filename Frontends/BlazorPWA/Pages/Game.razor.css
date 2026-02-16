@@ -117,43 +117,73 @@
 }
 
 .card {
-    background: #f8fafc;
-    border-radius: 12px;
-    padding: 10px 12px;
-    font-weight: 600;
-    border: 1px solid #e5e7eb;
-    min-width: 48px;
-    text-align: center;
+    background: #fff;
+    border-radius: 8px;
+    border: 1.5px solid #d1d5db;
+    width: 52px;
+    height: 73px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 5px 6px;
+    gap: 2px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.10), 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
-.card.suit-red,
+.card-rank {
+    font-size: 0.85rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #1b1f2a;
+}
+
+.card-suit {
+    font-size: 0.9rem;
+    line-height: 1;
+    color: #1b1f2a;
+}
+
+.card.suit-red .card-rank,
+.card.suit-red .card-suit,
 .pill .suit-red {
     color: #dc2626;
 }
 
 .card.defence {
-    background: #e2e8f0;
+    background: #f1f5f9;
 }
 
 .hand {
     background: #fff;
     border-radius: 20px;
-    padding: 12px;
+    padding: 12px 16px 16px;
     box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+    overflow: hidden;
 }
 
 .hand-cards {
     display: flex;
-    gap: 8px;
     overflow-x: auto;
-    padding-top: 8px;
-    padding-bottom: 4px;
+    padding: 12px 4px 4px;
+}
+
+.hand-cards .card + .card {
+    margin-inline-start: -18px;
 }
 
 .hand .card {
-    border: 2px solid transparent;
+    position: relative;
+    z-index: 1;
     cursor: pointer;
-    transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
+    border: 1.5px solid transparent;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, z-index 0s;
+}
+
+.hand .card:hover {
+    z-index: 5;
+    transform: translateY(-8px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
 .hand .card.playable,
@@ -163,10 +193,21 @@
 }
 
 .hand .card.selected {
+    z-index: 5;
     border-color: #4f46e5;
     background: #eef2ff;
-    transform: translateY(-6px);
-    box-shadow: 0 6px 16px rgba(79, 70, 229, 0.25);
+    transform: translateY(-14px);
+    box-shadow: 0 8px 20px rgba(79, 70, 229, 0.30);
+}
+
+.hand .card.selected .card-rank,
+.hand .card.selected .card-suit {
+    color: #4f46e5;
+}
+
+.hand .card.selected.suit-red .card-rank,
+.hand .card.selected.suit-red .card-suit {
+    color: #dc2626;
 }
 
 .table .card {
