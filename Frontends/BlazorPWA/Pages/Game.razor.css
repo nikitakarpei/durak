@@ -126,69 +126,56 @@
 }
 
 .opponent {
-    background: #fff;
-    border-radius: 12px;
-    padding: 6px 10px 6px 6px;
-    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.07);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.opponent--empty {
-    background: transparent;
-    box-shadow: none;
-    border: 1.5px dashed rgba(100, 116, 139, 0.35);
-}
-
-.opp-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: #dbeafe;
-    color: #1e40af;
-    font-size: 0.68rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.opponent--empty .opp-avatar {
-    background: #f3f4f6;
-    color: #9ca3af;
-}
-
-.opp-info {
     display: flex;
     flex-direction: column;
-    gap: 2px;
-}
-
-.opp-name {
-    font-size: 0.78rem;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.opponent--empty .opp-name {
-    font-weight: 400;
-    color: #9ca3af;
-}
-
-.opp-cards {
-    display: flex;
     align-items: center;
     gap: 4px;
 }
 
-.opp-card-icon {
-    display: inline-block;
-    width: 12px;
-    height: 17px;
-    border-radius: 2px;
-    border: 1px solid rgba(255, 255, 255, 0.18);
+.opponent--empty {
+    opacity: 0.45;
+}
+
+.opp-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 2px solid #1e40af;
+    background: #dbeafe;
+    color: #1e40af;
+    font-size: 0.95rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.opponent--empty .opp-avatar {
+    background: transparent;
+    border: 2px dashed rgba(100, 116, 139, 0.45);
+    color: #9ca3af;
+}
+
+.opp-name {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.opponent--empty .opp-name {
+    color: #9ca3af;
+}
+
+.opp-hand {
+    display: flex;
+    margin-top: 2px;
+}
+
+.opp-card-back {
+    width: 18px;
+    height: 26px;
+    border-radius: 3px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
     background: repeating-linear-gradient(
         45deg,
         #1e3a8a 0px,
@@ -196,12 +183,12 @@
         #1e40af 2px,
         #1e40af 4px
     );
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+    flex-shrink: 0;
 }
 
-.opp-card-count {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: #374151;
+.opp-card-back + .opp-card-back {
+    margin-inline-start: -10px;
 }
 
 .table {

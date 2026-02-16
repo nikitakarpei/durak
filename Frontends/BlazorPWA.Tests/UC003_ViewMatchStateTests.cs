@@ -138,15 +138,40 @@ public class UC003_ViewMatchStateTests : TestContext
 
         var opponents = cut.FindAll("div.opponent");
         opponents.Should().HaveCount(5);
-        opponents[0].TextContent.Should().Contain("Player 2");   // seat 1 → Player 2
+        opponents[0].TextContent.Should().Contain("Player 2");    // seat 1 → Player 2
         opponents[0].TextContent.Should().NotContain("player-2"); // UUID hidden
-        opponents[0].TextContent.Should().Contain("5");           // card count visible
-        opponents[1].TextContent.Should().Contain("Player 3");   // seat 2 → Player 3
+        opponents[0].QuerySelectorAll(".opp-card-back").Should().HaveCount(5); // visual hand
+        opponents[1].TextContent.Should().Contain("Player 3");    // seat 2 → Player 3
         opponents[1].TextContent.Should().NotContain("player-3"); // UUID hidden
-        opponents[1].TextContent.Should().Contain("3");
+        opponents[1].QuerySelectorAll(".opp-card-back").Should().HaveCount(3);
         opponents[2].TextContent.Should().Contain("Not joined");
         opponents[3].TextContent.Should().Contain("Not joined");
         opponents[4].TextContent.Should().Contain("Not joined");
+    }
+
+    [Fact]
+    public void Opponent_MiniCardBackCount_MatchesCardCount()
+    {
+        _gameState.TotalPlayerSeats = 2;
+        _gameState.LocalPlayerId = "player-1";
+        _gameState.Players["player-1"] = new PlayerState("player-1", 0);
+        _gameState.Players["player-2"] = new PlayerState("player-2", 1) { CardCount = 6 };
+
+        var cut = RenderComponent<Game>();
+
+        cut.Find("div.opponent .opp-hand").QuerySelectorAll(".opp-card-back").Length.Should().Be(6);
+    }
+
+    [Fact]
+    public void Opponent_EmptySeat_HasNoCardBacks()
+    {
+        _gameState.TotalPlayerSeats = 2;
+        _gameState.LocalPlayerId = "player-1";
+        _gameState.Players["player-1"] = new PlayerState("player-1", 0);
+
+        var cut = RenderComponent<Game>();
+
+        cut.Find("div.opponent").QuerySelectorAll(".opp-card-back").Should().BeEmpty();
     }
 
     [Fact]

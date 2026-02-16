@@ -46,14 +46,17 @@
                 @foreach (var opponent in GetOpponents())
                 {
                     <div class="opponent @(opponent.IsJoined ? "" : "opponent--empty")">
-                        <div class="opp-avatar">@(opponent.IsJoined ? $"P{opponent.Seat + 1}" : "?")</div>
-                        <div class="opp-info">
-                            <span class="opp-name">@(opponent.IsJoined ? $"Player {opponent.Seat + 1}" : "Not joined")</span>
-                            @if (opponent.IsJoined)
-                            {
-                                <div class="opp-cards"><span class="opp-card-icon"></span><span class="opp-card-count">@opponent.CardCount</span></div>
-                            }
-                        </div>
+                        <div class="opp-avatar">@(opponent.IsJoined ? $"{opponent.Seat + 1}" : "?")</div>
+                        <span class="opp-name">@(opponent.IsJoined ? $"Player {opponent.Seat + 1}" : "Not joined")</span>
+                        @if (opponent.IsJoined && opponent.CardCount > 0)
+                        {
+                            <div class="opp-hand">
+                                @for (var i = 0; i < Math.Min(opponent.CardCount, 8); i++)
+                                {
+                                    <div class="opp-card-back"></div>
+                                }
+                            </div>
+                        }
                     </div>
                 }
             </section>
