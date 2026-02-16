@@ -1,6 +1,6 @@
 .game-shell {
     min-height: 100vh;
-    background: radial-gradient(circle at 20% 20%, #f0f4ff, #f9f9f9);
+    background: #e8eaf0;
     color: #1b1f2a;
     display: flex;
     align-items: center;
@@ -97,16 +97,13 @@
 }
 
 .table {
-    background: #fff;
-    border-radius: 20px;
-    padding: 16px;
     min-height: 180px;
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
     align-items: center;
     justify-content: center;
-    box-shadow: inset 0 0 0 1px #e5e7eb;
+    padding: 16px 0;
 }
 
 .pair {

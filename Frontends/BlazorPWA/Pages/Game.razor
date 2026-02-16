@@ -51,25 +51,13 @@
                     <div class="pair">
                         @if (pair.Defence is null)
                         {
-                            <button class="card @(selectedAttackCardId == pair.Attack.Id ? "selected" : "") @(IsAttackCardBeatable(pair.Attack.Id) ? "beatable" : "") @SuitClass(pair.Attack.Suit)" @onclick="() => SelectAttackCard(pair.Attack.Id)">
-                                <span class="card-rank">@RankToText(pair.Attack.Rank)</span>
-                                <span class="card-suit">@SuitToText(pair.Attack.Suit)</span>
-                            </button>
+                            <button class="card @(selectedAttackCardId == pair.Attack.Id ? "selected" : "") @(IsAttackCardBeatable(pair.Attack.Id) ? "beatable" : "") @SuitClass(pair.Attack.Suit)" @onclick="() => SelectAttackCard(pair.Attack.Id)"><span class="card-rank">@RankToText(pair.Attack.Rank)</span><span class="card-suit">@SuitToText(pair.Attack.Suit)</span></button>
                         }
                         else
                         {
-                            <div class="card @SuitClass(pair.Attack.Suit)">
-                                <span class="card-rank">@RankToText(pair.Attack.Rank)</span>
-                                <span class="card-suit">@SuitToText(pair.Attack.Suit)</span>
-                            </div>
+                            <div class="card @SuitClass(pair.Attack.Suit)"><span class="card-rank">@RankToText(pair.Attack.Rank)</span><span class="card-suit">@SuitToText(pair.Attack.Suit)</span></div>
                         }
-                        <div class="card defence @(pair.Defence is not null ? SuitClass(pair.Defence.Suit) : "")">
-                            @if (pair.Defence is not null)
-                            {
-                                <span class="card-rank">@RankToText(pair.Defence.Rank)</span>
-                                <span class="card-suit">@SuitToText(pair.Defence.Suit)</span>
-                            }
-                        </div>
+                        <div class="card defence @(pair.Defence is not null ? SuitClass(pair.Defence.Suit) : "")">@if (pair.Defence is not null) {<span class="card-rank">@RankToText(pair.Defence.Rank)</span><span class="card-suit">@SuitToText(pair.Defence.Suit)</span>}</div>
                     </div>
                 }
             </section>
@@ -78,10 +66,7 @@
                 <div class="hand-cards">
                     @foreach (var card in State.YourHand)
                     {
-                        <button class="card @(selectedCardId == card.Id ? "selected" : "") @(IsCardPlayable(card.Id) ? "playable" : "") @(IsHandCardBeatable(card.Id) ? "beatable" : "") @SuitClass(card.Suit)" @onclick="() => SelectCard(card.Id)">
-                            <span class="card-rank">@RankToText(card.Rank)</span>
-                            <span class="card-suit">@SuitToText(card.Suit)</span>
-                        </button>
+                        <button class="card @(selectedCardId == card.Id ? "selected" : "") @(IsCardPlayable(card.Id) ? "playable" : "") @(IsHandCardBeatable(card.Id) ? "beatable" : "") @SuitClass(card.Suit)" @onclick="() => SelectCard(card.Id)"><span class="card-rank">@RankToText(card.Rank)</span><span class="card-suit">@SuitToText(card.Suit)</span></button>
                     }
                 </div>
             </section>
