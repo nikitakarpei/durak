@@ -29,10 +29,10 @@
     {
         <section class="match">
             <div class="deck-area">
-                <div class="deck-pile">
+                <div class="deck-pile @(State.TalonCount > 0 ? "deck-pile--stacked" : "")">
                     @if (State.TrumpCard is not null)
                     {
-                        <div class="card trump-face @SuitClass(State.TrumpCard.Suit)"><span class="card-rank">@RankToText(State.TrumpCard.Rank)</span><span class="card-suit">@SuitToText(State.TrumpCard.Suit)</span></div>
+                        <div class="card trump-face @(State.TalonCount > 0 ? "trump-face--rotated" : "") @SuitClass(State.TrumpCard.Suit)"><span class="card-rank">@RankToText(State.TrumpCard.Rank)</span><span class="card-suit">@SuitToText(State.TrumpCard.Suit)</span></div>
                     }
                     @if (State.TalonCount > 0)
                     {

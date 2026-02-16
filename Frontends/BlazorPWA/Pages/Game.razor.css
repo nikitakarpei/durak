@@ -68,24 +68,33 @@
 
 .deck-pile {
     position: relative;
-    width: 96px;
+}
+
+/* When the deck is present: square container sized to the trump card's height
+   so the rotated card (87px visual width) fits exactly and peeks out symmetrically */
+.deck-pile--stacked {
+    width: 87px;
     height: 87px;
 }
 
-/* Trump card: face-up, rotated 90°, peeking to the right from behind the deck */
+/* Trump card: normal full-size card; rotation applied only when deck is present */
 .card.trump-face {
-    position: absolute;
-    top: 50%;
-    left: 14px;
-    transform: translateY(-50%) rotate(90deg);
     z-index: 1;
 }
 
-/* Face-down deck on top */
+.card.trump-face.trump-face--rotated {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(90deg);
+}
+
+/* Face-down deck on top, centred over the rotated trump */
 .deck-back-card {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     width: 62px;
     height: 87px;
     border-radius: 10px;
