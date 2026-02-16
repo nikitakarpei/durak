@@ -189,7 +189,7 @@
     width: 18px;
     height: 26px;
     border-radius: 3px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1.5px solid rgba(255, 255, 255, 0.55);
     background: repeating-linear-gradient(
         45deg,
         #1e3a8a 0px,
@@ -197,8 +197,9 @@
         #1e40af 2px,
         #1e40af 4px
     );
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
     flex-shrink: 0;
+    position: relative; /* establishes stacking context; later siblings paint on top */
 }
 
 .opp-card-back + .opp-card-back {
