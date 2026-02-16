@@ -269,7 +269,7 @@
     z-index: 1;
     cursor: pointer;
     border: 1.5px solid transparent;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, z-index 0s;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, opacity 0.15s ease, z-index 0s;
 }
 
 .hand .card:hover {
@@ -278,10 +278,23 @@
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
+/* Playable / beatable cards: keep white background, lift with shadow and green border */
 .hand .card.playable,
-.card.beatable {
+.hand .card.beatable {
     border-color: #86efac;
-    background: #f0fdf4;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.13);
+}
+
+/* Beatable table attack cards: green border only */
+.table .card.beatable {
+    border-color: #86efac;
+}
+
+/* Dim cards that are not active when a turn is in progress */
+.hand-cards:has(.card.playable) .card:not(.playable):not(.selected),
+.hand-cards:has(.card.beatable) .card:not(.beatable):not(.selected) {
+    opacity: 0.5;
+    box-shadow: none;
 }
 
 .hand .card.selected {
