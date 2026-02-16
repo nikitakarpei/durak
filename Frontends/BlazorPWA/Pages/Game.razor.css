@@ -68,25 +68,17 @@
 
 .deck-pile {
     position: relative;
-}
-
-/* When deck is present the pile needs fixed dimensions to contain both cards */
-.deck-pile--stacked {
     width: 96px;
     height: 87px;
 }
 
-/* Trump card face-up, normal vertical orientation */
+/* Trump card: face-up, rotated 90°, peeking to the right from behind the deck */
 .card.trump-face {
-    z-index: 1;
-}
-
-/* When cards remain: trump rotates 90° and peeks out to the right from behind the deck back */
-.card.trump-face.trump-face--rotated {
     position: absolute;
     top: 50%;
     left: 14px;
     transform: translateY(-50%) rotate(90deg);
+    z-index: 1;
 }
 
 /* Face-down deck on top */
