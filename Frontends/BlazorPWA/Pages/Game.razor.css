@@ -137,6 +137,7 @@
     justify-content: space-between;
     align-items: flex-start;
     gap: 8px;
+    padding: 12px 18% 0;
 }
 
 .opponent {
