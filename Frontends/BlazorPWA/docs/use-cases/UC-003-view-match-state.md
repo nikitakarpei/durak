@@ -12,7 +12,7 @@
 
 ## Main Flow
 1. App shows a visual deck area: the trump card face-up and the remaining deck as a face-down card rotated 90° on top, with a count of cards remaining.
-2. App shows all opponent seats configured for the game, including seats not yet occupied.
+2. App shows all opponent seats configured for the game, including seats not yet occupied. Each joined opponent is shown as a compact tile with a circular avatar, a friendly name ("Player N"), and a visual card-count indicator. Unjoined seats are shown as a faint dashed placeholder.
 3. App shows table cards.
 4. App shows player hand and action controls.
 

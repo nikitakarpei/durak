@@ -45,10 +45,15 @@
             <section class="opponents">
                 @foreach (var opponent in GetOpponents())
                 {
-                    <div class="opponent">
-                        <div class="name">@(opponent.IsJoined ? opponent.PlayerId : "Not joined")</div>
-                        <div class="meta">Seat @opponent.Seat</div>
-                        <div class="count">@(opponent.IsJoined ? $"Cards: {opponent.CardCount}" : "Waiting for player")</div>
+                    <div class="opponent @(opponent.IsJoined ? "" : "opponent--empty")">
+                        <div class="opp-avatar">@(opponent.IsJoined ? $"P{opponent.Seat + 1}" : "?")</div>
+                        <div class="opp-info">
+                            <span class="opp-name">@(opponent.IsJoined ? $"Player {opponent.Seat + 1}" : "Not joined")</span>
+                            @if (opponent.IsJoined)
+                            {
+                                <div class="opp-cards"><span class="opp-card-icon"></span><span class="opp-card-count">@opponent.CardCount</span></div>
+                            }
+                        </div>
                     </div>
                 }
             </section>

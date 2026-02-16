@@ -116,18 +116,15 @@ public class UC003_ViewMatchStateTests : TestContext
 
         var opponents = cut.FindAll("div.opponent");
         opponents.Should().HaveCount(5);
-        opponents[0].TextContent.Should().Contain("player-2");
-        opponents[0].TextContent.Should().Contain("Seat 1");
-        opponents[0].TextContent.Should().Contain("5");
-        opponents[1].TextContent.Should().Contain("player-3");
-        opponents[1].TextContent.Should().Contain("Seat 2");
+        opponents[0].TextContent.Should().Contain("Player 2");   // seat 1 → Player 2
+        opponents[0].TextContent.Should().NotContain("player-2"); // UUID hidden
+        opponents[0].TextContent.Should().Contain("5");           // card count visible
+        opponents[1].TextContent.Should().Contain("Player 3");   // seat 2 → Player 3
+        opponents[1].TextContent.Should().NotContain("player-3"); // UUID hidden
         opponents[1].TextContent.Should().Contain("3");
         opponents[2].TextContent.Should().Contain("Not joined");
-        opponents[2].TextContent.Should().Contain("Seat 3");
         opponents[3].TextContent.Should().Contain("Not joined");
-        opponents[3].TextContent.Should().Contain("Seat 4");
         opponents[4].TextContent.Should().Contain("Not joined");
-        opponents[4].TextContent.Should().Contain("Seat 5");
     }
 
     [Fact]
@@ -144,7 +141,6 @@ public class UC003_ViewMatchStateTests : TestContext
 
         var opponents = cut.FindAll("div.opponent");
         opponents.Should().HaveCount(1);
-        opponents[0].TextContent.Should().Contain("Seat 1");
         opponents[0].TextContent.Should().Contain("Not joined");
     }
 
