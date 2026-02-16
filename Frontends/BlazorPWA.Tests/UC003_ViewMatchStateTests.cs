@@ -34,17 +34,73 @@ public class UC003_ViewMatchStateTests : TestContext
     }
 
     [Fact]
-    public void HeaderShowsGameIdTrumpAndTalon()
+    public void DeckArea_ShowsTrumpCardFaceUp()
     {
         _gameState.TrumpCard = new RegularCard { Id = "c1", Suit = CardSuit.Hearts, Rank = CardRank.Ace };
-        _gameState.TalonCount = 12;
 
         var cut = RenderComponent<Game>();
 
-        var header = cut.Find("header.top-bar");
-        header.TextContent.Should().Contain("game-123");
-        header.TextContent.Should().Contain("A♥");
-        header.TextContent.Should().Contain("12");
+        var trump = cut.Find(".trump-face");
+        trump.QuerySelector(".card-rank")!.TextContent.Should().Be("A");
+        trump.QuerySelector(".card-suit")!.TextContent.Should().Be("♥");
+    }
+
+    [Fact]
+    public void DeckArea_TrumpCard_HasSuitRedClassForRedSuit()
+    {
+        _gameState.TrumpCard = new RegularCard { Id = "c1", Suit = CardSuit.Diamonds, Rank = CardRank.King };
+
+        var cut = RenderComponent<Game>();
+
+        cut.Find(".trump-face").ClassList.Should().Contain("suit-red");
+    }
+
+    [Fact]
+    public void DeckArea_TrumpCard_NoSuitRedClassForBlackSuit()
+    {
+        _gameState.TrumpCard = new RegularCard { Id = "c1", Suit = CardSuit.Spades, Rank = CardRank.King };
+
+        var cut = RenderComponent<Game>();
+
+        cut.Find(".trump-face").ClassList.Should().NotContain("suit-red");
+    }
+
+    [Fact]
+    public void DeckArea_DeckBackVisible_WhenTalonPositive()
+    {
+        _gameState.TalonCount = 5;
+
+        var cut = RenderComponent<Game>();
+
+        cut.FindAll(".deck-back-card").Should().HaveCount(1);
+    }
+
+    [Fact]
+    public void DeckArea_DeckBackHidden_WhenTalonEmpty()
+    {
+        _gameState.TalonCount = 0;
+
+        var cut = RenderComponent<Game>();
+
+        cut.FindAll(".deck-back-card").Should().BeEmpty();
+    }
+
+    [Fact]
+    public void DeckArea_ShowsRemainingCardCount()
+    {
+        _gameState.TalonCount = 7;
+
+        var cut = RenderComponent<Game>();
+
+        cut.Find(".deck-count").TextContent.Should().Contain("7");
+    }
+
+    [Fact]
+    public void GameId_NotShownInUI()
+    {
+        var cut = RenderComponent<Game>();
+
+        cut.Markup.Should().NotContain("game-123");
     }
 
     [Fact]

@@ -28,11 +28,19 @@
     else
     {
         <section class="match">
-            <header class="top-bar">
-                <div class="pill">Game: @State.GameId</div>
-                <div class="pill">Trump: <span class="@(State.TrumpCard is not null ? SuitClass(State.TrumpCard.Suit) : "")">@RenderCardLabel(State.TrumpCard)</span></div>
-                <div class="pill">Talon: @State.TalonCount</div>
-            </header>
+            <div class="deck-area">
+                <div class="deck-pile">
+                    @if (State.TrumpCard is not null)
+                    {
+                        <div class="card trump-face @SuitClass(State.TrumpCard.Suit)"><span class="card-rank">@RankToText(State.TrumpCard.Rank)</span><span class="card-suit">@SuitToText(State.TrumpCard.Suit)</span></div>
+                    }
+                    @if (State.TalonCount > 0)
+                    {
+                        <div class="deck-back-card"></div>
+                    }
+                </div>
+                <span class="deck-count">@State.TalonCount left</span>
+            </div>
 
             <section class="opponents">
                 @foreach (var opponent in GetOpponents())
@@ -95,6 +103,7 @@
     private bool isConnecting;
     private string? selectedCardId;
     private string? selectedAttackCardId;
+    private bool _gameIdLogged;
 
     protected override void OnInitialized()
     {
@@ -103,6 +112,11 @@
 
     private void OnConnectionStateChanged()
     {
+        if (!_gameIdLogged && !string.IsNullOrEmpty(State.GameId))
+        {
+            Console.WriteLine($"[Game] id={State.GameId}");
+            _gameIdLogged = true;
+        }
         InvokeAsync(StateHasChanged);
     }
 

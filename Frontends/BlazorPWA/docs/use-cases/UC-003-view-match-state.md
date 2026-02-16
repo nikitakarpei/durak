@@ -11,7 +11,7 @@
 - Match screen is open and game state changes
 
 ## Main Flow
-1. App shows game header information.
+1. App shows a visual deck area: the trump card face-up and the remaining deck as a face-down card rotated 90° on top, with a count of cards remaining.
 2. App shows all opponent seats configured for the game, including seats not yet occupied.
 3. App shows table cards.
 4. App shows player hand and action controls.
@@ -24,6 +24,7 @@
 
 ## Observable Changes
 - Turn, table, hand, trump, and talon information update over time.
+- The game ID is not shown in the UI; it is logged to the browser console once for debugging.
 - The talon count decreases each time cards are dealt to a player.
 - Any unoccupied opponent seat within the configured seat count is shown as "Not joined" until a player joins it.
 - Cards in the player's hand are displayed as recognisable playing cards: white background, rounded corners, drop shadow, and the rank and suit shown in the top-left corner.

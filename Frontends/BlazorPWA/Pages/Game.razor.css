@@ -58,18 +58,54 @@
     gap: 16px;
 }
 
-.top-bar {
+.deck-area {
+    justify-self: end;
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
 }
 
-.pill {
-    background: #111827;
-    color: #fff;
-    padding: 6px 12px;
-    border-radius: 999px;
-    font-size: 0.85rem;
+.deck-pile {
+    position: relative;
+    width: 96px;
+    height: 87px;
+}
+
+/* Trump card: face-up, rotated 90°, peeking to the right from behind the deck */
+.card.trump-face {
+    position: absolute;
+    top: 50%;
+    left: 14px;
+    transform: translateY(-50%) rotate(90deg);
+    z-index: 1;
+}
+
+/* Face-down deck on top */
+.deck-back-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 62px;
+    height: 87px;
+    border-radius: 10px;
+    border: 1.5px solid rgba(255, 255, 255, 0.18);
+    background: repeating-linear-gradient(
+        45deg,
+        #1e3a8a 0px,
+        #1e3a8a 4px,
+        #1e40af 4px,
+        #1e40af 8px
+    );
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18), 0 1px 2px rgba(0, 0, 0, 0.10);
+    z-index: 2;
+}
+
+.deck-count {
+    font-size: 0.75rem;
+    color: #6b7280;
+    font-weight: 500;
+    letter-spacing: 0.01em;
 }
 
 .opponents {
@@ -142,8 +178,7 @@
 }
 
 .card.suit-red .card-rank,
-.card.suit-red .card-suit,
-.pill .suit-red {
+.card.suit-red .card-suit {
     color: #dc2626;
 }
 
