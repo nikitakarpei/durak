@@ -289,14 +289,7 @@
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
-/* Playable / beatable cards: keep white background, lift with shadow and green border */
-.hand .card.playable,
-.hand .card.beatable {
-    border-color: #86efac;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.13);
-}
-
-/* Beatable table attack cards: green border only */
+/* Beatable table attack cards: green border to highlight the target */
 .table .card.beatable {
     border-color: #86efac;
 }
