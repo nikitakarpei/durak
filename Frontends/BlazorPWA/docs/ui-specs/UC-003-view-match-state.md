@@ -8,7 +8,7 @@
 2. The HUD uses a pill container with a light background, rounded corners, subtle border or shadow, and two sections separated by a faint divider.
 3. Trump section shows a mini card face with rank and suit when known.
 4. Deck section shows a small blue card-back icon and the remaining deck count.
-5. The talon HUD sits near the top of the screen and does not overlap the top-center or upper-right opponent seats.
+5. The talon HUD sits directly below the opponent top zone and does not overlap any opponent seat.
 6. The talon HUD has a fixed, stable size at all times. Neither the trump rank (one-character "A" vs three-character "10♦") nor the deck count (single digit vs double digit) may change the physical dimensions of the pill. The HUD must also not grow or shrink based on the presence or absence of action buttons — its height must be determined solely by its own content.
 
 ## Opponents Area
@@ -16,15 +16,13 @@
 2. Joined seats show a compact tile with identity placeholder and card-count indicator.
 3. Unoccupied seats show a placeholder tile.
 4. Current UI placeholders: friendly seat names such as `Player N` and unoccupied label such as `Not joined`.
-5. Opponents are positioned in a U shape around the top half of the screen, leaving the table centered.
-5a. All game sections stack in a fixed order: talon HUD and table toward the top, hand cards and action buttons anchored to the bottom of the game area. The table area expands to fill available space between them. Section positions must not shift based on the content or visibility of sibling sections.
-6. Seat positions (visual order): left-middle, upper-left, top-center, upper-right, right-middle.
-7. The visual positions assigned depend on the number of opponent seats to achieve a symmetric, balanced layout:
-   - 1 seat → top-center (pos-3)
-   - 2 seats → upper-left, upper-right (pos-2, pos-4)
-   - 3 seats → left-middle, top-center, right-middle (pos-1, pos-3, pos-5)
-   - 4 seats → left-middle, upper-left, upper-right, right-middle (pos-1, pos-2, pos-4, pos-5)
-   - 5 seats → all positions (pos-1, pos-2, pos-3, pos-4, pos-5)
+5. All opponent seats are displayed in a top zone above the talon HUD and table, arranged in up to two horizontal rows (tiers). The layout is symmetric and adjusts to seat count:
+   - 1 seat  → tier 1: center
+   - 2 seats → tier 1: left + right
+   - 3 seats → tier 1: left + center + right
+   - 4 seats → tier 1: left + right / tier 2: outer-left + outer-right
+   - 5 seats → tier 1: left + center + right / tier 2: outer-left + outer-right
+6. All game sections stack in a fixed order: opponents → talon HUD → table (1fr) → hand → actions. Section positions must not shift based on the content or visibility of sibling sections.
 
 ## Table Area
 1. Show all attack/defence pairs currently on table.

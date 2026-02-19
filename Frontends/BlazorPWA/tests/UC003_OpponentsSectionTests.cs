@@ -53,31 +53,29 @@ public class UC003_OpponentsSectionTests : TestContext
     }
 
     [Fact]
-    public void Given_OneOpponentSeat_When_SectionRenders_Then_SeatPositionIsTopCenter()
+    public void Given_OneOpponentSeat_When_SectionRenders_Then_SeatIsInTier1Only()
     {
         var seats = new List<OpponentSeatViewModel> { new(1, true, 3) };
 
         var cut = RenderComponent<OpponentsSection>(parameters => parameters.Add(p => p.Seats, seats));
 
-        cut.FindAll("[data-testid='opponent-seat']")
-            .Select(s => s.GetAttribute("data-seat-position"))
-            .Should().BeEquivalentTo(new[] { "3" });
+        cut.FindAll("[data-testid='opponent-seat'][data-tier='1']").Should().HaveCount(1);
+        cut.FindAll("[data-testid='opponent-seat'][data-tier='2']").Should().BeEmpty();
     }
 
     [Fact]
-    public void Given_TwoOpponentSeats_When_SectionRenders_Then_SeatsAreAtTopLeftAndTopRight()
+    public void Given_TwoOpponentSeats_When_SectionRenders_Then_BothSeatsAreInTier1Only()
     {
         var seats = new List<OpponentSeatViewModel> { new(1, true, 3), new(2, false, 0) };
 
         var cut = RenderComponent<OpponentsSection>(parameters => parameters.Add(p => p.Seats, seats));
 
-        cut.FindAll("[data-testid='opponent-seat']")
-            .Select(s => s.GetAttribute("data-seat-position"))
-            .Should().BeEquivalentTo(new[] { "2", "4" }, o => o.WithStrictOrdering());
+        cut.FindAll("[data-testid='opponent-seat'][data-tier='1']").Should().HaveCount(2);
+        cut.FindAll("[data-testid='opponent-seat'][data-tier='2']").Should().BeEmpty();
     }
 
     [Fact]
-    public void Given_ThreeOpponentSeats_When_SectionRenders_Then_SeatsAreAtSidesAndTopCenter()
+    public void Given_ThreeOpponentSeats_When_SectionRenders_Then_AllThreeSeatsAreInTier1Only()
     {
         var seats = new List<OpponentSeatViewModel>
         {
@@ -86,13 +84,12 @@ public class UC003_OpponentsSectionTests : TestContext
 
         var cut = RenderComponent<OpponentsSection>(parameters => parameters.Add(p => p.Seats, seats));
 
-        cut.FindAll("[data-testid='opponent-seat']")
-            .Select(s => s.GetAttribute("data-seat-position"))
-            .Should().BeEquivalentTo(new[] { "1", "3", "5" }, o => o.WithStrictOrdering());
+        cut.FindAll("[data-testid='opponent-seat'][data-tier='1']").Should().HaveCount(3);
+        cut.FindAll("[data-testid='opponent-seat'][data-tier='2']").Should().BeEmpty();
     }
 
     [Fact]
-    public void Given_FourOpponentSeats_When_SectionRenders_Then_SeatsAreAtSidesAndTopCornersWithoutCenter()
+    public void Given_FourOpponentSeats_When_SectionRenders_Then_TwoSeatsInEachTier()
     {
         var seats = new List<OpponentSeatViewModel>
         {
@@ -101,8 +98,21 @@ public class UC003_OpponentsSectionTests : TestContext
 
         var cut = RenderComponent<OpponentsSection>(parameters => parameters.Add(p => p.Seats, seats));
 
-        cut.FindAll("[data-testid='opponent-seat']")
-            .Select(s => s.GetAttribute("data-seat-position"))
-            .Should().BeEquivalentTo(new[] { "1", "2", "4", "5" }, o => o.WithStrictOrdering());
+        cut.FindAll("[data-testid='opponent-seat'][data-tier='1']").Should().HaveCount(2);
+        cut.FindAll("[data-testid='opponent-seat'][data-tier='2']").Should().HaveCount(2);
+    }
+
+    [Fact]
+    public void Given_FiveOpponentSeats_When_SectionRenders_Then_ThreeSeatsInTier1AndTwoInTier2()
+    {
+        var seats = new List<OpponentSeatViewModel>
+        {
+            new(1, true, 3), new(2, false, 0), new(3, false, 0), new(4, false, 0), new(5, false, 0),
+        };
+
+        var cut = RenderComponent<OpponentsSection>(parameters => parameters.Add(p => p.Seats, seats));
+
+        cut.FindAll("[data-testid='opponent-seat'][data-tier='1']").Should().HaveCount(3);
+        cut.FindAll("[data-testid='opponent-seat'][data-tier='2']").Should().HaveCount(2);
     }
 }

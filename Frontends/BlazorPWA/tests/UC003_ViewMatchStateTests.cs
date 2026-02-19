@@ -85,7 +85,7 @@ public class UC003_ViewMatchStateTests : TestContext
     }
 
     [Fact]
-    public void Given_SixPlayerGame_When_MatchRenders_Then_OpponentSeatsHaveFixedPositions()
+    public void Given_SixPlayerGame_When_MatchRenders_Then_OpponentSeatsAreArrangedInTwoTiers()
     {
         _gameState.TotalPlayerSeats = 6;
         _gameState.LocalPlayerId = "player-1";
@@ -93,12 +93,8 @@ public class UC003_ViewMatchStateTests : TestContext
 
         var cut = RenderComponent<Game>();
 
-        var seats = cut.FindAll("[data-testid='opponent-seat']");
-        seats.Should().HaveCount(5);
-        seats.Select(s => s.GetAttribute("data-seat-position")).Should().BeEquivalentTo(new[]
-        {
-            "1", "2", "3", "4", "5"
-        });
+        cut.FindAll("[data-testid='opponent-seat'][data-tier='1']").Should().HaveCount(3);
+        cut.FindAll("[data-testid='opponent-seat'][data-tier='2']").Should().HaveCount(2);
     }
 
     [Fact]

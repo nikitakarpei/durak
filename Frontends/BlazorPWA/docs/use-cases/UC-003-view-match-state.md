@@ -34,8 +34,7 @@
 - When a turn highlights playable or beatable hand cards, the other hand cards are visually de-emphasized but remain opaque and keep normal card shadows.
 - Hovered or selected hand cards can lift upward without being clipped by the hand container.
 - The trump suit and remaining deck count are shown in a compact HUD widget that does not occupy table space.
-- Opponent seats are distributed around the top half of the screen in fixed positions so the table stays centered.
-- The seating arrangement is symmetric and adjusts to the number of active opponents: 1 opponent sits at top-center; 2 sit at top-left and top-right; 3 sit at left-middle, top-center, and right-middle; 4 sit at left-middle, top-left, top-right, and right-middle; 5 fill all outer positions. The layout never looks lopsided.
+- All opponent seats are displayed in a top zone above the table, arranged in up to two symmetric horizontal rows. The arrangement adjusts by seat count so the layout is always balanced and never lopsided.
 
 ## Out of Scope (MVP)
 - Desktop-first layout optimization

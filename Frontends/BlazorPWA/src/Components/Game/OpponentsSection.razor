@@ -1,22 +1,56 @@
 <section class="opponents" data-testid="opponents-section">
-    @for (var index = 0; index < Seats.Count; index++)
+    @{
+        var layout = GetTierLayout();
+    }
+    @if (layout.Tier1.Length > 0)
     {
-        var seat = Seats[index];
-        var position = GetPosition(index);
-        <div class="opponent opponent--pos-@position @(seat.IsJoined ? "" : "opponent--empty")"
-             data-testid="opponent-seat"
-             data-seat="@seat.Seat"
-             data-seat-position="@position"
-             data-joined="@(seat.IsJoined ? "true" : "false")"
-             data-card-count="@seat.CardCount">
-            <div class="opp-avatar">@(seat.IsJoined ? $"{seat.Seat + 1}" : "?")</div>
-            <span class="opp-name">@(seat.IsJoined ? $"Player {seat.Seat + 1}" : "Not joined")</span>
-            @if (seat.IsJoined && seat.CardCount > 0)
+        <div class="opponents__tier opponents__tier--1" data-testid="opponents-tier" data-tier="1">
+            @foreach (var index in layout.Tier1)
             {
-                <div class="opp-hand" data-testid="opponent-hand" data-seat="@seat.Seat">
-                    @for (var i = 0; i < Math.Min(seat.CardCount, 8); i++)
+                var seat = Seats[index];
+                <div class="opponent @(seat.IsJoined ? "" : "opponent--empty")"
+                     data-testid="opponent-seat"
+                     data-seat="@seat.Seat"
+                     data-tier="1"
+                     data-joined="@(seat.IsJoined ? "true" : "false")"
+                     data-card-count="@seat.CardCount">
+                    <div class="opp-avatar">@(seat.IsJoined ? $"{seat.Seat + 1}" : "?")</div>
+                    <span class="opp-name">@(seat.IsJoined ? $"Player {seat.Seat + 1}" : "Not joined")</span>
+                    @if (seat.IsJoined && seat.CardCount > 0)
                     {
-                        <div class="opp-card-back" data-testid="opponent-card-back" data-seat="@seat.Seat"></div>
+                        <div class="opp-hand" data-testid="opponent-hand" data-seat="@seat.Seat">
+                            @for (var i = 0; i < Math.Min(seat.CardCount, 8); i++)
+                            {
+                                <div class="opp-card-back" data-testid="opponent-card-back" data-seat="@seat.Seat"></div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+    @if (layout.Tier2.Length > 0)
+    {
+        <div class="opponents__tier opponents__tier--2" data-testid="opponents-tier" data-tier="2">
+            @foreach (var index in layout.Tier2)
+            {
+                var seat = Seats[index];
+                <div class="opponent @(seat.IsJoined ? "" : "opponent--empty")"
+                     data-testid="opponent-seat"
+                     data-seat="@seat.Seat"
+                     data-tier="2"
+                     data-joined="@(seat.IsJoined ? "true" : "false")"
+                     data-card-count="@seat.CardCount">
+                    <div class="opp-avatar">@(seat.IsJoined ? $"{seat.Seat + 1}" : "?")</div>
+                    <span class="opp-name">@(seat.IsJoined ? $"Player {seat.Seat + 1}" : "Not joined")</span>
+                    @if (seat.IsJoined && seat.CardCount > 0)
+                    {
+                        <div class="opp-hand" data-testid="opponent-hand" data-seat="@seat.Seat">
+                            @for (var i = 0; i < Math.Min(seat.CardCount, 8); i++)
+                            {
+                                <div class="opp-card-back" data-testid="opponent-card-back" data-seat="@seat.Seat"></div>
+                            }
+                        </div>
                     }
                 </div>
             }
@@ -28,15 +62,21 @@
     [Parameter]
     public IReadOnlyList<OpponentSeatViewModel> Seats { get; set; } = Array.Empty<OpponentSeatViewModel>();
 
-    private static readonly IReadOnlyDictionary<int, int[]> SymmetricPositions = new Dictionary<int, int[]>
-    {
-        [1] = new[] { 3 },
-        [2] = new[] { 2, 4 },
-        [3] = new[] { 1, 3, 5 },
-        [4] = new[] { 1, 2, 4, 5 },
-        [5] = new[] { 1, 2, 3, 4, 5 },
-    };
+    private record TierAssignment(int[] Tier1, int[] Tier2);
 
-    private int GetPosition(int index) =>
-        SymmetricPositions.TryGetValue(Seats.Count, out var positions) ? positions[index] : index + 1;
+    private static readonly IReadOnlyDictionary<int, TierAssignment> TierLayouts =
+        new Dictionary<int, TierAssignment>
+        {
+            [0] = new(Array.Empty<int>(), Array.Empty<int>()),
+            [1] = new(new[] { 0 }, Array.Empty<int>()),
+            [2] = new(new[] { 0, 1 }, Array.Empty<int>()),
+            [3] = new(new[] { 0, 1, 2 }, Array.Empty<int>()),
+            [4] = new(new[] { 0, 1 }, new[] { 2, 3 }),
+            [5] = new(new[] { 0, 1, 2 }, new[] { 3, 4 }),
+        };
+
+    private TierAssignment GetTierLayout() =>
+        TierLayouts.TryGetValue(Seats.Count, out var layout)
+            ? layout
+            : new TierAssignment(Array.Empty<int>(), Array.Empty<int>());
 }

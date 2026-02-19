@@ -55,7 +55,7 @@
 .match {
     width: min(960px, 100%);
     display: grid;
-    grid-template-rows: auto 1fr auto auto;
+    grid-template-rows: auto auto 1fr auto auto;
     gap: 16px;
     position: relative;
     min-height: 600px;
@@ -71,56 +71,34 @@
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    align-self: start;
-    margin-top: 88px;
-    z-index: 2;
 }
 
 ::deep .opponents {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding-bottom: 4px;
+}
+
+::deep .opponents__tier {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+::deep .opponents__tier--2 {
+    justify-content: space-between;
 }
 
 ::deep .opponent {
-    position: absolute;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 4px;
     width: 110px;
     text-align: center;
-    pointer-events: auto;
-}
-
-::deep .opponent--pos-1 {
-    left: 0;
-    top: 58%;
-    transform: translate(0, -50%);
-}
-
-::deep .opponent--pos-2 {
-    left: 14%;
-    top: 6%;
-    transform: translate(-50%, 0);
-}
-
-::deep .opponent--pos-3 {
-    left: 50%;
-    top: 2%;
-    transform: translate(-50%, 0);
-}
-
-::deep .opponent--pos-4 {
-    right: 14%;
-    top: 6%;
-    transform: translate(50%, 0);
-}
-
-::deep .opponent--pos-5 {
-    right: 0;
-    top: 58%;
-    transform: translate(0, -50%);
 }
 
 ::deep .opponent--empty {
