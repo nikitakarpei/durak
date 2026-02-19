@@ -45,6 +45,36 @@ public class UC005_TableSectionTests : TestContext
     }
 
     [Fact]
+    public void Given_DefendedPair_When_TableSectionRenders_Then_PairHasBeatenClass()
+    {
+        var pairs = new List<TablePair>
+        {
+            new(new Card("atk-1", CardSuit.Clubs, CardRank.Six), new Card("def-1", CardSuit.Spades, CardRank.Ace)),
+        };
+
+        var cut = RenderComponent<TableSection>(parameters => parameters
+            .Add(p => p.Pairs, pairs)
+            .Add(p => p.BeatableAttackCardIds, new HashSet<string>()));
+
+        cut.Find("[data-testid='table-pair']").ClassList.Should().Contain("beaten");
+    }
+
+    [Fact]
+    public void Given_OpenAttackPair_When_TableSectionRenders_Then_PairDoesNotHaveBeatenClass()
+    {
+        var pairs = new List<TablePair>
+        {
+            new(new Card("atk-1", CardSuit.Clubs, CardRank.Six), null),
+        };
+
+        var cut = RenderComponent<TableSection>(parameters => parameters
+            .Add(p => p.Pairs, pairs)
+            .Add(p => p.BeatableAttackCardIds, new HashSet<string>()));
+
+        cut.Find("[data-testid='table-pair']").ClassList.Should().NotContain("beaten");
+    }
+
+    [Fact]
     public void Given_OpenAttackCard_When_Clicked_Then_AttackSelectedCallbackIsRaisedWithCardId()
     {
         var selectedAttack = string.Empty;

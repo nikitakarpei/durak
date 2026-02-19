@@ -4,7 +4,7 @@
 <section class="table" data-testid="table-section">
     @foreach (var pair in Pairs)
     {
-        <div class="pair" data-testid="table-pair" data-attack-id="@pair.Attack.Id">
+        <div class="pair @(pair.Defence is not null ? "beaten" : "")" data-testid="table-pair" data-attack-id="@pair.Attack.Id">
             @if (pair.Defence is null)
             {
                 <button data-testid="@($"table-attack-{pair.Attack.Id}")"

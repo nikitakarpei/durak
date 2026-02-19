@@ -179,6 +179,22 @@
     justify-items: center;
 }
 
+::deep .pair.beaten {
+    position: relative;
+    display: block;
+    width: 62px;
+    height: 87px;
+    overflow: visible;
+}
+
+::deep .pair.beaten .card.defence {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    transform: rotate(20deg);
+    z-index: 1;
+}
+
 ::deep .card {
     background: #fff;
     border-radius: 10px;

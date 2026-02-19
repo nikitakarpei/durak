@@ -34,7 +34,7 @@
 ## Observable Changes
 - The Beat Attack button is visible only when it is the player's defence turn. No action buttons are shown otherwise.
 - Player can explicitly select a target attack card and a defender card before submitting.
-- Defender card appears paired with the chosen attack card after the game state updates.
+- Defender card appears overlaid on the chosen attack card after the game state updates: the defender card is placed on top, offset and rotated, while the attack card remains visible beneath it.
 
 ## Out of Scope (MVP)
 - Client-side legality checks for selected card pair
