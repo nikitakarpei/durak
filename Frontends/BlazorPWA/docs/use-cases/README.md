@@ -2,6 +2,8 @@
 
 This folder defines player-visible MVP use cases for the Durak frontend.
 
+Why this document type exists: define what user-visible behavior must happen, independent of implementation details.
+
 - Template: `_template.md`
 - One use case per file
 - Scope source: `docs/Product.md` and `docs/Design.md`

@@ -3,6 +3,10 @@
 - Priority: <Must|Should|Could>
 - Actor: <Primary actor>
 - Action: <What actor wants to accomplish>
+- Related UI Spec: `<optional path in docs/ui-specs/>`
+
+## Why This Use Case Is Needed
+- <User value this behavior provides>
 
 ## Preconditions
 - <Condition that must be true before the use case starts>

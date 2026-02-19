@@ -5,6 +5,17 @@
 2. **Apply TDD:** design abstractions, write failing tests, then implement.
 3. **Commit all task changes.**
 
+## Document Types
+1. **Product (`docs/Product.md`)**
+   Why: define scope and priorities.
+   Rules: business/user value only; no UI implementation or technical internals.
+2. **Use Cases (`docs/use-cases/`)**
+   Why: define what user-visible behavior must happen.
+   Rules: actor goals/triggers/outcomes/failures only; no implementation details.
+3. **UI Specs (`docs/ui-specs/`)**
+   Why: define exact UI behavior needed for HTML/CSS generation (states, copy, layout, responsive, accessibility expectations).
+   Rules: user-visible UI contracts only; no framework internals.
+
 ## Use Cases
 1. **Use cases first for user-visible changes.** Before implementing any user-visible behavior, update/create the relevant file in `docs/use-cases/`.
 2. **Write only user value and user-observable behavior.** Describe actor goals, triggers, outcomes, and user-visible failures.
