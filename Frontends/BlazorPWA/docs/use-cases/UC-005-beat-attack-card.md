@@ -3,6 +3,10 @@
 - Priority: Must
 - Actor: Player
 - Action: Defend by choosing a specific attack card and a defender card
+- Related UI Spec: `docs/ui-specs/UC-005-beat-attack-card.md`
+
+## Why This Use Case Is Needed
+- Player needs to defend a specific attack card to continue the round.
 
 ## Preconditions
 - Player is connected to a game
@@ -29,8 +33,7 @@
 
 ## Observable Changes
 - The Beat Attack button is visible only when it is the player's defence turn. No action buttons are shown otherwise.
-- Cards the player is allowed to beat with are visually marked (green tint).
-- Selected hand card is raised above the hand row with an indigo border (full card remains visible); selected attack card on the table is highlighted with an indigo border.
+- Player can explicitly select a target attack card and a defender card before submitting.
 - Defender card appears paired with the chosen attack card after the game state updates.
 
 ## Out of Scope (MVP)
