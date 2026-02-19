@@ -8,22 +8,15 @@
     <ErrorToast />
     @if (State.GameId == string.Empty || Connection.Status == ConnectionStatus.Idle)
     {
-        <section class="card-panel" data-testid="join-panel">
-            <h1 data-testid="join-title">Join Game</h1>
-            <label class="field">
-                <span>Game ID</span>
-                <input data-testid="game-id-input" @bind="gameId" placeholder="Enter game id" />
-            </label>
-            <label class="field">
-                <span>Custom ID</span>
-                <input data-testid="custom-id-input" @bind="customId" placeholder="Enter custom id" />
-            </label>
-            <button data-testid="connect-button" class="primary" @onclick="ConnectAsync" disabled="@isConnecting">Connect</button>
-            @if (Connection.Status == ConnectionStatus.Error && !string.IsNullOrWhiteSpace(Connection.ErrorMessage))
-            {
-                <div class="error" data-testid="join-error">@Connection.ErrorMessage</div>
-            }
-        </section>
+        <JoinPanel
+            GameId="@gameId"
+            CustomId="@customId"
+            IsConnecting="@isConnecting"
+            ShowError="@(Connection.Status == ConnectionStatus.Error)"
+            ErrorMessage="@Connection.ErrorMessage"
+            GameIdChanged="OnGameIdChanged"
+            CustomIdChanged="OnCustomIdChanged"
+            OnConnect="ConnectAsync" />
     }
     else
     {
@@ -145,6 +138,16 @@
         isConnecting = true;
         await Connection.ConnectAsync(gameId.Trim(), customId.Trim(), CancellationToken.None);
         isConnecting = false;
+    }
+
+    private void OnGameIdChanged(string value)
+    {
+        gameId = value;
+    }
+
+    private void OnCustomIdChanged(string value)
+    {
+        customId = value;
     }
 
     private IEnumerable<OpponentSeatView> GetOpponents()
