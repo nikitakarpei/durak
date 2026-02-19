@@ -3,6 +3,10 @@
 - Priority: Must
 - Actor: Player
 - Action: Receive clear error feedback when connection or move submission fails
+- Related UI Spec: `docs/ui-specs/UC-007-handle-connection-and-move-failures.md`
+
+## Why This Use Case Is Needed
+- Player needs clear feedback when actions fail so they understand current state and can decide next steps.
 
 ## Preconditions
 - Player is connecting, connected, or submitting a move
