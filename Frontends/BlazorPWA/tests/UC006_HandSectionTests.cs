@@ -38,6 +38,22 @@ public class UC006_HandSectionTests : TestContext
     }
 
     [Fact]
+    public void Given_PopulatedHand_When_SectionRenders_Then_ScrollContainerIsPresent()
+    {
+        var cards = new List<Card>
+        {
+            new("h1", CardSuit.Hearts, CardRank.Queen),
+        };
+
+        var cut = RenderComponent<HandSection>(parameters => parameters
+            .Add(p => p.Cards, cards)
+            .Add(p => p.PlayableCardIds, new HashSet<string>())
+            .Add(p => p.BeatableHandCardIds, new HashSet<string>()));
+
+        cut.FindAll("[data-testid='hand-scroll']").Should().HaveCount(1);
+    }
+
+    [Fact]
     public void Given_PlayableCardExists_When_SectionRenders_Then_NonPlayableCardsAreMarkedInactive()
     {
         var cards = new List<Card>

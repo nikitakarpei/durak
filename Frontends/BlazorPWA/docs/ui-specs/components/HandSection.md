@@ -26,6 +26,7 @@
 
 ## Test Hooks
 - `data-testid='hand-section'`
+- `data-testid='hand-scroll'`
 - `data-testid='hand-card-<cardId>'`
 - `data-visual-state='inactive'` on non-playable, non-selected hand cards when at least one playable or beatable hand card exists.
 

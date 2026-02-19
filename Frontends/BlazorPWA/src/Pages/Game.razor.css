@@ -268,11 +268,19 @@
     overflow: visible;
 }
 
+::deep .hand-rail {
+    overflow: visible;
+}
+
+::deep .hand-scroll {
+    overflow-x: auto;
+    overflow-y: visible;
+    padding: calc(4px + var(--hand-selected-lift, 14px)) 4px 8px;
+}
+
 ::deep .hand-cards {
     display: flex;
     justify-content: center;
-    overflow-x: auto;
-    padding: 18px 4px 8px;
 }
 
 ::deep .hand-cards .card + .card {
@@ -289,7 +297,7 @@
 
 ::deep .hand .card:hover {
     z-index: 5;
-    transform: translateY(-8px);
+    transform: translateY(calc(-1 * var(--hand-hover-lift, 8px)));
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
@@ -308,7 +316,7 @@
     z-index: 10;
     border-color: #4f46e5;
     background: #eef2ff;
-    transform: translateY(-14px);
+    transform: translateY(calc(-1 * var(--hand-selected-lift, 14px)));
     box-shadow: 0 8px 20px rgba(79, 70, 229, 0.30);
 }
 

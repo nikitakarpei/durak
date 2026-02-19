@@ -2,19 +2,23 @@
 @using GameService.Api.Data
 
 <section class="hand" data-testid="hand-section">
-    <div class="hand-cards">
-        @foreach (var card in Cards)
-        {
-            var isSelected = SelectedCardId == card.Id;
-            var isPlayable = PlayableCardIds.Contains(card.Id);
-            var isBeatable = BeatableHandCardIds.Contains(card.Id);
-            <button data-testid="@($"hand-card-{card.Id}")"
-                    class="card @(isSelected ? "selected" : "") @(isPlayable ? "playable" : "") @(isBeatable ? "beatable" : "") @SuitClass(card.Suit)"
-                    data-visual-state="@(GetVisualState(isSelected, isPlayable, isBeatable))"
-                    @onclick="() => OnCardSelected.InvokeAsync(card.Id)">
-                <span class="card-rank">@RankToText(card.Rank)</span><span class="card-suit">@SuitToText(card.Suit)</span>
-            </button>
-        }
+    <div class="hand-rail">
+        <div class="hand-scroll" data-testid="hand-scroll">
+            <div class="hand-cards">
+                @foreach (var card in Cards)
+                {
+                    var isSelected = SelectedCardId == card.Id;
+                    var isPlayable = PlayableCardIds.Contains(card.Id);
+                    var isBeatable = BeatableHandCardIds.Contains(card.Id);
+                    <button data-testid="@($"hand-card-{card.Id}")"
+                            class="card @(isSelected ? "selected" : "") @(isPlayable ? "playable" : "") @(isBeatable ? "beatable" : "") @SuitClass(card.Suit)"
+                            data-visual-state="@(GetVisualState(isSelected, isPlayable, isBeatable))"
+                            @onclick="() => OnCardSelected.InvokeAsync(card.Id)">
+                        <span class="card-rank">@RankToText(card.Rank)</span><span class="card-suit">@SuitToText(card.Suit)</span>
+                    </button>
+                }
+            </div>
+        </div>
     </div>
 </section>
 
