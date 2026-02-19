@@ -5,6 +5,9 @@
 - Action: Observe current match status and cards
 - Related UI Spec: `docs/ui-specs/UC-003-view-match-state.md`
 
+## Why This Use Case Is Needed
+- Player needs a clear, continuously updated match view to make decisions during play.
+
 ## Preconditions
 - Player is connected to a game
 
