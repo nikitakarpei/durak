@@ -24,22 +24,11 @@
             <OpponentsSection Seats="@GetOpponents()" />
 
             <div class="play-area">
-            <section class="table" data-testid="table-section">
-                @foreach (var pair in State.Table)
-                {
-                    <div class="pair" data-testid="table-pair" data-attack-id="@pair.Attack.Id">
-                        @if (pair.Defence is null)
-                        {
-                            <button data-testid="@($"table-attack-{pair.Attack.Id}")" class="card @(selectedAttackCardId == pair.Attack.Id ? "selected" : "") @(IsAttackCardBeatable(pair.Attack.Id) ? "beatable" : "") @SuitClass(pair.Attack.Suit)" @onclick="() => SelectAttackCard(pair.Attack.Id)"><span class="card-rank">@RankToText(pair.Attack.Rank)</span><span class="card-suit">@SuitToText(pair.Attack.Suit)</span></button>
-                        }
-                        else
-                        {
-                            <div data-testid="@($"table-attack-{pair.Attack.Id}")" class="card @SuitClass(pair.Attack.Suit)"><span class="card-rank">@RankToText(pair.Attack.Rank)</span><span class="card-suit">@SuitToText(pair.Attack.Suit)</span></div>
-                        }
-                        <div data-testid="@($"table-defence-{pair.Attack.Id}")" class="card defence @(pair.Defence is null ? "empty" : SuitClass(pair.Defence.Suit))">@if (pair.Defence is not null) {<span class="card-rank">@RankToText(pair.Defence.Rank)</span><span class="card-suit">@SuitToText(pair.Defence.Suit)</span>}</div>
-                    </div>
-                }
-            </section>
+                <TableSection
+                    Pairs="@State.Table"
+                    SelectedAttackCardId="@selectedAttackCardId"
+                    BeatableAttackCardIds="@GetBeatableAttackCardIds()"
+                    OnAttackCardSelected="SelectAttackCard" />
 
             <div class="deck-area" data-testid="deck-area">
                 <div class="deck-pile @(State.TalonCount > 0 ? "deck-pile--stacked" : "")">
@@ -231,6 +220,22 @@
             m.Type == PossibleMoveType.BeatAttackCard &&
             m.YourCardId == selectedCardId &&
             m.TargetCardId == attackCardId);
+
+    private IReadOnlySet<string> GetBeatableAttackCardIds()
+    {
+        if (string.IsNullOrWhiteSpace(selectedCardId))
+        {
+            return new HashSet<string>();
+        }
+
+        return State.YourPossibleMoves
+            .Where(m =>
+                m.Type == PossibleMoveType.BeatAttackCard &&
+                m.YourCardId == selectedCardId &&
+                !string.IsNullOrWhiteSpace(m.TargetCardId))
+            .Select(m => m.TargetCardId!)
+            .ToHashSet();
+    }
 
     private bool IsHandCardBeatable(string handCardId) =>
         !string.IsNullOrWhiteSpace(selectedAttackCardId) &&
