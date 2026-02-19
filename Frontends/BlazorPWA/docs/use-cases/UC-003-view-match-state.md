@@ -12,7 +12,7 @@
 
 ## Main Flow
 1. App shows a visual deck area: the trump card face-up and the remaining deck as a face-down card rotated 90° on top, with a count of cards remaining.
-2. App shows all opponent seats configured for the game, including seats not yet occupied. Each joined opponent is shown as a compact tile with a circular avatar, a friendly name ("Player N"), and a visual card-count indicator. Unjoined seats are shown as a faint dashed placeholder.
+2. App shows all opponent seats configured for the game, including seats not yet occupied. Joined opponents are shown as compact tiles with an identity indicator and a visual card-count indicator. Unoccupied seats are shown as empty placeholders.
 3. App shows table cards.
 4. App shows player hand and action controls.
 
@@ -24,12 +24,9 @@
 
 ## Observable Changes
 - Turn, table, hand, trump, and talon information update over time.
-- The game ID is not shown in the UI; it is logged to the browser console once for debugging.
 - The talon count decreases each time cards are dealt to a player.
-- Any unoccupied opponent seat within the configured seat count is shown as "Not joined" until a player joins it.
-- Cards in the player's hand are displayed as recognisable playing cards: white background, rounded corners, drop shadow, and the rank and suit shown in the top-left corner.
-- Red suits (Hearts, Diamonds) appear in red; black suits (Spades, Clubs) appear in dark.
-- Cards in hand overlap slightly in a fan layout to conserve horizontal space; the selected card lifts above the others.
+- Any unoccupied opponent seat within the configured seat count is shown as an empty placeholder until a player joins it.
+- Cards in the player's hand are displayed as recognizable playing cards with rank and suit information.
 
 ## Out of Scope (MVP)
 - Desktop-first layout optimization
