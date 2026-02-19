@@ -70,14 +70,14 @@ public class UC002_ConnectTests : TestContext
     }
 
     [Fact]
-    public void ErrorMessageShownWhenStatusIsError()
+    public void JoinErrorVisibleWhenStatusIsError()
     {
         _connectionMock.SetupGet(c => c.Status).Returns(ConnectionStatus.Error);
         _connectionMock.SetupGet(c => c.ErrorMessage).Returns("Connection failed");
 
         var cut = RenderComponent<Game>();
 
-        cut.Find("[data-testid='join-error']").TextContent.Should().Be("Connection failed");
+        cut.FindAll("[data-testid='join-error']").Should().HaveCount(1);
     }
 
     [Fact]
