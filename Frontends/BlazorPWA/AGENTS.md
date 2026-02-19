@@ -13,6 +13,13 @@
 5. **Every user-visible code change must update use cases/UI specs in the same task.**
 6. **Every user-visible UI change must satisfy `docs/ui-specs/HTML-CSS-GENERATION-CHECKLIST.md` and update the relevant UI spec accordingly.**
 
+## UI Modularity Enforcement
+1. **User-visible UI changes must be implemented in section components, not by expanding monolithic page files.**
+2. **Page files act as orchestration only** (state wiring and intent routing), while rendering/interaction details belong to section components.
+3. **Each new or changed section component must have a component contract spec** in `docs/ui-specs/components/` (or update an existing one).
+4. **Each section component must define explicit inputs, outputs, and stable test hooks** (`data-testid`).
+5. **Do not add hidden cross-component dependencies.** Components may only depend on declared parameters/contracts.
+
 ## Test Policy (Strict)
 1. **Test user-observable behavior, not internals.**
 2. **Test public contracts per layer.** In frontend, prioritize user-facing UI contracts (actions, visibility, enabled/disabled state, accessibility semantics) and boundary contracts (service/API calls), not component-private internals.
