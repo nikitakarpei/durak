@@ -5,22 +5,12 @@
 2. **Apply TDD:** design abstractions, write failing tests, then implement.
 3. **Commit all task changes.**
 
-## Document Types
-1. **Product (`docs/Product.md`)**
-   Why: define scope and priorities.
-   Rules: business/user value only; no UI implementation or technical internals.
-2. **Use Cases (`docs/use-cases/`)**
-   Why: define what user-visible behavior must happen.
-   Rules: actor goals/triggers/outcomes/failures only; no implementation details.
-3. **UI Specs (`docs/ui-specs/`)**
-   Why: define exact UI behavior needed for HTML/CSS generation (states, copy, layout, responsive, accessibility expectations).
-   Rules: user-visible UI contracts only; no framework internals.
-
 ## Use Cases
-1. **Use cases first for user-visible changes.** Before implementing any user-visible behavior, update/create the relevant file in `docs/use-cases/`.
-2. **Write only user value and user-observable behavior.** Describe actor goals, triggers, outcomes, and user-visible failures.
-3. **No implementation details in use cases.** Exclude logs, events, APIs, services, reducers, storage, and technical workflows.
-4. **Keep use cases behavior-focused; put detailed UI rules in `docs/ui-specs/`.** Link the related UI spec from the use case when exact copy/visual details matter.
+1. **Before implementing any user-visible behavior, update/create the relevant use case in `docs/use-cases/` and related UI spec in `docs/ui-specs/`.**
+2. **Use cases must contain only user-observable behavior and user value.**
+3. **UI specs must contain exact UI contracts needed for implementation and testing.**
+4. **Do not include implementation details in use cases or UI specs.** Exclude logs, events, APIs, services, reducers, storage, and technical workflows.
+5. **Every user-visible code change must update use cases/UI specs in the same task.**
 
 ## Test Policy (Strict)
 1. **Test user-observable behavior, not internals.**
