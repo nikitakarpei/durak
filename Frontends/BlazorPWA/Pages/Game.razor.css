@@ -323,30 +323,30 @@
     color: #dc2626;
 }
 
-.table .card {
+::deep .table .card {
     cursor: pointer;
 }
 
-.table .card.selected {
+::deep .table .card.selected {
     border-color: #4f46e5;
     background: #eef2ff;
     box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
 }
 
-.actions {
+::deep .actions {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 10px;
 }
 
-.actions button {
+::deep .actions button {
     padding: 12px 10px;
     border-radius: 12px;
     border: 1px solid #d1d5db;
     background: #fff;
 }
 
-.actions button:disabled {
+::deep .actions button:disabled {
     opacity: 0.4;
     cursor: not-allowed;
 }
