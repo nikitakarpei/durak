@@ -1,6 +1,7 @@
 using BlazorPWA.Pages;
 using BlazorPWA.Services.Connection;
 using BlazorPWA.State;
+using AngleSharp.Dom;
 using Bunit;
 using FluentAssertions;
 using Moq;
@@ -34,30 +35,28 @@ public class UC002_ConnectTests : TestContext
 
         var cut = RenderComponent<Game>();
 
-        cut.Find("h1").TextContent.Should().Be("Join Game");
+        cut.Find("h1").TextContent.Should().Contain("Join Game");
+        FindConnectButton(cut).Should().NotBeNull();
     }
 
     [Fact]
     public void ConnectButtonDisabledWhileConnecting()
     {
         _connectionMock.SetupGet(c => c.Status).Returns(ConnectionStatus.Idle);
+        var connectPending = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
         _connectionMock
             .Setup(c => c.ConnectAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(async () =>
-            {
-                // Simulate async delay so isConnecting remains true during the test
-                await Task.Delay(Timeout.Infinite);
-            });
+            .Returns(connectPending.Task);
 
         var cut = RenderComponent<Game>();
 
         var gameIdInput = cut.Find("input[placeholder='Enter game id']");
         gameIdInput.Change("test-game");
 
-        var connectButton = cut.Find("button.primary");
+        var connectButton = FindConnectButton(cut);
         connectButton.Click();
 
-        cut.Find("button.primary").HasAttribute("disabled").Should().BeTrue();
+        FindConnectButton(cut).HasAttribute("disabled").Should().BeTrue();
     }
 
     [Fact]
@@ -89,7 +88,7 @@ public class UC002_ConnectTests : TestContext
 
         var cut = RenderComponent<Game>();
 
-        cut.Find("button.primary").Click();
+        FindConnectButton(cut).Click();
 
         _connectionMock.Verify(
             c => c.ConnectAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
@@ -110,11 +109,14 @@ public class UC002_ConnectTests : TestContext
         cut.Find("input[placeholder='Enter game id']").Change("  game-123  ");
         cut.Find("input[placeholder='Enter custom id']").Change("  player-xyz  ");
 
-        cut.Find("button.primary").Click();
+        FindConnectButton(cut).Click();
 
         _connectionMock.Verify(
             c => c.ConnectAsync("game-123", "player-xyz", It.IsAny<CancellationToken>()),
             Times.Once
         );
     }
+
+    private static IElement FindConnectButton(IRenderedFragment cut) =>
+        cut.FindAll("button").First(b => b.TextContent.Contains("Connect", StringComparison.Ordinal));
 }

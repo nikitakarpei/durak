@@ -1,5 +1,10 @@
 # Decision Log
 
+## 2026-02-19
+- Refactor UC-002 frontend tests to assert observable behavior and command effects, while avoiding timing-dependent async patterns.
+  - Why: aligns tests with new quality rules (behavior-first, deterministic, less brittle).
+  - Alternatives considered: keep existing tests with `Task.Delay(Timeout.Infinite)` and CSS-class/button-class targeting (rejected; higher flake risk and stronger coupling to markup details).
+
 ## 2026-02-15
 - Keep MVP as join-only by existing `game_id`; do not include game creation in current scope.
   - Why: current milestone is playable match screen for an existing game.
