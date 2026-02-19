@@ -115,7 +115,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontends", "Frontends", "{
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorPWA", "Frontends\BlazorPWA\BlazorPWA.csproj", "{202D35E0-4B8F-40A8-BE03-7AB30F948E10}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorPWA.Tests", "Frontends\BlazorPWA.Tests\BlazorPWA.Tests.csproj", "{94AAEE31-D2A0-4096-AB04-59401CDD9603}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorPWA.Tests", "Frontends\BlazorPWA\tests\BlazorPWA.Tests\BlazorPWA.Tests.csproj", "{94AAEE31-D2A0-4096-AB04-59401CDD9603}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
