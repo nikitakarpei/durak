@@ -51,4 +51,58 @@ public class UC003_OpponentsSectionTests : TestContext
 
         cut.FindAll("[data-testid='opponent-card-back'][data-seat='2']").Should().BeEmpty();
     }
+
+    [Fact]
+    public void Given_OneOpponentSeat_When_SectionRenders_Then_SeatPositionIsTopCenter()
+    {
+        var seats = new List<OpponentSeatViewModel> { new(1, true, 3) };
+
+        var cut = RenderComponent<OpponentsSection>(parameters => parameters.Add(p => p.Seats, seats));
+
+        cut.FindAll("[data-testid='opponent-seat']")
+            .Select(s => s.GetAttribute("data-seat-position"))
+            .Should().BeEquivalentTo(new[] { "3" });
+    }
+
+    [Fact]
+    public void Given_TwoOpponentSeats_When_SectionRenders_Then_SeatsAreAtTopLeftAndTopRight()
+    {
+        var seats = new List<OpponentSeatViewModel> { new(1, true, 3), new(2, false, 0) };
+
+        var cut = RenderComponent<OpponentsSection>(parameters => parameters.Add(p => p.Seats, seats));
+
+        cut.FindAll("[data-testid='opponent-seat']")
+            .Select(s => s.GetAttribute("data-seat-position"))
+            .Should().BeEquivalentTo(new[] { "2", "4" }, o => o.WithStrictOrdering());
+    }
+
+    [Fact]
+    public void Given_ThreeOpponentSeats_When_SectionRenders_Then_SeatsAreAtSidesAndTopCenter()
+    {
+        var seats = new List<OpponentSeatViewModel>
+        {
+            new(1, true, 3), new(2, false, 0), new(3, false, 0),
+        };
+
+        var cut = RenderComponent<OpponentsSection>(parameters => parameters.Add(p => p.Seats, seats));
+
+        cut.FindAll("[data-testid='opponent-seat']")
+            .Select(s => s.GetAttribute("data-seat-position"))
+            .Should().BeEquivalentTo(new[] { "1", "3", "5" }, o => o.WithStrictOrdering());
+    }
+
+    [Fact]
+    public void Given_FourOpponentSeats_When_SectionRenders_Then_SeatsAreAtSidesAndTopCornersWithoutCenter()
+    {
+        var seats = new List<OpponentSeatViewModel>
+        {
+            new(1, true, 3), new(2, false, 0), new(3, false, 0), new(4, false, 0),
+        };
+
+        var cut = RenderComponent<OpponentsSection>(parameters => parameters.Add(p => p.Seats, seats));
+
+        cut.FindAll("[data-testid='opponent-seat']")
+            .Select(s => s.GetAttribute("data-seat-position"))
+            .Should().BeEquivalentTo(new[] { "1", "2", "4", "5" }, o => o.WithStrictOrdering());
+    }
 }

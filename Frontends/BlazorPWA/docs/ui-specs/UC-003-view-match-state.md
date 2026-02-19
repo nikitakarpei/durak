@@ -17,6 +17,12 @@
 4. Current UI placeholders: friendly seat names such as `Player N` and unoccupied label such as `Not joined`.
 5. Opponents are positioned in a U shape around the top half of the screen, leaving the table centered.
 6. Seat positions (visual order): left-middle, upper-left, top-center, upper-right, right-middle.
+7. The visual positions assigned depend on the number of opponent seats to achieve a symmetric, balanced layout:
+   - 1 seat → top-center (pos-3)
+   - 2 seats → upper-left, upper-right (pos-2, pos-4)
+   - 3 seats → left-middle, top-center, right-middle (pos-1, pos-3, pos-5)
+   - 4 seats → left-middle, upper-left, upper-right, right-middle (pos-1, pos-2, pos-4, pos-5)
+   - 5 seats → all positions (pos-1, pos-2, pos-3, pos-4, pos-5)
 
 ## Table Area
 1. Show all attack/defence pairs currently on table.

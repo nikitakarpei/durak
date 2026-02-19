@@ -2,7 +2,7 @@
     @for (var index = 0; index < Seats.Count; index++)
     {
         var seat = Seats[index];
-        var position = index + 1;
+        var position = GetPosition(index);
         <div class="opponent opponent--pos-@position @(seat.IsJoined ? "" : "opponent--empty")"
              data-testid="opponent-seat"
              data-seat="@seat.Seat"
@@ -27,4 +27,16 @@
 @code {
     [Parameter]
     public IReadOnlyList<OpponentSeatViewModel> Seats { get; set; } = Array.Empty<OpponentSeatViewModel>();
+
+    private static readonly IReadOnlyDictionary<int, int[]> SymmetricPositions = new Dictionary<int, int[]>
+    {
+        [1] = new[] { 3 },
+        [2] = new[] { 2, 4 },
+        [3] = new[] { 1, 3, 5 },
+        [4] = new[] { 1, 2, 4, 5 },
+        [5] = new[] { 1, 2, 3, 4, 5 },
+    };
+
+    private int GetPosition(int index) =>
+        SymmetricPositions.TryGetValue(Seats.Count, out var positions) ? positions[index] : index + 1;
 }
