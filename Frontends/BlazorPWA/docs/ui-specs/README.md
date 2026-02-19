@@ -14,3 +14,6 @@ UI specs define exact user-visible UI behavior so HTML/CSS can be generated cons
 ## Templates
 - Screen-level UI spec: `docs/ui-specs/_template.md`
 - Component contract spec: `docs/ui-specs/components/_template.md`
+
+## Enforcement Checklist
+- `docs/ui-specs/HTML-CSS-GENERATION-CHECKLIST.md`

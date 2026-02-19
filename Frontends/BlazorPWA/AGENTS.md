@@ -11,6 +11,7 @@
 3. **UI specs must contain exact UI contracts needed for implementation and testing.**
 4. **Do not include implementation details in use cases or UI specs.** Exclude logs, events, APIs, services, reducers, storage, and technical workflows.
 5. **Every user-visible code change must update use cases/UI specs in the same task.**
+6. **Every user-visible UI change must satisfy `docs/ui-specs/HTML-CSS-GENERATION-CHECKLIST.md` and update the relevant UI spec accordingly.**
 
 ## Test Policy (Strict)
 1. **Test user-observable behavior, not internals.**
