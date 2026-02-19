@@ -21,28 +21,7 @@
     else
     {
         <section class="match" data-testid="match-panel">
-            <section class="opponents" data-testid="opponents-section">
-                @foreach (var opponent in GetOpponents())
-                {
-                    <div class="opponent @(opponent.IsJoined ? "" : "opponent--empty")"
-                         data-testid="opponent-seat"
-                         data-seat="@opponent.Seat"
-                         data-joined="@(opponent.IsJoined ? "true" : "false")"
-                         data-card-count="@opponent.CardCount">
-                        <div class="opp-avatar">@(opponent.IsJoined ? $"{opponent.Seat + 1}" : "?")</div>
-                        <span class="opp-name">@(opponent.IsJoined ? $"Player {opponent.Seat + 1}" : "Not joined")</span>
-                        @if (opponent.IsJoined && opponent.CardCount > 0)
-                        {
-                            <div class="opp-hand" data-testid="opponent-hand" data-seat="@opponent.Seat">
-                                @for (var i = 0; i < Math.Min(opponent.CardCount, 8); i++)
-                                {
-                                    <div class="opp-card-back" data-testid="opponent-card-back" data-seat="@opponent.Seat"></div>
-                                }
-                            </div>
-                        }
-                    </div>
-                }
-            </section>
+            <OpponentsSection Seats="@GetOpponents()" />
 
             <div class="play-area">
             <section class="table" data-testid="table-section">
@@ -150,7 +129,7 @@
         customId = value;
     }
 
-    private IEnumerable<OpponentSeatView> GetOpponents()
+    private IReadOnlyList<OpponentSeatViewModel> GetOpponents()
     {
         var localSeat = State.LocalPlayerId is not null &&
                         State.Players.TryGetValue(State.LocalPlayerId, out var localPlayer)
@@ -172,7 +151,7 @@
         var totalSeats = Math.Max(seatCountFromGame, highestKnownSeat + 1);
         if (totalSeats <= 0)
         {
-            return Enumerable.Empty<OpponentSeatView>();
+            return Array.Empty<OpponentSeatViewModel>();
         }
 
         var visibleSeats = Enumerable.Range(0, totalSeats)
@@ -194,11 +173,11 @@
             {
                 if (joinedBySeat.TryGetValue(seat, out var player))
                 {
-                    return new OpponentSeatView(seat, player.PlayerId, player.CardCount, true);
+                    return new OpponentSeatViewModel(seat, true, player.CardCount);
                 }
 
-                return new OpponentSeatView(seat, null, 0, false);
-            });
+                return new OpponentSeatViewModel(seat, false, 0);
+            }).ToList();
     }
 
     private string RenderCardLabel(GameService.Api.Data.RegularCard? card)
@@ -304,6 +283,4 @@
 
         return Connection.GiveUpDefenceAsync(Connection.AccessToken, CancellationToken.None);
     }
-
-    private sealed record OpponentSeatView(int Seat, string? PlayerId, int CardCount, bool IsJoined);
 }
