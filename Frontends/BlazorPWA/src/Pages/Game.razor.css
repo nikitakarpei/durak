@@ -299,10 +299,14 @@
 }
 
 /* Dim cards that are not active when a turn is in progress */
-::deep .hand-cards:has(.card.playable) .card:not(.playable):not(.selected),
-::deep .hand-cards:has(.card.beatable) .card:not(.beatable):not(.selected) {
-    opacity: 0.5;
-    box-shadow: none;
+::deep .hand .card[data-visual-state='inactive'] {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+::deep .hand .card[data-visual-state='inactive'] .card-rank,
+::deep .hand .card[data-visual-state='inactive'] .card-suit {
+    color: #64748b;
 }
 
 ::deep .hand .card.selected {

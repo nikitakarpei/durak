@@ -31,6 +31,7 @@
 - The talon count decreases each time cards are dealt to a player.
 - Any unoccupied opponent seat within the configured seat count is shown as an empty placeholder until a player joins it.
 - Cards in the player's hand are displayed as recognizable playing cards with rank and suit information.
+- When a turn highlights playable or beatable hand cards, the other hand cards are visually de-emphasized but remain opaque and keep normal card shadows.
 
 ## Out of Scope (MVP)
 - Desktop-first layout optimization

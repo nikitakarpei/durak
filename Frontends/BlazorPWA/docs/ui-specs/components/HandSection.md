@@ -22,10 +22,12 @@
 2. Populated hand.
 3. Selected card state.
 4. Playable/beatable highlight states.
+5. Non-playable card state when playable or beatable cards exist.
 
 ## Test Hooks
 - `data-testid='hand-section'`
 - `data-testid='hand-card-<cardId>'`
+- `data-visual-state='inactive'` on non-playable, non-selected hand cards when at least one playable or beatable hand card exists.
 
 ## Out of Scope
 - Move legality computation and selected-card toggle logic ownership.

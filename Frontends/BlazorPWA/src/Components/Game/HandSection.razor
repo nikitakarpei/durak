@@ -5,8 +5,12 @@
     <div class="hand-cards">
         @foreach (var card in Cards)
         {
+            var isSelected = SelectedCardId == card.Id;
+            var isPlayable = PlayableCardIds.Contains(card.Id);
+            var isBeatable = BeatableHandCardIds.Contains(card.Id);
             <button data-testid="@($"hand-card-{card.Id}")"
-                    class="card @(SelectedCardId == card.Id ? "selected" : "") @(PlayableCardIds.Contains(card.Id) ? "playable" : "") @(BeatableHandCardIds.Contains(card.Id) ? "beatable" : "") @SuitClass(card.Suit)"
+                    class="card @(isSelected ? "selected" : "") @(isPlayable ? "playable" : "") @(isBeatable ? "beatable" : "") @SuitClass(card.Suit)"
+                    data-visual-state="@(GetVisualState(isSelected, isPlayable, isBeatable))"
                     @onclick="() => OnCardSelected.InvokeAsync(card.Id)">
                 <span class="card-rank">@RankToText(card.Rank)</span><span class="card-suit">@SuitToText(card.Suit)</span>
             </button>
@@ -29,6 +33,15 @@
 
     [Parameter]
     public EventCallback<string> OnCardSelected { get; set; }
+
+    private string? GetVisualState(bool isSelected, bool isPlayable, bool isBeatable)
+    {
+        var hasPlayable = PlayableCardIds.Count > 0;
+        var hasBeatable = BeatableHandCardIds.Count > 0;
+        var isInactive = (hasPlayable && !isPlayable && !isSelected) || (hasBeatable && !isBeatable && !isSelected);
+
+        return isInactive ? "inactive" : null;
+    }
 
     private static string RankToText(CardRank rank) => rank switch
     {
