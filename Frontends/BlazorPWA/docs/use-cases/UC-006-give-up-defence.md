@@ -3,6 +3,10 @@
 - Priority: Must
 - Actor: Player
 - Action: Give up current defence
+- Related UI Spec: `docs/ui-specs/UC-006-give-up-defence.md`
+
+## Why This Use Case Is Needed
+- Player needs a valid way to concede defence and continue match progression when they cannot or choose not to beat attacks.
 
 ## Preconditions
 - Player is connected to a game
