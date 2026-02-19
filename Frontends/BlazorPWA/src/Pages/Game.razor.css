@@ -300,14 +300,9 @@
 
 /* Dim cards that are not active when a turn is in progress */
 ::deep .hand .card[data-visual-state='inactive'] {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
+    filter: grayscale(0.7) saturate(0.35) brightness(0.92);
 }
 
-::deep .hand .card[data-visual-state='inactive'] .card-rank,
-::deep .hand .card[data-visual-state='inactive'] .card-suit {
-    color: #64748b;
-}
 
 ::deep .hand .card.selected {
     z-index: 10;
