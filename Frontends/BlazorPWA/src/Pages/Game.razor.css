@@ -55,10 +55,10 @@
 .match {
     width: min(960px, 100%);
     display: grid;
+    grid-template-rows: auto 1fr auto auto;
     gap: 16px;
     position: relative;
     min-height: 600px;
-    align-content: start;
 }
 
 .play-area {
