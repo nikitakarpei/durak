@@ -3,6 +3,10 @@
 - Priority: Must
 - Actor: Player
 - Action: As attacker, play one selected card from hand
+- Related UI Spec: `docs/ui-specs/UC-004-play-attack-card.md`
+
+## Why This Use Case Is Needed
+- Player needs to perform an attack move to progress the round.
 
 ## Preconditions
 - Player is connected to a game
@@ -28,9 +32,7 @@
 
 ## Observable Changes
 - The Play Attack button is visible only when it is the player's attack turn. No action buttons are shown otherwise.
-- Cards the player is allowed to play are visually marked (green tint) only during the player's own turn.
-- The green tint is removed from all hand cards when it becomes another player's turn.
-- Selected card is highlighted (raised above the hand row with an indigo border) while it is pending submission. The full card remains visible when raised.
+- Player can select and unselect a hand card before submitting.
 - Selected card appears on the table and is removed from hand after the game state updates.
 
 ## Out of Scope (MVP)
