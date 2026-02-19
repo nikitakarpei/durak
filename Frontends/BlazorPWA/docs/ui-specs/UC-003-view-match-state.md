@@ -23,6 +23,7 @@
 2. Current UI uses recognizable card styling (rounded white card look with suit color).
 3. Current suit color rule: Hearts/Diamonds are red, Spades/Clubs are dark.
 4. When playable or beatable hand cards are highlighted, non-playable hand cards are visually de-emphasized with a greyed-out look that remains opaque and keeps normal card shadows.
+5. Hovered or selected hand cards can lift upward without being clipped by the hand container.
 
 ## Actions Area
 1. Show action controls based on available moves in current state.

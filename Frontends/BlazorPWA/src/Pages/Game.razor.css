@@ -265,7 +265,7 @@
 }
 
 ::deep .hand {
-    overflow: hidden;
+    overflow: visible;
 }
 
 ::deep .hand-cards {
