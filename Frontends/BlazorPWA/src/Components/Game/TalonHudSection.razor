@@ -1,0 +1,59 @@
+@using GameService.Api.Data
+
+<section class="talon-hud" data-testid="talon-hud">
+    <div class="talon-hud__section talon-hud__section--trump" data-testid="talon-trump">
+        @if (TrumpCard is null)
+        {
+            <span class="talon-hud__mini-card talon-hud__mini-card--placeholder">?</span>
+        }
+        else
+        {
+            <span class="talon-hud__mini-card @SuitClass(TrumpCard.Suit)">
+                @RankToText(TrumpCard.Rank)@SuitToText(TrumpCard.Suit)
+            </span>
+        }
+    </div>
+    <div class="talon-hud__divider" aria-hidden="true"></div>
+    <div class="talon-hud__section talon-hud__section--deck">
+        <span class="talon-hud__deck-icon" data-testid="talon-deck" aria-hidden="true"></span>
+        <span class="talon-hud__count" data-testid="talon-count">@TalonCount</span>
+    </div>
+</section>
+
+@code {
+    [Parameter]
+    public RegularCard? TrumpCard { get; set; }
+
+    [Parameter]
+    public int TalonCount { get; set; }
+
+    private static string RankToText(CardRank rank) => rank switch
+    {
+        CardRank.Two => "2",
+        CardRank.Three => "3",
+        CardRank.Four => "4",
+        CardRank.Five => "5",
+        CardRank.Six => "6",
+        CardRank.Seven => "7",
+        CardRank.Eight => "8",
+        CardRank.Nine => "9",
+        CardRank.Ten => "10",
+        CardRank.Jack => "J",
+        CardRank.Queen => "Q",
+        CardRank.King => "K",
+        CardRank.Ace => "A",
+        _ => "?"
+    };
+
+    private static string SuitToText(CardSuit suit) => suit switch
+    {
+        CardSuit.Clubs => "♣",
+        CardSuit.Diamonds => "♦",
+        CardSuit.Hearts => "♥",
+        CardSuit.Spades => "♠",
+        _ => "?"
+    };
+
+    private static string SuitClass(CardSuit suit) =>
+        suit is CardSuit.Hearts or CardSuit.Diamonds ? "suit-red" : "";
+}

@@ -23,28 +23,15 @@
         <section class="match" data-testid="match-panel">
             <OpponentsSection Seats="@GetOpponents()" />
 
-            <div class="play-area">
-                <TableSection
-                    Pairs="@State.Table"
-                    SelectedAttackCardId="@selectedAttackCardId"
-                    BeatableAttackCardIds="@GetBeatableAttackCardIds()"
-                    OnAttackCardSelected="SelectAttackCard" />
+            <div class="talon-hud-row">
+                <TalonHudSection TrumpCard="@State.TrumpCard" TalonCount="@State.TalonCount" />
+            </div>
 
-            <div class="deck-area" data-testid="deck-area">
-                <div class="deck-pile @(State.TalonCount > 0 ? "deck-pile--stacked" : "")">
-                    @if (State.TrumpCard is not null)
-                    {
-                        <div data-testid="trump-card" class="card trump-face @(State.TalonCount > 0 ? "trump-face--rotated" : "") @SuitClass(State.TrumpCard.Suit)"><span class="card-rank">@RankToText(State.TrumpCard.Rank)</span><span class="card-suit">@SuitToText(State.TrumpCard.Suit)</span></div>
-                    }
-                    @if (State.TalonCount > 0)
-                    {
-                        <div data-testid="deck-back-card" class="deck-back-card">
-                            <span data-testid="talon-count" data-count="@State.TalonCount" class="deck-count">@State.TalonCount</span>
-                        </div>
-                    }
-                </div>
-            </div>
-            </div>
+            <TableSection
+                Pairs="@State.Table"
+                SelectedAttackCardId="@selectedAttackCardId"
+                BeatableAttackCardIds="@GetBeatableAttackCardIds()"
+                OnAttackCardSelected="SelectAttackCard" />
 
             <HandSection
                 Cards="@State.YourHand"

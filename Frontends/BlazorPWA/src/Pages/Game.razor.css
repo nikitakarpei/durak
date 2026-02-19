@@ -64,71 +64,10 @@
     gap: 16px;
 }
 
-.deck-area {
+.talon-hud-row {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex-shrink: 0;
-}
-
-.deck-pile {
-    position: relative;
-}
-
-/* When the deck is present: square container sized to the trump card's height
-   so the rotated card (87px visual width) fits exactly and peeks out symmetrically */
-.deck-pile--stacked {
-    width: 87px;
-    height: 87px;
-}
-
-/* Trump card: normal full-size card; rotation applied only when deck is present */
-.card.trump-face {
-    z-index: 1;
-}
-
-.card.trump-face.trump-face--rotated {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(90deg);
-}
-
-/* Face-down deck on top, centred over the rotated trump */
-.deck-back-card {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 62px;
-    height: 87px;
-    border-radius: 10px;
-    border: 1.5px solid rgba(255, 255, 255, 0.18);
-    background: repeating-linear-gradient(
-        45deg,
-        #1e3a8a 0px,
-        #1e3a8a 4px,
-        #1e40af 4px,
-        #1e40af 8px
-    );
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18), 0 1px 2px rgba(0, 0, 0, 0.10);
-    z-index: 2;
-}
-
-/* Count badge overlaid on the deck-back-card (positioned within its absolute parent) */
-.deck-count {
-    position: absolute;
-    bottom: 5px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 0.62rem;
-    font-weight: 700;
-    color: #fff;
-    background: rgba(0, 0, 0, 0.40);
-    border-radius: 3px;
-    padding: 1px 4px;
-    white-space: nowrap;
-    pointer-events: none;
+    justify-content: center;
+    margin-top: 6px;
 }
 
 ::deep .opponents {

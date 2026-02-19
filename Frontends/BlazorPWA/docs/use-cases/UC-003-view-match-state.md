@@ -33,6 +33,7 @@
 - Cards in the player's hand are displayed as recognizable playing cards with rank and suit information.
 - When a turn highlights playable or beatable hand cards, the other hand cards are visually de-emphasized but remain opaque and keep normal card shadows.
 - Hovered or selected hand cards can lift upward without being clipped by the hand container.
+- The trump suit and remaining deck count are shown in a compact HUD widget that does not occupy table space.
 
 ## Out of Scope (MVP)
 - Desktop-first layout optimization

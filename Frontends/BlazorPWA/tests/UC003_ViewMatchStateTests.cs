@@ -34,34 +34,36 @@ public class UC003_ViewMatchStateTests : TestContext
     }
 
     [Fact]
-    public void Given_TrumpCardKnown_When_MatchRenders_Then_TrumpCardIsVisible()
+    public void Given_TrumpCardKnown_When_MatchRenders_Then_TalonHudShowsTrumpCard()
     {
         _gameState.TrumpCard = new RegularCard { Id = "c1", Suit = CardSuit.Hearts, Rank = CardRank.Ace };
 
         var cut = RenderComponent<Game>();
 
-        cut.FindAll("[data-testid='trump-card']").Should().HaveCount(1);
+        cut.FindAll("[data-testid='talon-hud']").Should().HaveCount(1);
+        cut.Find("[data-testid='talon-trump']").TextContent.Should().Contain("A");
     }
 
     [Fact]
-    public void Given_PositiveTalonCount_When_MatchRenders_Then_DeckBackAndTalonCountAreVisible()
+    public void Given_PositiveTalonCount_When_MatchRenders_Then_TalonHudShowsDeckCount()
     {
         _gameState.TalonCount = 7;
 
         var cut = RenderComponent<Game>();
 
-        cut.FindAll("[data-testid='deck-back-card']").Should().HaveCount(1);
-        cut.Find("[data-testid='talon-count']").GetAttribute("data-count").Should().Be("7");
+        cut.FindAll("[data-testid='talon-hud']").Should().HaveCount(1);
+        cut.Find("[data-testid='talon-count']").TextContent.Should().Be("7");
     }
 
     [Fact]
-    public void Given_ZeroTalonCount_When_MatchRenders_Then_DeckBackIsHidden()
+    public void Given_ZeroTalonCount_When_MatchRenders_Then_TalonHudShowsZeroCount()
     {
         _gameState.TalonCount = 0;
 
         var cut = RenderComponent<Game>();
 
-        cut.FindAll("[data-testid='deck-back-card']").Should().BeEmpty();
+        cut.FindAll("[data-testid='talon-hud']").Should().HaveCount(1);
+        cut.Find("[data-testid='talon-count']").TextContent.Should().Be("0");
     }
 
     [Fact]

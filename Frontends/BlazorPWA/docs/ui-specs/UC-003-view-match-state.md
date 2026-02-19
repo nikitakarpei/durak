@@ -4,9 +4,10 @@
 - Scope: Current UI details for match-state presentation (can evolve over time).
 
 ## Deck Area
-1. Show trump card face-up when known.
-2. When talon has cards, show a face-down deck card and visible talon count.
-3. Current UI: deck card is visually rotated for stacked-deck effect.
+1. Show a compact talon HUD widget for trump and deck status.
+2. The HUD uses a pill container with a light background, rounded corners, subtle border or shadow, and two sections separated by a faint divider.
+3. Trump section shows a mini card face with rank and suit when known.
+4. Deck section shows a small blue card-back icon and the remaining deck count.
 
 ## Opponents Area
 1. Show all configured opponent seats, including unoccupied seats.
