@@ -19,7 +19,7 @@
 1. Trump known: shows mini card face with rank and suit.
 2. Trump unknown: shows placeholder content in the trump slot.
 3. Deck count present: shows count value and deck icon.
-4. Rigid size: the pill, trump slot, and count slot are fixed-width; content changes (rank length, digit count) must not change the physical dimensions of the HUD.
+4. Rigid size: the pill, trump slot, and count slot are fixed-width; content changes (rank length, digit count) must not change the physical dimensions of the HUD. The HUD height must also be stable — it must not be stretched by the surrounding grid layout (e.g., when the actions section is empty).
 
 ## Test Hooks
 - `data-testid='talon-hud'`
