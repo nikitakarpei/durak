@@ -3,6 +3,10 @@
 - Priority: Must
 - Actor: Player
 - Action: Join an existing game by game ID
+- Related UI Spec: `docs/ui-specs/UC-002-enter-game-and-connect.md`
+
+## Why This Use Case Is Needed
+- Player needs a direct way to enter an existing game and start playing.
 
 ## Preconditions
 - App shell is loaded
@@ -14,7 +18,7 @@
 ## Main Flow
 1. Player enters game ID and optional identifier.
 2. App starts connection and shows connecting state.
-3. App completes sign-in and game join flow.
+3. App completes connection for the selected game.
 4. Match screen is shown.
 
 ## Alternative / Failure Flows
