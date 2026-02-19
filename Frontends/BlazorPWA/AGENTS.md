@@ -18,4 +18,6 @@
 
 1. **Apply TDD before implementation.** Before implementing behavior, first think through and define the required abstractions, then write tests for the expected behavior, and only after that implement code to satisfy those tests.
 
-2. **Commit all changes.** Every completed task must end with a git commit that includes all modified and new files related to that task.
+2. **Focus frontend tests on behavior.** Good frontend tests validate user-observable behavior, not implementation internals.
+
+3. **Commit all changes.** Every completed task must end with a git commit that includes all modified and new files related to that task.
