@@ -66,20 +66,15 @@
                 </div>
             </section>
 
-            <section class="actions" data-testid="actions-section">
-                @if (State.YourPossibleMoves.Any(m => m.Type == PossibleMoveType.PlayAttackCard))
-                {
-                    <button @onclick="PlayAttackAsync" disabled="@string.IsNullOrWhiteSpace(selectedCardId)">Play Attack</button>
-                }
-                @if (State.YourPossibleMoves.Any(m => m.Type == PossibleMoveType.BeatAttackCard))
-                {
-                    <button @onclick="BeatAttackAsync" disabled="@(string.IsNullOrWhiteSpace(selectedCardId) || string.IsNullOrWhiteSpace(selectedAttackCardId))">Beat Attack</button>
-                }
-                @if (State.YourPossibleMoves.Any(m => m.Type == PossibleMoveType.GiveUpDefence))
-                {
-                    <button @onclick="GiveUpAsync">Give Up Defence</button>
-                }
-            </section>
+            <ActionsSection
+                CanPlayAttack="@State.YourPossibleMoves.Any(m => m.Type == PossibleMoveType.PlayAttackCard)"
+                CanBeatAttack="@State.YourPossibleMoves.Any(m => m.Type == PossibleMoveType.BeatAttackCard)"
+                CanGiveUpDefence="@State.YourPossibleMoves.Any(m => m.Type == PossibleMoveType.GiveUpDefence)"
+                IsPlayAttackEnabled="@(!string.IsNullOrWhiteSpace(selectedCardId))"
+                IsBeatAttackEnabled="@(!string.IsNullOrWhiteSpace(selectedCardId) && !string.IsNullOrWhiteSpace(selectedAttackCardId))"
+                OnPlayAttack="PlayAttackAsync"
+                OnBeatAttack="BeatAttackAsync"
+                OnGiveUpDefence="GiveUpAsync" />
         </section>
     }
 </main>
