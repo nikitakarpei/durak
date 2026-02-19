@@ -9,7 +9,7 @@
     font-family: "Space Grotesk", "Segoe UI", sans-serif;
 }
 
-.card-panel {
+::deep .card-panel {
     background: #ffffff;
     border-radius: 20px;
     padding: 24px;
@@ -19,26 +19,26 @@
     gap: 16px;
 }
 
-.card-panel h1 {
+::deep .card-panel h1 {
     font-size: 1.4rem;
     margin: 0;
 }
 
-.field {
+::deep .field {
     display: grid;
     gap: 6px;
     font-size: 0.9rem;
     color: #4b5563;
 }
 
-.field input {
+::deep .field input {
     padding: 12px 14px;
     border-radius: 12px;
     border: 1px solid #d1d5db;
     font-size: 1rem;
 }
 
-.primary {
+::deep .primary {
     background: #111827;
     color: #fff;
     border: none;
@@ -47,7 +47,7 @@
     font-size: 1rem;
 }
 
-.error {
+::deep .error {
     color: #b91c1c;
     font-size: 0.9rem;
 }
@@ -131,7 +131,7 @@
     pointer-events: none;
 }
 
-.opponents {
+::deep .opponents {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -140,18 +140,18 @@
     padding: 12px 18% 0;
 }
 
-.opponent {
+::deep .opponent {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 4px;
 }
 
-.opponent--empty {
+::deep .opponent--empty {
     opacity: 0.45;
 }
 
-.opp-avatar {
+::deep .opp-avatar {
     width: 48px;
     height: 48px;
     border-radius: 50%;
@@ -165,28 +165,28 @@
     justify-content: center;
 }
 
-.opponent--empty .opp-avatar {
+::deep .opponent--empty .opp-avatar {
     background: transparent;
     border: 2px dashed rgba(100, 116, 139, 0.45);
     color: #9ca3af;
 }
 
-.opp-name {
+::deep .opp-name {
     font-size: 0.72rem;
     font-weight: 500;
     color: #374151;
 }
 
-.opponent--empty .opp-name {
+::deep .opponent--empty .opp-name {
     color: #9ca3af;
 }
 
-.opp-hand {
+::deep .opp-hand {
     display: flex;
     margin-top: 2px;
 }
 
-.opp-card-back {
+::deep .opp-card-back {
     width: 18px;
     height: 26px;
     border-radius: 3px;
@@ -203,11 +203,11 @@
     position: relative; /* establishes stacking context; later siblings paint on top */
 }
 
-.opp-card-back + .opp-card-back {
+::deep .opp-card-back + .opp-card-back {
     margin-inline-start: -10px;
 }
 
-.table {
+::deep .table {
     flex: 1;
     min-height: 180px;
     display: flex;
@@ -218,14 +218,14 @@
     padding: 16px 0;
 }
 
-.pair {
+::deep .pair {
     display: grid;
     gap: 8px;
     align-items: center;
     justify-items: center;
 }
 
-.card {
+::deep .card {
     background: #fff;
     border-radius: 10px;
     border: 1.5px solid #d1d5db;
@@ -240,46 +240,46 @@
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.10), 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
-.card-rank {
+::deep .card-rank {
     font-size: 1rem;
     font-weight: 700;
     line-height: 1;
     color: #1b1f2a;
 }
 
-.card-suit {
+::deep .card-suit {
     font-size: 1.05rem;
     line-height: 1;
     color: #1b1f2a;
 }
 
-.card.suit-red .card-rank,
-.card.suit-red .card-suit {
+::deep .card.suit-red .card-rank,
+::deep .card.suit-red .card-suit {
     color: #dc2626;
 }
 
-.card.defence.empty {
+::deep .card.defence.empty {
     background: transparent;
     border: 2px dashed rgba(100, 116, 139, 0.40);
     box-shadow: none;
 }
 
-.hand {
+::deep .hand {
     overflow: hidden;
 }
 
-.hand-cards {
+::deep .hand-cards {
     display: flex;
     justify-content: center;
     overflow-x: auto;
     padding: 4px 4px 8px;
 }
 
-.hand-cards .card + .card {
+::deep .hand-cards .card + .card {
     margin-inline-start: -22px;
 }
 
-.hand .card {
+::deep .hand .card {
     position: relative;
     z-index: 1;
     cursor: pointer;
@@ -287,25 +287,25 @@
     transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, opacity 0.15s ease, z-index 0s;
 }
 
-.hand .card:hover {
+::deep .hand .card:hover {
     z-index: 5;
     transform: translateY(-8px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
 /* Beatable table attack cards: green border to highlight the target */
-.table .card.beatable {
+::deep .table .card.beatable {
     border-color: #86efac;
 }
 
 /* Dim cards that are not active when a turn is in progress */
-.hand-cards:has(.card.playable) .card:not(.playable):not(.selected),
-.hand-cards:has(.card.beatable) .card:not(.beatable):not(.selected) {
+::deep .hand-cards:has(.card.playable) .card:not(.playable):not(.selected),
+::deep .hand-cards:has(.card.beatable) .card:not(.beatable):not(.selected) {
     opacity: 0.5;
     box-shadow: none;
 }
 
-.hand .card.selected {
+::deep .hand .card.selected {
     z-index: 10;
     border-color: #4f46e5;
     background: #eef2ff;
@@ -313,8 +313,8 @@
     box-shadow: 0 8px 20px rgba(79, 70, 229, 0.30);
 }
 
-.hand .card.selected .card-rank,
-.hand .card.selected .card-suit {
+::deep .hand .card.selected .card-rank,
+::deep .hand .card.selected .card-suit {
     color: #4f46e5;
 }
 
@@ -350,4 +350,3 @@
     opacity: 0.4;
     cursor: not-allowed;
 }
-
