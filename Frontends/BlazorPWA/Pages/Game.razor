@@ -46,14 +46,12 @@
             </div>
             </div>
 
-            <section class="hand" data-testid="hand-section">
-                <div class="hand-cards">
-                    @foreach (var card in State.YourHand)
-                    {
-                        <button data-testid="@($"hand-card-{card.Id}")" class="card @(selectedCardId == card.Id ? "selected" : "") @(IsCardPlayable(card.Id) ? "playable" : "") @(IsHandCardBeatable(card.Id) ? "beatable" : "") @SuitClass(card.Suit)" @onclick="() => SelectCard(card.Id)"><span class="card-rank">@RankToText(card.Rank)</span><span class="card-suit">@SuitToText(card.Suit)</span></button>
-                    }
-                </div>
-            </section>
+            <HandSection
+                Cards="@State.YourHand"
+                SelectedCardId="@selectedCardId"
+                PlayableCardIds="@GetPlayableCardIds()"
+                BeatableHandCardIds="@GetBeatableHandCardIds()"
+                OnCardSelected="SelectCard" />
 
             <ActionsSection
                 CanPlayAttack="@State.YourPossibleMoves.Any(m => m.Type == PossibleMoveType.PlayAttackCard)"
@@ -211,8 +209,11 @@
             ? "suit-red"
             : "";
 
-    private bool IsCardPlayable(string cardId) =>
-        State.YourPossibleMoves.Any(m => m.YourCardId == cardId);
+    private IReadOnlySet<string> GetPlayableCardIds() =>
+        State.YourPossibleMoves
+            .Where(m => !string.IsNullOrWhiteSpace(m.YourCardId))
+            .Select(m => m.YourCardId!)
+            .ToHashSet();
 
     private bool IsAttackCardBeatable(string attackCardId) =>
         !string.IsNullOrWhiteSpace(selectedCardId) &&
@@ -237,12 +238,21 @@
             .ToHashSet();
     }
 
-    private bool IsHandCardBeatable(string handCardId) =>
-        !string.IsNullOrWhiteSpace(selectedAttackCardId) &&
-        State.YourPossibleMoves.Any(m =>
-            m.Type == PossibleMoveType.BeatAttackCard &&
-            m.TargetCardId == selectedAttackCardId &&
-            m.YourCardId == handCardId);
+    private IReadOnlySet<string> GetBeatableHandCardIds()
+    {
+        if (string.IsNullOrWhiteSpace(selectedAttackCardId))
+        {
+            return new HashSet<string>();
+        }
+
+        return State.YourPossibleMoves
+            .Where(m =>
+                m.Type == PossibleMoveType.BeatAttackCard &&
+                m.TargetCardId == selectedAttackCardId &&
+                !string.IsNullOrWhiteSpace(m.YourCardId))
+            .Select(m => m.YourCardId!)
+            .ToHashSet();
+    }
 
     private void SelectCard(string cardId)
     {
