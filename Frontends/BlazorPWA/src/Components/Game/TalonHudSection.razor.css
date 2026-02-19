@@ -25,9 +25,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 32px;
+    width: 40px;
     height: 22px;
-    padding: 0 6px;
     border-radius: 6px;
     background: #ffffff;
     border: 1px solid rgba(148, 163, 184, 0.45);
@@ -65,4 +64,6 @@
     font-size: 0.85rem;
     font-weight: 700;
     color: #0f172a;
+    min-width: 24px;
+    text-align: center;
 }

@@ -9,6 +9,7 @@
 3. Trump section shows a mini card face with rank and suit when known.
 4. Deck section shows a small blue card-back icon and the remaining deck count.
 5. The talon HUD sits near the top of the screen and does not overlap the top-center or upper-right opponent seats.
+6. The talon HUD has a fixed, stable size at all times. Neither the trump rank (one-character "A" vs three-character "10♦") nor the deck count (single digit vs double digit) may change the physical dimensions of the pill.
 
 ## Opponents Area
 1. Show all configured opponent seats, including unoccupied seats.
