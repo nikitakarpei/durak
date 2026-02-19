@@ -17,6 +17,7 @@
 3. Unoccupied seats show a placeholder tile.
 4. Current UI placeholders: friendly seat names such as `Player N` and unoccupied label such as `Not joined`.
 5. Opponents are positioned in a U shape around the top half of the screen, leaving the table centered.
+5a. All game sections (talon HUD, table, hand, actions) stack from the top in a fixed order. Their vertical positions must not shift based on the content or visibility of sibling sections.
 6. Seat positions (visual order): left-middle, upper-left, top-center, upper-right, right-middle.
 7. The visual positions assigned depend on the number of opponent seats to achieve a symmetric, balanced layout:
    - 1 seat → top-center (pos-3)
