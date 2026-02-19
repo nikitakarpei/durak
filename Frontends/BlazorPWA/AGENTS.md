@@ -16,3 +16,4 @@
 4. **Do not test styling/DOM internals** (CSS classes, exact markup structure) unless explicitly required behavior.
 5. **Text assertions are opt-in only:** use them only when copy itself is a requirement (for example error/legal/contract text).
 6. **Tests must be deterministic** (no real time/network/randomness).
+7. **Use Given-When-Then test names** (`Given_<context>_When_<action>_Then_<outcome>`).

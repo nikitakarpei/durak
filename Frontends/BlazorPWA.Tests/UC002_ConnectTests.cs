@@ -28,7 +28,7 @@ public class UC002_ConnectTests : TestContext
     }
 
     [Fact]
-    public void JoinScreenShownWhenStatusIsIdle()
+    public void Given_IdleConnectionStatus_When_GamePageRenders_Then_JoinPanelIsVisible()
     {
         _connectionMock.SetupGet(c => c.Status).Returns(ConnectionStatus.Idle);
 
@@ -39,7 +39,7 @@ public class UC002_ConnectTests : TestContext
     }
 
     [Fact]
-    public void ConnectButtonDisabledWhileConnecting()
+    public void Given_ConnectRequestInProgress_When_ConnectClicked_Then_ConnectButtonIsDisabled()
     {
         _connectionMock.SetupGet(c => c.Status).Returns(ConnectionStatus.Idle);
         var connectPending = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -59,7 +59,7 @@ public class UC002_ConnectTests : TestContext
     }
 
     [Fact]
-    public void MatchScreenShownWhenConnectedAndGameIdSet()
+    public void Given_ConnectedStatusAndGameId_When_GamePageRenders_Then_MatchPanelIsVisible()
     {
         _gameState.GameId = "game-123";
         _connectionMock.SetupGet(c => c.Status).Returns(ConnectionStatus.Connected);
@@ -70,7 +70,7 @@ public class UC002_ConnectTests : TestContext
     }
 
     [Fact]
-    public void JoinErrorVisibleWhenStatusIsError()
+    public void Given_ErrorConnectionStatus_When_GamePageRenders_Then_JoinErrorIsVisible()
     {
         _connectionMock.SetupGet(c => c.Status).Returns(ConnectionStatus.Error);
         _connectionMock.SetupGet(c => c.ErrorMessage).Returns("Connection failed");
@@ -81,7 +81,7 @@ public class UC002_ConnectTests : TestContext
     }
 
     [Fact]
-    public void EmptyGameId_ClickConnect_ConnectAsyncNotCalled()
+    public void Given_EmptyGameId_When_ConnectClicked_Then_ConnectIsNotRequested()
     {
         _connectionMock.SetupGet(c => c.Status).Returns(ConnectionStatus.Idle);
 
@@ -96,7 +96,7 @@ public class UC002_ConnectTests : TestContext
     }
 
     [Fact]
-    public void GameIdAndCustomIdProvided_ClickConnect_ConnectAsyncCalledWithTrimmedValues()
+    public void Given_GameIdAndCustomIdWithSpaces_When_ConnectClicked_Then_TrimmedValuesAreRequested()
     {
         _connectionMock.SetupGet(c => c.Status).Returns(ConnectionStatus.Idle);
         _connectionMock
