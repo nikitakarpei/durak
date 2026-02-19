@@ -20,4 +20,6 @@
 
 2. **Focus frontend tests on behavior.** Good frontend tests validate user-observable behavior, not implementation internals.
 
-3. **Commit all changes.** Every completed task must end with a git commit that includes all modified and new files related to that task.
+3. **Avoid styling/DOM-internal assertions.** Do not test CSS classes, exact DOM structure, or implementation-only markup unless it is user-observable behavior (for example visibility, enabled/disabled state, role/name, text, and actionable controls).
+
+4. **Commit all changes.** Every completed task must end with a git commit that includes all modified and new files related to that task.
