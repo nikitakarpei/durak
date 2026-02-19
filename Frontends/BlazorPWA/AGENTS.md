@@ -2,8 +2,9 @@
 
 ## Core Workflow
 1. **Use `docs/` when needed.**
-2. **Apply TDD:** design abstractions, write failing tests, then implement.
-3. **Commit all task changes.**
+2. **Apply strict TDD:** design abstractions, write/adjust tests first, run them to fail (red), then implement and run them to pass (green).
+3. **For UI component changes, use spec-driven TDD order:** component contract spec -> tests (red) -> implementation (green).
+4. **Commit all task changes.**
 
 ## Use Cases
 1. **Before implementing any user-visible behavior, update/create the relevant use case in `docs/use-cases/` and related UI spec in `docs/ui-specs/`.**
