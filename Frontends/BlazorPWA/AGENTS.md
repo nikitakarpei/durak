@@ -2,9 +2,8 @@
 
 ## Core Workflow
 1. **Use `docs/` when needed.**
-2. **Log decisions in `docs/Decisions.md`** with what/why/alternatives.
-3. **Apply TDD:** design abstractions, write failing tests, then implement.
-4. **Commit all task changes.**
+2. **Apply TDD:** design abstractions, write failing tests, then implement.
+3. **Commit all task changes.**
 
 ## Use Cases
 1. **Update `docs/use-cases/` whenever UI behavior changes.**
