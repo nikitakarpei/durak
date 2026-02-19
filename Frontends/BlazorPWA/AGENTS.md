@@ -5,6 +5,7 @@
 2. **Apply strict TDD:** design abstractions, write/adjust tests first, run them to fail (red), then implement and run them to pass (green).
 3. **For UI component changes, use spec-driven TDD order:** component contract spec -> tests (red) -> implementation (green).
 4. **Commit all task changes.**
+5. **When fixing problems, avoid immediate quick patches.** First identify the root cause, then propose a long-term solution that prevents similar issues in the future.
 
 ## Use Cases
 1. **Before implementing any user-visible behavior, update/create the relevant use case in `docs/use-cases/` and related UI spec in `docs/ui-specs/`.**
