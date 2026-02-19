@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../../src/BlazorPWA.csproj" />
+    <ProjectReference Include="../src/BlazorPWA.csproj" />
   </ItemGroup>
 
 </Project>
