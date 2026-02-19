@@ -28,18 +28,22 @@
     else
     {
         <section class="match" data-testid="match-panel">
-            <section class="opponents">
+            <section class="opponents" data-testid="opponents-section">
                 @foreach (var opponent in GetOpponents())
                 {
-                    <div class="opponent @(opponent.IsJoined ? "" : "opponent--empty")">
+                    <div class="opponent @(opponent.IsJoined ? "" : "opponent--empty")"
+                         data-testid="opponent-seat"
+                         data-seat="@opponent.Seat"
+                         data-joined="@(opponent.IsJoined ? "true" : "false")"
+                         data-card-count="@opponent.CardCount">
                         <div class="opp-avatar">@(opponent.IsJoined ? $"{opponent.Seat + 1}" : "?")</div>
                         <span class="opp-name">@(opponent.IsJoined ? $"Player {opponent.Seat + 1}" : "Not joined")</span>
                         @if (opponent.IsJoined && opponent.CardCount > 0)
                         {
-                            <div class="opp-hand">
+                            <div class="opp-hand" data-testid="opponent-hand" data-seat="@opponent.Seat">
                                 @for (var i = 0; i < Math.Min(opponent.CardCount, 8); i++)
                                 {
-                                    <div class="opp-card-back"></div>
+                                    <div class="opp-card-back" data-testid="opponent-card-back" data-seat="@opponent.Seat"></div>
                                 }
                             </div>
                         }
@@ -48,49 +52,49 @@
             </section>
 
             <div class="play-area">
-            <section class="table">
+            <section class="table" data-testid="table-section">
                 @foreach (var pair in State.Table)
                 {
-                    <div class="pair">
+                    <div class="pair" data-testid="table-pair" data-attack-id="@pair.Attack.Id">
                         @if (pair.Defence is null)
                         {
-                            <button class="card @(selectedAttackCardId == pair.Attack.Id ? "selected" : "") @(IsAttackCardBeatable(pair.Attack.Id) ? "beatable" : "") @SuitClass(pair.Attack.Suit)" @onclick="() => SelectAttackCard(pair.Attack.Id)"><span class="card-rank">@RankToText(pair.Attack.Rank)</span><span class="card-suit">@SuitToText(pair.Attack.Suit)</span></button>
+                            <button data-testid="@($"table-attack-{pair.Attack.Id}")" class="card @(selectedAttackCardId == pair.Attack.Id ? "selected" : "") @(IsAttackCardBeatable(pair.Attack.Id) ? "beatable" : "") @SuitClass(pair.Attack.Suit)" @onclick="() => SelectAttackCard(pair.Attack.Id)"><span class="card-rank">@RankToText(pair.Attack.Rank)</span><span class="card-suit">@SuitToText(pair.Attack.Suit)</span></button>
                         }
                         else
                         {
-                            <div class="card @SuitClass(pair.Attack.Suit)"><span class="card-rank">@RankToText(pair.Attack.Rank)</span><span class="card-suit">@SuitToText(pair.Attack.Suit)</span></div>
+                            <div data-testid="@($"table-attack-{pair.Attack.Id}")" class="card @SuitClass(pair.Attack.Suit)"><span class="card-rank">@RankToText(pair.Attack.Rank)</span><span class="card-suit">@SuitToText(pair.Attack.Suit)</span></div>
                         }
-                        <div class="card defence @(pair.Defence is null ? "empty" : SuitClass(pair.Defence.Suit))">@if (pair.Defence is not null) {<span class="card-rank">@RankToText(pair.Defence.Rank)</span><span class="card-suit">@SuitToText(pair.Defence.Suit)</span>}</div>
+                        <div data-testid="@($"table-defence-{pair.Attack.Id}")" class="card defence @(pair.Defence is null ? "empty" : SuitClass(pair.Defence.Suit))">@if (pair.Defence is not null) {<span class="card-rank">@RankToText(pair.Defence.Rank)</span><span class="card-suit">@SuitToText(pair.Defence.Suit)</span>}</div>
                     </div>
                 }
             </section>
 
-            <div class="deck-area">
+            <div class="deck-area" data-testid="deck-area">
                 <div class="deck-pile @(State.TalonCount > 0 ? "deck-pile--stacked" : "")">
                     @if (State.TrumpCard is not null)
                     {
-                        <div class="card trump-face @(State.TalonCount > 0 ? "trump-face--rotated" : "") @SuitClass(State.TrumpCard.Suit)"><span class="card-rank">@RankToText(State.TrumpCard.Rank)</span><span class="card-suit">@SuitToText(State.TrumpCard.Suit)</span></div>
+                        <div data-testid="trump-card" class="card trump-face @(State.TalonCount > 0 ? "trump-face--rotated" : "") @SuitClass(State.TrumpCard.Suit)"><span class="card-rank">@RankToText(State.TrumpCard.Rank)</span><span class="card-suit">@SuitToText(State.TrumpCard.Suit)</span></div>
                     }
                     @if (State.TalonCount > 0)
                     {
-                        <div class="deck-back-card">
-                            <span class="deck-count">@State.TalonCount</span>
+                        <div data-testid="deck-back-card" class="deck-back-card">
+                            <span data-testid="talon-count" data-count="@State.TalonCount" class="deck-count">@State.TalonCount</span>
                         </div>
                     }
                 </div>
             </div>
             </div>
 
-            <section class="hand">
+            <section class="hand" data-testid="hand-section">
                 <div class="hand-cards">
                     @foreach (var card in State.YourHand)
                     {
-                        <button class="card @(selectedCardId == card.Id ? "selected" : "") @(IsCardPlayable(card.Id) ? "playable" : "") @(IsHandCardBeatable(card.Id) ? "beatable" : "") @SuitClass(card.Suit)" @onclick="() => SelectCard(card.Id)"><span class="card-rank">@RankToText(card.Rank)</span><span class="card-suit">@SuitToText(card.Suit)</span></button>
+                        <button data-testid="@($"hand-card-{card.Id}")" class="card @(selectedCardId == card.Id ? "selected" : "") @(IsCardPlayable(card.Id) ? "playable" : "") @(IsHandCardBeatable(card.Id) ? "beatable" : "") @SuitClass(card.Suit)" @onclick="() => SelectCard(card.Id)"><span class="card-rank">@RankToText(card.Rank)</span><span class="card-suit">@SuitToText(card.Suit)</span></button>
                     }
                 </div>
             </section>
 
-            <section class="actions">
+            <section class="actions" data-testid="actions-section">
                 @if (State.YourPossibleMoves.Any(m => m.Type == PossibleMoveType.PlayAttackCard))
                 {
                     <button @onclick="PlayAttackAsync" disabled="@string.IsNullOrWhiteSpace(selectedCardId)">Play Attack</button>
