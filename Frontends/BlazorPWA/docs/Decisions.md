@@ -1,6 +1,9 @@
 # Decision Log
 
 ## 2026-02-19
+- Enforce stable selector policy for UC-002 by adding `data-testid` hooks in join/match UI and using them in tests.
+  - Why: text/placeholder selectors are brittle under copy changes and localization; explicit test IDs provide a stable contract.
+  - Alternatives considered: keep text/placeholder selectors (rejected; high maintenance), rely on CSS selectors (rejected; tests implementation details).
 - Refactor UC-002 frontend tests to assert observable behavior and command effects, while avoiding timing-dependent async patterns.
   - Why: aligns tests with new quality rules (behavior-first, deterministic, less brittle).
   - Alternatives considered: keep existing tests with `Task.Delay(Timeout.Infinite)` and CSS-class/button-class targeting (rejected; higher flake risk and stronger coupling to markup details).

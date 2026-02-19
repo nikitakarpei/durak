@@ -8,26 +8,26 @@
     <ErrorToast />
     @if (State.GameId == string.Empty || Connection.Status == ConnectionStatus.Idle)
     {
-        <section class="card-panel">
-            <h1>Join Game</h1>
+        <section class="card-panel" data-testid="join-panel">
+            <h1 data-testid="join-title">Join Game</h1>
             <label class="field">
                 <span>Game ID</span>
-                <input @bind="gameId" placeholder="Enter game id" />
+                <input data-testid="game-id-input" @bind="gameId" placeholder="Enter game id" />
             </label>
             <label class="field">
                 <span>Custom ID</span>
-                <input @bind="customId" placeholder="Enter custom id" />
+                <input data-testid="custom-id-input" @bind="customId" placeholder="Enter custom id" />
             </label>
-            <button class="primary" @onclick="ConnectAsync" disabled="@isConnecting">Connect</button>
+            <button data-testid="connect-button" class="primary" @onclick="ConnectAsync" disabled="@isConnecting">Connect</button>
             @if (Connection.Status == ConnectionStatus.Error && !string.IsNullOrWhiteSpace(Connection.ErrorMessage))
             {
-                <div class="error">@Connection.ErrorMessage</div>
+                <div class="error" data-testid="join-error">@Connection.ErrorMessage</div>
             }
         </section>
     }
     else
     {
-        <section class="match">
+        <section class="match" data-testid="match-panel">
             <section class="opponents">
                 @foreach (var opponent in GetOpponents())
                 {

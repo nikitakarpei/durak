@@ -1,7 +1,6 @@
 using BlazorPWA.Pages;
 using BlazorPWA.Services.Connection;
 using BlazorPWA.State;
-using AngleSharp.Dom;
 using Bunit;
 using FluentAssertions;
 using Moq;
@@ -35,8 +34,8 @@ public class UC002_ConnectTests : TestContext
 
         var cut = RenderComponent<Game>();
 
-        cut.Find("h1").TextContent.Should().Contain("Join Game");
-        FindConnectButton(cut).Should().NotBeNull();
+        cut.Find("[data-testid='join-panel']").Should().NotBeNull();
+        cut.Find("[data-testid='connect-button']").Should().NotBeNull();
     }
 
     [Fact]
@@ -50,13 +49,13 @@ public class UC002_ConnectTests : TestContext
 
         var cut = RenderComponent<Game>();
 
-        var gameIdInput = cut.Find("input[placeholder='Enter game id']");
+        var gameIdInput = cut.Find("[data-testid='game-id-input']");
         gameIdInput.Change("test-game");
 
-        var connectButton = FindConnectButton(cut);
+        var connectButton = cut.Find("[data-testid='connect-button']");
         connectButton.Click();
 
-        FindConnectButton(cut).HasAttribute("disabled").Should().BeTrue();
+        cut.Find("[data-testid='connect-button']").HasAttribute("disabled").Should().BeTrue();
     }
 
     [Fact]
@@ -67,7 +66,7 @@ public class UC002_ConnectTests : TestContext
 
         var cut = RenderComponent<Game>();
 
-        cut.Find("section.match").Should().NotBeNull();
+        cut.Find("[data-testid='match-panel']").Should().NotBeNull();
     }
 
     [Fact]
@@ -78,7 +77,7 @@ public class UC002_ConnectTests : TestContext
 
         var cut = RenderComponent<Game>();
 
-        cut.Find("div.error").TextContent.Should().Be("Connection failed");
+        cut.Find("[data-testid='join-error']").TextContent.Should().Be("Connection failed");
     }
 
     [Fact]
@@ -88,7 +87,7 @@ public class UC002_ConnectTests : TestContext
 
         var cut = RenderComponent<Game>();
 
-        FindConnectButton(cut).Click();
+        cut.Find("[data-testid='connect-button']").Click();
 
         _connectionMock.Verify(
             c => c.ConnectAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
@@ -106,17 +105,14 @@ public class UC002_ConnectTests : TestContext
 
         var cut = RenderComponent<Game>();
 
-        cut.Find("input[placeholder='Enter game id']").Change("  game-123  ");
-        cut.Find("input[placeholder='Enter custom id']").Change("  player-xyz  ");
+        cut.Find("[data-testid='game-id-input']").Change("  game-123  ");
+        cut.Find("[data-testid='custom-id-input']").Change("  player-xyz  ");
 
-        FindConnectButton(cut).Click();
+        cut.Find("[data-testid='connect-button']").Click();
 
         _connectionMock.Verify(
             c => c.ConnectAsync("game-123", "player-xyz", It.IsAny<CancellationToken>()),
             Times.Once
         );
     }
-
-    private static IElement FindConnectButton(IRenderedFragment cut) =>
-        cut.FindAll("button").First(b => b.TextContent.Contains("Connect", StringComparison.Ordinal));
 }
