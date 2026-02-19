@@ -11,7 +11,8 @@
 
 ## Test Policy (Strict)
 1. **Test user-observable behavior, not internals.**
-2. **Prefer stable selectors:** `data-testid` -> role/label -> text (last resort).
-3. **Do not test styling/DOM internals** (CSS classes, exact markup structure) unless explicitly required behavior.
-4. **Text assertions are opt-in only:** use them only when copy itself is a requirement (for example error/legal/contract text).
-5. **Tests must be deterministic** (no real time/network/randomness).
+2. **Test public contracts per layer.** In frontend, prioritize user-facing UI contracts (actions, visibility, enabled/disabled state, accessibility semantics) and boundary contracts (service/API calls), not component-private internals.
+3. **Prefer stable selectors:** `data-testid` -> role/label -> text (last resort).
+4. **Do not test styling/DOM internals** (CSS classes, exact markup structure) unless explicitly required behavior.
+5. **Text assertions are opt-in only:** use them only when copy itself is a requirement (for example error/legal/contract text).
+6. **Tests must be deterministic** (no real time/network/randomness).
