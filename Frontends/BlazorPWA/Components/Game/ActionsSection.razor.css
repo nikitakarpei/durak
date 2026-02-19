@@ -1,0 +1,19 @@
+.actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+}
+
+.actions button {
+    padding: 12px 10px;
+    border-radius: 12px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    color: #1f2937;
+    font-weight: 600;
+}
+
+.actions button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
