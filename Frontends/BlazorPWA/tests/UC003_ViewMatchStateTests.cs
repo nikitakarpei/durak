@@ -152,7 +152,7 @@ public class UC003_ViewMatchStateTests : TestContext
 
         cut.FindAll("[data-testid='table-pair']").Should().HaveCount(2);
         cut.Find("[data-testid='table-defence-atk-1']").Children.Should().HaveCount(2);
-        cut.Find("[data-testid='table-defence-atk-2']").Children.Should().BeEmpty();
+        cut.FindAll("[data-testid='table-defence-atk-2']").Should().BeEmpty();
     }
 
     [Fact]

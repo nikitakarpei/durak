@@ -19,7 +19,7 @@
 
 ## Required States
 1. Empty table (no pairs).
-2. Open attack pair (attack selectable, defence empty slot shown as dashed placeholder).
+2. Open attack pair (attack selectable, no defence element rendered).
 3. Defended pair (attack non-selectable; defence card rendered overlaid on the attack card, offset 10px down-right and rotated 20° clockwise, so both cards remain visible).
 4. Selected/beatable highlighting states for open attack cards.
 
