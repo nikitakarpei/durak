@@ -3,7 +3,7 @@
 
 @if (Connection.Status == ConnectionStatus.Error && !string.IsNullOrWhiteSpace(Connection.ErrorMessage))
 {
-    <div class="toast">@Connection.ErrorMessage</div>
+    <div class="toast" data-testid="error-toast">@Connection.ErrorMessage</div>
 }
 
 @code {
