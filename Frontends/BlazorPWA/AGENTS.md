@@ -6,8 +6,9 @@
 3. **Commit all task changes.**
 
 ## Use Cases
-1. **Update `docs/use-cases/` whenever UI behavior changes.**
-2. **Keep use cases user-facing only** (no implementation details).
+1. **Use cases first for user-visible changes.** Before implementing any user-visible behavior, update/create the relevant file in `docs/use-cases/`.
+2. **Write only user value and user-observable behavior.** Describe actor goals, triggers, outcomes, and user-visible failures.
+3. **No implementation details in use cases.** Exclude logs, events, APIs, services, reducers, storage, and technical workflows.
 
 ## Test Policy (Strict)
 1. **Test user-observable behavior, not internals.**
