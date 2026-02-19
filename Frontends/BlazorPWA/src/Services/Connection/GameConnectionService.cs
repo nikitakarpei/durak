@@ -2,6 +2,7 @@ using BlazorPWA.Configuration;
 using BlazorPWA.Services.Api;
 using BlazorPWA.State;
 using GameService.Api.Commands;
+using GameService.Api.GameEvents;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Options;
 
@@ -156,11 +157,11 @@ public sealed class GameConnectionService : IGameConnectionService
             {
                 if (response.ResultCase == GetGameEventsCommand.Types.StreamResponse.ResultOneofCase.OldEvent)
                 {
-                    ApplyEvent(response.OldEvent.Event);
+                    await ApplyEventAsync(response.OldEvent.Event, cancellationToken);
                 }
                 else if (response.ResultCase == GetGameEventsCommand.Types.StreamResponse.ResultOneofCase.NewEvent)
                 {
-                    ApplyEvent(response.NewEvent.Event);
+                    await ApplyEventAsync(response.NewEvent.Event, cancellationToken);
                 }
                 else if (response.ResultCase == GetGameEventsCommand.Types.StreamResponse.ResultOneofCase.OldEventsEnded)
                 {
@@ -178,8 +179,13 @@ public sealed class GameConnectionService : IGameConnectionService
         }
     }
 
-    private void ApplyEvent(Any payload)
+    // TECH DEBT: 1s artificial delay before RoundFinished to let players see the final table state.
+    // Replace with a proper server-driven acknowledgement flow.
+    private async Task ApplyEventAsync(Any payload, CancellationToken cancellationToken)
     {
+        if (payload.Is(RoundFinished.Descriptor))
+            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+
         GameStateReducer.Apply(_state, payload);
         NotifyStateChanged();
     }
