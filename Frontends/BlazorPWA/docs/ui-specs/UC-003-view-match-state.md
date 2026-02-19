@@ -8,12 +8,15 @@
 2. The HUD uses a pill container with a light background, rounded corners, subtle border or shadow, and two sections separated by a faint divider.
 3. Trump section shows a mini card face with rank and suit when known.
 4. Deck section shows a small blue card-back icon and the remaining deck count.
+5. The talon HUD sits near the top of the screen and does not overlap the top-center or upper-right opponent seats.
 
 ## Opponents Area
 1. Show all configured opponent seats, including unoccupied seats.
 2. Joined seats show a compact tile with identity placeholder and card-count indicator.
 3. Unoccupied seats show a placeholder tile.
 4. Current UI placeholders: friendly seat names such as `Player N` and unoccupied label such as `Not joined`.
+5. Opponents are positioned in a U shape around the top half of the screen, leaving the table centered.
+6. Seat positions (visual order): left-middle, upper-left, top-center, upper-right, right-middle.
 
 ## Table Area
 1. Show all attack/defence pairs currently on table.

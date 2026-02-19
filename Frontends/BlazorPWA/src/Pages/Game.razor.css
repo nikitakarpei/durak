@@ -56,6 +56,8 @@
     width: min(960px, 100%);
     display: grid;
     gap: 16px;
+    position: relative;
+    min-height: 600px;
 }
 
 .play-area {
@@ -67,23 +69,55 @@
 .talon-hud-row {
     display: flex;
     justify-content: center;
-    margin-top: 6px;
+    margin-top: 88px;
+    z-index: 2;
 }
 
 ::deep .opponents {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 8px;
-    padding: 12px 18% 0;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
 }
 
 ::deep .opponent {
+    position: absolute;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 4px;
+    width: 110px;
+    text-align: center;
+    pointer-events: auto;
+}
+
+::deep .opponent--pos-1 {
+    left: 0;
+    top: 58%;
+    transform: translate(0, -50%);
+}
+
+::deep .opponent--pos-2 {
+    left: 14%;
+    top: 6%;
+    transform: translate(-50%, 0);
+}
+
+::deep .opponent--pos-3 {
+    left: 50%;
+    top: 2%;
+    transform: translate(-50%, 0);
+}
+
+::deep .opponent--pos-4 {
+    right: 14%;
+    top: 6%;
+    transform: translate(50%, 0);
+}
+
+::deep .opponent--pos-5 {
+    right: 0;
+    top: 58%;
+    transform: translate(0, -50%);
 }
 
 ::deep .opponent--empty {

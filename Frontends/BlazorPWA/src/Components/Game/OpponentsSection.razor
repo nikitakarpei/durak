@@ -1,9 +1,12 @@
 <section class="opponents" data-testid="opponents-section">
-    @foreach (var seat in Seats)
+    @for (var index = 0; index < Seats.Count; index++)
     {
-        <div class="opponent @(seat.IsJoined ? "" : "opponent--empty")"
+        var seat = Seats[index];
+        var position = index + 1;
+        <div class="opponent opponent--pos-@position @(seat.IsJoined ? "" : "opponent--empty")"
              data-testid="opponent-seat"
              data-seat="@seat.Seat"
+             data-seat-position="@position"
              data-joined="@(seat.IsJoined ? "true" : "false")"
              data-card-count="@seat.CardCount">
             <div class="opp-avatar">@(seat.IsJoined ? $"{seat.Seat + 1}" : "?")</div>

@@ -85,6 +85,23 @@ public class UC003_ViewMatchStateTests : TestContext
     }
 
     [Fact]
+    public void Given_SixPlayerGame_When_MatchRenders_Then_OpponentSeatsHaveFixedPositions()
+    {
+        _gameState.TotalPlayerSeats = 6;
+        _gameState.LocalPlayerId = "player-1";
+        _gameState.Players["player-1"] = new PlayerState("player-1", 0);
+
+        var cut = RenderComponent<Game>();
+
+        var seats = cut.FindAll("[data-testid='opponent-seat']");
+        seats.Should().HaveCount(5);
+        seats.Select(s => s.GetAttribute("data-seat-position")).Should().BeEquivalentTo(new[]
+        {
+            "1", "2", "3", "4", "5"
+        });
+    }
+
+    [Fact]
     public void Given_OpponentWithManyCards_When_MatchRenders_Then_VisualCardBacksAreCappedAtEight()
     {
         _gameState.TotalPlayerSeats = 2;
