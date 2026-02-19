@@ -6,6 +6,7 @@ This folder defines player-visible MVP use cases for the Durak frontend.
 - One use case per file
 - Scope source: `docs/Product.md` and `docs/Design.md`
 - Style rule: product-level behavior only (no implementation details)
+- Detailed UI rules (copy/visual specifics): `docs/ui-specs/` linked from use cases when needed
 - Priority: all current use cases are `Must`
 
 ## List

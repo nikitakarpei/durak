@@ -3,6 +3,7 @@
 - Priority: Must
 - Actor: Player
 - Action: Observe current match status and cards
+- Related UI Spec: `docs/ui-specs/UC-003-view-match-state.md`
 
 ## Preconditions
 - Player is connected to a game
@@ -11,8 +12,8 @@
 - Match screen is open and game state changes
 
 ## Main Flow
-1. App shows a visual deck area: the trump card face-up and the remaining deck as a face-down card rotated 90° on top, with a count of cards remaining.
-2. App shows all opponent seats configured for the game, including seats not yet occupied. Joined opponents are shown as compact tiles with an identity indicator and a visual card-count indicator. Unoccupied seats are shown as empty placeholders.
+1. App shows deck information, including the trump card (when known) and remaining talon size.
+2. App shows all opponent seats configured for the game, including seats not yet occupied.
 3. App shows table cards.
 4. App shows player hand and action controls.
 
@@ -23,7 +24,7 @@
 - Player can see the current match state.
 
 ## Observable Changes
-- Turn, table, hand, trump, and talon information update over time.
+- Table, hand, trump, and talon information update over time.
 - The talon count decreases each time cards are dealt to a player.
 - Any unoccupied opponent seat within the configured seat count is shown as an empty placeholder until a player joins it.
 - Cards in the player's hand are displayed as recognizable playing cards with rank and suit information.
