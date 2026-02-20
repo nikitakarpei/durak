@@ -34,6 +34,7 @@
 - The Play Attack button is visible only when it is the player's attack turn. No action buttons are shown otherwise.
 - Player can select and unselect a hand card before submitting.
 - Selected card appears on the table and is removed from hand after the game state updates.
+- After the play is confirmed, the previous hand selection is cleared.
 
 ## Out of Scope (MVP)
 - Client-side move validity enforcement

@@ -21,6 +21,7 @@
 ## Layout and Responsive Rules
 1. Hand cards remain visible and actionable in a mobile-first layout.
 2. After state update confirming played attack, the played card is removed from hand and shown on table.
+3. After state update confirming played attack, any prior hand selection is cleared.
 
 ## Copy Rules
 - Current button label for attack action may change; behavior remains the contract.

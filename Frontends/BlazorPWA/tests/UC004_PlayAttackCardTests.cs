@@ -186,5 +186,6 @@ public class UC004_PlayAttackCardTests : TestContext
         var tableCardText = cut.Find("section.table-zone .pair .card-face").TextContent;
         tableCardText.Should().Contain("A");
         tableCardText.Should().Contain("♥");
+        cut.Find("section.table-zone .pair .card-face").GetAttribute("data-visual-state").Should().BeNull();
     }
 }
