@@ -15,63 +15,46 @@
 .central-hud__timer {
     position: absolute;
     inset: -4px;
-    border-radius: 999px;
+    width: calc(100% + 8px);
+    height: calc(100% + 8px);
     pointer-events: none;
     z-index: 1;
-    --timer-progress: 360deg;
-    background: conic-gradient(
-        var(--timer-color) 0 var(--timer-progress),
-        transparent 0
-    );
-    -webkit-mask-image: conic-gradient(#000 0 var(--timer-progress), transparent 0);
-    mask-image: conic-gradient(#000 0 var(--timer-progress), transparent 0);
+}
+
+.central-hud__timer-path {
+    fill: none;
+    stroke-width: 4px;
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    vector-effect: non-scaling-stroke;
     animation:
-        central-hud-timer-progress var(--turn-timer-duration) linear forwards,
+        central-hud-timer-dash var(--turn-timer-duration) linear forwards,
         central-hud-timer-color var(--turn-timer-duration) linear forwards,
         central-hud-timer-pulse var(--turn-timer-duration) linear forwards;
 }
 
-@property --timer-progress {
-    syntax: "<angle>";
-    inherits: false;
-    initial-value: 360deg;
-}
-
-@property --timer-color {
-    syntax: "<color>";
-    inherits: false;
-    initial-value: #2563eb;
-}
-
-.central-hud__timer::after {
-    content: "";
-    position: absolute;
-    inset: 4px;
-    border-radius: 999px;
-    background: #f8fafc;
-}
-
-@keyframes central-hud-timer-progress {
+@keyframes central-hud-timer-dash {
     from {
-        --timer-progress: 360deg;
+        stroke-dashoffset: 0;
     }
     to {
-        --timer-progress: 0deg;
+        stroke-dashoffset: 1;
     }
 }
 
 @keyframes central-hud-timer-color {
     0%,
     50% {
-        --timer-color: var(--turn-timer-neutral);
+        stroke: var(--turn-timer-neutral);
     }
     50.01%,
     80% {
-        --timer-color: var(--turn-timer-warning);
+        stroke: var(--turn-timer-warning);
     }
     80.01%,
     100% {
-        --timer-color: var(--turn-timer-urgent);
+        stroke: var(--turn-timer-urgent);
     }
 }
 
