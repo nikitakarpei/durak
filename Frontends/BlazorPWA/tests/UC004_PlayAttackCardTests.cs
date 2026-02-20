@@ -57,7 +57,7 @@ public class UC004_PlayAttackCardTests : TestContext
     {
         var cut = RenderComponent<Game>();
 
-        cut.Find("section.hand button.card").Click();
+        cut.Find("section.hand button.card-face").Click();
 
         cut.Find("section.actions button").HasAttribute("disabled").Should().BeFalse();
     }
@@ -67,7 +67,7 @@ public class UC004_PlayAttackCardTests : TestContext
     {
         var cut = RenderComponent<Game>();
 
-        var cards = cut.FindAll("section.hand button.card");
+        var cards = cut.FindAll("section.hand button.card-face");
         cards[0].ClassList.Should().Contain("playable");
         cards[1].ClassList.Should().NotContain("playable");
     }
@@ -77,10 +77,10 @@ public class UC004_PlayAttackCardTests : TestContext
     {
         var cut = RenderComponent<Game>();
 
-        var card = cut.FindAll("section.hand button.card")[0];
+        var card = cut.FindAll("section.hand button.card-face")[0];
         card.Click();
 
-        cut.FindAll("section.hand button.card")[0].ClassList.Should().Contain("selected");
+        cut.FindAll("section.hand button.card-face")[0].ClassList.Should().Contain("selected");
     }
 
     [Fact]
@@ -88,11 +88,11 @@ public class UC004_PlayAttackCardTests : TestContext
     {
         var cut = RenderComponent<Game>();
 
-        var card = cut.FindAll("section.hand button.card")[0];
+        var card = cut.FindAll("section.hand button.card-face")[0];
         card.Click();
-        cut.FindAll("section.hand button.card")[0].Click();
+        cut.FindAll("section.hand button.card-face")[0].Click();
 
-        cut.FindAll("section.hand button.card")[0].ClassList.Should().NotContain("selected");
+        cut.FindAll("section.hand button.card-face")[0].ClassList.Should().NotContain("selected");
     }
 
     [Fact]
@@ -119,7 +119,7 @@ public class UC004_PlayAttackCardTests : TestContext
 
         var cut = RenderComponent<Game>();
 
-        cut.FindAll("section.hand button.card")[0].Click();
+        cut.FindAll("section.hand button.card-face")[0].Click();
 
         cut.FindAll("section.actions button")
             .First(b => b.TextContent.Contains("Play Attack"))
@@ -138,7 +138,7 @@ public class UC004_PlayAttackCardTests : TestContext
 
         var cut = RenderComponent<Game>();
 
-        cut.FindAll("section.hand button.card")[0].Click();
+        cut.FindAll("section.hand button.card-face")[0].Click();
         cut.FindAll("section.actions button")
             .First(b => b.TextContent.Contains("Play Attack"))
             .Click();
@@ -154,14 +154,14 @@ public class UC004_PlayAttackCardTests : TestContext
     {
         var cut = RenderComponent<Game>();
 
-        cut.FindAll("section.hand button.card")[0].ClassList.Should().Contain("playable");
+        cut.FindAll("section.hand button.card-face")[0].ClassList.Should().Contain("playable");
 
         // Simulate OpponentTurnStarted state update
         _gameState.YourPossibleMoves.Clear();
         cut.Render();
 
-        cut.FindAll("section.hand button.card")[0].ClassList.Should().NotContain("playable");
-        cut.FindAll("section.hand button.card")[1].ClassList.Should().NotContain("playable");
+        cut.FindAll("section.hand button.card-face")[0].ClassList.Should().NotContain("playable");
+        cut.FindAll("section.hand button.card-face")[1].ClassList.Should().NotContain("playable");
     }
 
     [Fact]
@@ -173,7 +173,7 @@ public class UC004_PlayAttackCardTests : TestContext
 
         var cut = RenderComponent<Game>();
 
-        cut.FindAll("section.hand button.card")[0].Click();
+        cut.FindAll("section.hand button.card-face")[0].Click();
         cut.FindAll("section.actions button")
             .First(b => b.TextContent.Contains("Play Attack"))
             .Click();
@@ -182,7 +182,9 @@ public class UC004_PlayAttackCardTests : TestContext
         _gameState.Table.Add(new TablePair(new Card("card-1", CardSuit.Hearts, CardRank.Ace), null));
         cut.Render();
 
-        cut.FindAll("section.hand button.card").Should().HaveCount(1);
-        cut.Find("section.table .pair .card").TextContent.Should().Contain("A♥");
+        cut.FindAll("section.hand button.card-face").Should().HaveCount(1);
+        var tableCardText = cut.Find("section.table .pair .card-face").TextContent;
+        tableCardText.Should().Contain("A");
+        tableCardText.Should().Contain("♥");
     }
 }

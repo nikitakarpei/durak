@@ -27,6 +27,7 @@
 ## Table Area
 1. Show all attack/defence pairs currently on table.
 2. If defence card is missing, show an empty defence slot.
+3. Table cards use the same face layout as hand cards: rank and suit are stacked with compact spacing.
 
 ## Hand Area
 1. Show player hand cards with rank and suit visible.

@@ -1,5 +1,4 @@
 @using BlazorPWA.State
-@using GameService.Api.Data
 
 <section class="hand" data-testid="hand-section">
     <div class="hand-rail">
@@ -10,12 +9,12 @@
                     var isSelected = SelectedCardId == card.Id;
                     var isPlayable = PlayableCardIds.Contains(card.Id);
                     var isBeatable = BeatableHandCardIds.Contains(card.Id);
-                    <button data-testid="@($"hand-card-{card.Id}")"
-                            class="card @(isSelected ? "selected" : "") @(isPlayable ? "playable" : "") @(isBeatable ? "beatable" : "") @SuitClass(card.Suit)"
-                            data-visual-state="@(GetVisualState(isSelected, isPlayable, isBeatable))"
-                            @onclick="() => OnCardSelected.InvokeAsync(card.Id)">
-                        <span class="card-rank">@RankToText(card.Rank)</span><span class="card-suit">@SuitToText(card.Suit)</span>
-                    </button>
+                    <CardFace Card="card"
+                              IsInteractive="true"
+                              TestId="@($"hand-card-{card.Id}")"
+                              StateClasses="@BuildStateClasses(isSelected, isPlayable, isBeatable)"
+                              VisualState="@(GetVisualState(isSelected, isPlayable, isBeatable))"
+                              OnClick="() => OnCardSelected.InvokeAsync(card.Id)" />
                 }
             </div>
         </div>
@@ -47,33 +46,24 @@
         return isInactive ? "inactive" : null;
     }
 
-    private static string RankToText(CardRank rank) => rank switch
+    private static string BuildStateClasses(bool isSelected, bool isPlayable, bool isBeatable)
     {
-        CardRank.Two => "2",
-        CardRank.Three => "3",
-        CardRank.Four => "4",
-        CardRank.Five => "5",
-        CardRank.Six => "6",
-        CardRank.Seven => "7",
-        CardRank.Eight => "8",
-        CardRank.Nine => "9",
-        CardRank.Ten => "10",
-        CardRank.Jack => "J",
-        CardRank.Queen => "Q",
-        CardRank.King => "K",
-        CardRank.Ace => "A",
-        _ => "?"
-    };
+        var classes = new List<string>();
+        if (isSelected)
+        {
+            classes.Add("selected");
+        }
 
-    private static string SuitToText(CardSuit suit) => suit switch
-    {
-        CardSuit.Clubs => "♣",
-        CardSuit.Diamonds => "♦",
-        CardSuit.Hearts => "♥",
-        CardSuit.Spades => "♠",
-        _ => "?"
-    };
+        if (isPlayable)
+        {
+            classes.Add("playable");
+        }
 
-    private static string SuitClass(CardSuit suit) =>
-        suit is CardSuit.Hearts or CardSuit.Diamonds ? "suit-red" : "";
+        if (isBeatable)
+        {
+            classes.Add("beatable");
+        }
+
+        return classes.Count > 0 ? string.Join(" ", classes) : string.Empty;
+    }
 }

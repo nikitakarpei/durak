@@ -23,6 +23,7 @@
 3. Selected card state.
 4. Playable/beatable highlight states.
 5. Non-playable card state when playable or beatable cards exist.
+6. Hand card face layout matches table cards with rank stacked above suit and compact spacing.
 
 ## Test Hooks
 - `data-testid='hand-section'`

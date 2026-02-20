@@ -1,0 +1,86 @@
+@using BlazorPWA.State
+@using GameService.Api.Data
+
+@if (IsInteractive)
+{
+    <button type="button"
+            class="@BuildCardClass()"
+            data-testid="@TestId"
+            data-visual-state="@VisualState"
+            @onclick="OnClick">
+        <span class="card-face__rank">@RankToText(Card.Rank)</span>
+        <span class="card-face__suit">@SuitToText(Card.Suit)</span>
+    </button>
+}
+else
+{
+    <div class="@BuildCardClass()"
+         data-testid="@TestId"
+         data-visual-state="@VisualState">
+        <span class="card-face__rank">@RankToText(Card.Rank)</span>
+        <span class="card-face__suit">@SuitToText(Card.Suit)</span>
+    </div>
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public Card Card { get; set; } = default!;
+
+    [Parameter]
+    public bool IsInteractive { get; set; }
+
+    [Parameter, EditorRequired]
+    public string TestId { get; set; } = string.Empty;
+
+    [Parameter]
+    public string? StateClasses { get; set; }
+
+    [Parameter]
+    public string? VisualState { get; set; }
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    private string BuildCardClass()
+    {
+        var classes = new List<string> { "card-face" };
+        if (Card.Suit is CardSuit.Hearts or CardSuit.Diamonds)
+        {
+            classes.Add("suit-red");
+        }
+
+        if (!string.IsNullOrWhiteSpace(StateClasses))
+        {
+            classes.Add(StateClasses);
+        }
+
+        return string.Join(" ", classes);
+    }
+
+    private static string RankToText(CardRank rank) => rank switch
+    {
+        CardRank.Two => "2",
+        CardRank.Three => "3",
+        CardRank.Four => "4",
+        CardRank.Five => "5",
+        CardRank.Six => "6",
+        CardRank.Seven => "7",
+        CardRank.Eight => "8",
+        CardRank.Nine => "9",
+        CardRank.Ten => "10",
+        CardRank.Jack => "J",
+        CardRank.Queen => "Q",
+        CardRank.King => "K",
+        CardRank.Ace => "A",
+        _ => "?"
+    };
+
+    private static string SuitToText(CardSuit suit) => suit switch
+    {
+        CardSuit.Clubs => "♣",
+        CardSuit.Diamonds => "♦",
+        CardSuit.Hearts => "♥",
+        CardSuit.Spades => "♠",
+        _ => "?"
+    };
+}

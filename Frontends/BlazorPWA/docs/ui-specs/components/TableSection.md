@@ -16,6 +16,7 @@
 3. Required accessibility semantics:
    - Open attack cards are actionable controls.
    - Defended attack cards are non-actionable content.
+4. Card face layout matches hand cards with rank stacked above suit and compact spacing.
 
 ## Required States
 1. Empty table (no pairs).

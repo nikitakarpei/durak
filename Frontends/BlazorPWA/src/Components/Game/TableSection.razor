@@ -1,5 +1,4 @@
 @using BlazorPWA.State
-@using GameService.Api.Data
 
 <section class="table" data-testid="table-section">
     @foreach (var pair in Pairs)
@@ -7,23 +6,22 @@
         <div class="pair @(pair.Defence is not null ? "beaten" : "")" data-testid="table-pair" data-attack-id="@pair.Attack.Id">
             @if (pair.Defence is null)
             {
-                <button data-testid="@($"table-attack-{pair.Attack.Id}")"
-                        class="card @(SelectedAttackCardId == pair.Attack.Id ? "selected" : "") @(BeatableAttackCardIds.Contains(pair.Attack.Id) ? "beatable" : "") @SuitClass(pair.Attack.Suit)"
-                        @onclick="() => OnAttackCardSelected.InvokeAsync(pair.Attack.Id)">
-                    <span class="card-rank">@RankToText(pair.Attack.Rank)</span><span class="card-suit">@SuitToText(pair.Attack.Suit)</span>
-                </button>
+                <CardFace Card="pair.Attack"
+                          IsInteractive="true"
+                          TestId="@($"table-attack-{pair.Attack.Id}")"
+                          StateClasses="@BuildAttackStateClasses(pair.Attack.Id)"
+                          OnClick="() => OnAttackCardSelected.InvokeAsync(pair.Attack.Id)" />
             }
             else
             {
-                <div data-testid="@($"table-attack-{pair.Attack.Id}")" class="card @SuitClass(pair.Attack.Suit)">
-                    <span class="card-rank">@RankToText(pair.Attack.Rank)</span><span class="card-suit">@SuitToText(pair.Attack.Suit)</span>
-                </div>
+                <CardFace Card="pair.Attack"
+                          TestId="@($"table-attack-{pair.Attack.Id}")" />
             }
             @if (pair.Defence is not null)
             {
-                <div data-testid="@($"table-defence-{pair.Attack.Id}")" class="card defence @SuitClass(pair.Defence.Suit)">
-                    <span class="card-rank">@RankToText(pair.Defence.Rank)</span><span class="card-suit">@SuitToText(pair.Defence.Suit)</span>
-                </div>
+                <CardFace Card="pair.Defence"
+                          TestId="@($"table-defence-{pair.Attack.Id}")"
+                          StateClasses="defence" />
             }
         </div>
     }
@@ -42,33 +40,19 @@
     [Parameter]
     public EventCallback<string> OnAttackCardSelected { get; set; }
 
-    private static string RankToText(CardRank rank) => rank switch
+    private string BuildAttackStateClasses(string attackId)
     {
-        CardRank.Two => "2",
-        CardRank.Three => "3",
-        CardRank.Four => "4",
-        CardRank.Five => "5",
-        CardRank.Six => "6",
-        CardRank.Seven => "7",
-        CardRank.Eight => "8",
-        CardRank.Nine => "9",
-        CardRank.Ten => "10",
-        CardRank.Jack => "J",
-        CardRank.Queen => "Q",
-        CardRank.King => "K",
-        CardRank.Ace => "A",
-        _ => "?"
-    };
+        var classes = new List<string>();
+        if (SelectedAttackCardId == attackId)
+        {
+            classes.Add("selected");
+        }
 
-    private static string SuitToText(CardSuit suit) => suit switch
-    {
-        CardSuit.Clubs => "♣",
-        CardSuit.Diamonds => "♦",
-        CardSuit.Hearts => "♥",
-        CardSuit.Spades => "♠",
-        _ => "?"
-    };
+        if (BeatableAttackCardIds.Contains(attackId))
+        {
+            classes.Add("beatable");
+        }
 
-    private static string SuitClass(CardSuit suit) =>
-        suit is CardSuit.Hearts or CardSuit.Diamonds ? "suit-red" : "";
+        return classes.Count > 0 ? string.Join(" ", classes) : string.Empty;
+    }
 }

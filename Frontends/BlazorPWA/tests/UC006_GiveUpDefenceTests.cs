@@ -91,9 +91,9 @@ public class UC006_GiveUpDefenceTests : TestContext
         _gameState.Table.Clear();
         cut.Render();
 
-        var handCards = cut.FindAll("section.hand button.card");
+        var handCards = cut.FindAll("section.hand button.card-face");
         handCards.Should().HaveCount(2);
-        handCards.Select(c => c.TextContent).Should().Contain(s => s.Contains("6♣"));
-        handCards.Select(c => c.TextContent).Should().Contain(s => s.Contains("7♥"));
+        handCards.Select(c => c.TextContent).Should().Contain(s => s.Contains("6") && s.Contains("♣"));
+        handCards.Select(c => c.TextContent).Should().Contain(s => s.Contains("7") && s.Contains("♥"));
     }
 }

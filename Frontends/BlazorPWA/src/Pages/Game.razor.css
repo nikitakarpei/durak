@@ -187,47 +187,13 @@
     overflow: visible;
 }
 
-::deep .pair.beaten .card.defence {
+::deep .pair.beaten .card-face.defence {
     position: absolute;
     top: 10px;
     left: 10px;
     transform: rotate(20deg);
     z-index: 1;
 }
-
-::deep .card {
-    background: #fff;
-    border-radius: 10px;
-    border: 1.5px solid #d1d5db;
-    width: 62px;
-    height: 87px;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 7px 8px;
-    gap: 3px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.10), 0 1px 2px rgba(0, 0, 0, 0.06);
-}
-
-::deep .card-rank {
-    font-size: 1rem;
-    font-weight: 700;
-    line-height: 1;
-    color: #1b1f2a;
-}
-
-::deep .card-suit {
-    font-size: 1.05rem;
-    line-height: 1;
-    color: #1b1f2a;
-}
-
-::deep .card.suit-red .card-rank,
-::deep .card.suit-red .card-suit {
-    color: #dc2626;
-}
-
 
 ::deep .hand {
     overflow: visible;
@@ -248,11 +214,11 @@
     justify-content: center;
 }
 
-::deep .hand-cards .card + .card {
+::deep .hand-cards .card-face + .card-face {
     margin-inline-start: -22px;
 }
 
-::deep .hand .card {
+::deep .hand .card-face {
     position: relative;
     z-index: 1;
     cursor: pointer;
@@ -260,24 +226,24 @@
     transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, opacity 0.15s ease, z-index 0s;
 }
 
-::deep .hand .card:hover {
+::deep .hand .card-face:hover {
     z-index: 5;
     transform: translateY(calc(-1 * var(--hand-hover-lift, 8px)));
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
 /* Beatable table attack cards: green border to highlight the target */
-::deep .table .card.beatable {
+::deep .table .card-face.beatable {
     border-color: #86efac;
 }
 
 /* Dim cards that are not active when a turn is in progress */
-::deep .hand .card[data-visual-state='inactive'] {
+::deep .hand .card-face[data-visual-state='inactive'] {
     filter: grayscale(0.7) saturate(0.35) brightness(0.92);
 }
 
 
-::deep .hand .card.selected {
+::deep .hand .card-face.selected {
     z-index: 10;
     border-color: #4f46e5;
     background: #eef2ff;
@@ -285,21 +251,21 @@
     box-shadow: 0 8px 20px rgba(79, 70, 229, 0.30);
 }
 
-::deep .hand .card.selected .card-rank,
-::deep .hand .card.selected .card-suit {
+::deep .hand .card-face.selected .card-face__rank,
+::deep .hand .card-face.selected .card-face__suit {
     color: #4f46e5;
 }
 
-.hand .card.selected.suit-red .card-rank,
-.hand .card.selected.suit-red .card-suit {
+.hand .card-face.selected.suit-red .card-face__rank,
+.hand .card-face.selected.suit-red .card-face__suit {
     color: #dc2626;
 }
 
-::deep .table .card {
+::deep .table .card-face {
     cursor: pointer;
 }
 
-::deep .table .card.selected {
+::deep .table .card-face.selected {
     border-color: #4f46e5;
     background: #eef2ff;
     box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
