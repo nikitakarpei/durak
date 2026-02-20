@@ -28,6 +28,7 @@
 1. Show all attack/defence pairs currently on table.
 2. If defence card is missing, show an empty defence slot.
 3. Table cards use the same face layout as hand cards: rank and suit are stacked with compact spacing.
+4. When the player has no available moves, table cards are non-interactive.
 
 ## Hand Area
 1. Show player hand cards with rank and suit visible.
@@ -35,6 +36,7 @@
 3. Current suit color rule: Hearts/Diamonds are red, Spades/Clubs are dark.
 4. When playable or beatable hand cards are highlighted, non-playable hand cards keep the same visual styling.
 5. Hovered or selected hand cards can lift upward without being clipped by the hand container.
+6. When the player has no available moves, hand cards are non-interactive.
 
 ## Actions Area
 1. Show action controls based on available moves in current state.

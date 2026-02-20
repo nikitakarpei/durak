@@ -10,7 +10,7 @@
                     var isPlayable = PlayableCardIds.Contains(card.Id);
                     var isBeatable = BeatableHandCardIds.Contains(card.Id);
                     <CardFace Card="card"
-                              IsInteractive="true"
+                              IsInteractive="IsInteractionEnabled"
                               TestId="@($"hand-card-{card.Id}")"
                               StateClasses="@BuildStateClasses(isSelected, isPlayable, isBeatable)"
                               VisualState="@GetVisualState(card.Id, isSelected, isBeatable)"
@@ -36,6 +36,9 @@
 
     [Parameter]
     public bool HasSelectedAttackCard { get; set; }
+
+    [Parameter]
+    public bool IsInteractionEnabled { get; set; } = true;
 
     [Parameter]
     public EventCallback<string> OnCardSelected { get; set; }
@@ -85,6 +88,11 @@
 
     private async Task HandleHandClick(string cardId)
     {
+        if (!IsInteractionEnabled)
+        {
+            return;
+        }
+
         var isBeatable = BeatableHandCardIds.Contains(cardId);
         if (HasSelectedAttackCard && !isBeatable)
         {

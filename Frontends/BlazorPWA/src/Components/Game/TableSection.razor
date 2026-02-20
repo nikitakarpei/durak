@@ -1,7 +1,7 @@
 @using BlazorPWA.State
 
 <section class="table-zone" data-testid="table-section">
-    @if (CanPlayAttack && HasSelectedHandCard)
+    @if (IsInteractionEnabled && CanPlayAttack && HasSelectedHandCard)
     {
         <button type="button"
                 class="table-play-target"
@@ -15,7 +15,7 @@
             @if (pair.Defence is null)
             {
                 <CardFace Card="pair.Attack"
-                          IsInteractive="true"
+                          IsInteractive="IsInteractionEnabled"
                           TestId="@($"table-attack-{pair.Attack.Id}")"
                           StateClasses="@BuildAttackStateClasses(pair.Attack.Id)"
                           VisualState="@GetVisualState(pair.Attack.Id)"
@@ -51,6 +51,9 @@
 
     [Parameter]
     public bool CanPlayAttack { get; set; }
+
+    [Parameter]
+    public bool IsInteractionEnabled { get; set; } = true;
 
     [Parameter]
     public EventCallback<string> OnAttackCardSelected { get; set; }
@@ -98,6 +101,11 @@
 
     private async Task HandleAttackClick(string attackId)
     {
+        if (!IsInteractionEnabled)
+        {
+            return;
+        }
+
         var isBeatable = BeatableAttackCardIds.Contains(attackId);
         if (HasSelectedHandCard && !isBeatable)
         {

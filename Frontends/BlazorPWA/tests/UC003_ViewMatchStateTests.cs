@@ -177,6 +177,20 @@ public class UC003_ViewMatchStateTests : TestContext
     }
 
     [Fact]
+    public void Given_NoPossibleMoves_When_MatchRenders_Then_HandAndTableCardsAreNonInteractive()
+    {
+        _gameState.YourHand.Add(new Card("h1", CardSuit.Hearts, CardRank.Queen));
+        _gameState.Table.Add(new TablePair(new Card("atk-1", CardSuit.Spades, CardRank.Seven), null));
+
+        var cut = RenderComponent<Game>();
+
+        cut.FindAll("section.hand button.card-face").Should().BeEmpty();
+        cut.FindAll("section.table-zone button.card-face").Should().BeEmpty();
+        cut.Find("[data-testid='hand-card-h1']").TagName.Should().Be("DIV");
+        cut.Find("[data-testid='table-attack-atk-1']").TagName.Should().Be("DIV");
+    }
+
+    [Fact]
     public void Given_CardsDealtEvent_When_ReducerApplies_Then_TalonCountDecreases()
     {
         _gameState.TalonCount = 20;

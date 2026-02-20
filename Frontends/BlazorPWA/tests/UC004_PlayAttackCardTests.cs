@@ -128,8 +128,9 @@ public class UC004_PlayAttackCardTests : TestContext
         _gameState.YourPossibleMoves.Clear();
         cut.Render();
 
-        cut.FindAll("section.hand button.card-face")[0].ClassList.Should().NotContain("playable");
-        cut.FindAll("section.hand button.card-face")[1].ClassList.Should().NotContain("playable");
+        cut.FindAll("section.hand button.card-face").Should().BeEmpty();
+        cut.Find("[data-testid='hand-card-card-1']").ClassList.Should().NotContain("playable");
+        cut.Find("[data-testid='hand-card-card-2']").ClassList.Should().NotContain("playable");
     }
 
     [Fact]

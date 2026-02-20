@@ -13,6 +13,7 @@
    - `PlayableCardIds` (`IReadOnlySet<string>`) for currently playable cards.
    - `BeatableHandCardIds` (`IReadOnlySet<string>`) for currently beatable hand cards.
    - `HasSelectedAttackCard` (`bool`) indicating whether the player has selected a table attack card.
+   - `IsInteractionEnabled` (`bool`) indicating whether hand cards are selectable.
 2. Outputs:
    - `OnCardSelected(string)` when user selects a hand card.
 3. Required accessibility semantics:
@@ -25,6 +26,7 @@
 4. Playable/beatable highlight states.
 5. Hand card face layout matches table cards with rank stacked above suit and compact spacing.
 6. When a table attack card is selected, non-beatable and non-selected hand cards are visually faded.
+7. When `IsInteractionEnabled` is false, hand cards are non-interactive and ignore clicks.
 
 ## Test Hooks
 - `data-testid='hand-section'`
