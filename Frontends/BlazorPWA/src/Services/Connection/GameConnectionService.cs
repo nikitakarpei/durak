@@ -41,12 +41,13 @@ public sealed class GameConnectionService : IGameConnectionService
     public async Task ConnectAsync(string gameId, string customId, CancellationToken cancellationToken)
     {
         ResetError();
+        _state.GameId = gameId;
         Status = ConnectionStatus.Connecting;
+        IsReplayingHistory = true;
         NotifyStateChanged();
 
         try
         {
-            _state.GameId = gameId;
 
             var identityEndpoint = new Uri(_settings.Services.PlayerIdentityServiceUrl);
             var identityClient = _identityClientFactory(identityEndpoint);
@@ -83,6 +84,7 @@ public sealed class GameConnectionService : IGameConnectionService
         catch (Exception ex)
         {
             _state.GameId = string.Empty;
+            IsReplayingHistory = false;
             Status = ConnectionStatus.Error;
             ErrorMessage = ex.Message;
             NotifyStateChanged();
@@ -152,9 +154,6 @@ public sealed class GameConnectionService : IGameConnectionService
         TaskCompletionSource oldEventsEnded,
         CancellationToken cancellationToken)
     {
-        IsReplayingHistory = true;
-        NotifyStateChanged();
-
         try
         {
             await foreach (var response in _gameClient!.GetGameEventsAsync(gameId, cancellationToken))
