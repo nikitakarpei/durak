@@ -31,6 +31,12 @@
         central-hud-timer-pulse var(--turn-timer-duration) linear forwards;
 }
 
+@property --timer-progress {
+    syntax: "<angle>";
+    inherits: false;
+    initial-value: 360deg;
+}
+
 .central-hud__timer::after {
     content: "";
     position: absolute;
