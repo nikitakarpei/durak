@@ -12,9 +12,10 @@
 6. When the player is defender and it is their turn, the role slot shows a shield icon.
 7. When the player is attacker and it is their turn, the role slot shows a crossed swords icon.
 8. When the player is not the active player, the role slot is empty.
-9. The three HUD sections (trump, role, deck) are equal width.
-10. The central HUD sits directly below the opponent top zone and does not overlap any opponent seat.
-11. The central HUD width stays stable across roles and must not grow or shrink based on the presence or absence of action buttons — its height must be determined solely by its own content.
+9. When the player is not active, the HUD shows only the trump and deck sections.
+10. When the role slot is visible, the three HUD sections (trump, role, deck) are equal width.
+11. The central HUD sits directly below the opponent top zone and does not overlap any opponent seat.
+12. The central HUD width stays stable across roles and must not grow or shrink based on the presence or absence of action buttons — its height must be determined solely by its own content.
 
 ## Opponents Area
 1. Show all configured opponent seats, including unoccupied seats.
