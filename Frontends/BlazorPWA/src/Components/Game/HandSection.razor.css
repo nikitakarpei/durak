@@ -1,4 +1,5 @@
 .hand {
+    --card-selected-lift: 14px;
     overflow: visible;
 }
 

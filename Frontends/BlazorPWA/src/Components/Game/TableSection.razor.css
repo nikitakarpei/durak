@@ -1,4 +1,5 @@
 .table-zone {
+    --card-selected-lift: 0px;
     flex: 1;
     min-height: 180px;
     display: flex;
