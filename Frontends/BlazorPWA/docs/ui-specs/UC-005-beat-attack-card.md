@@ -17,6 +17,7 @@
 3. Submitting defence sends both selected identifiers.
 4. If either selection is missing, submitting defence does not send a move.
 5. If access token is unavailable, submitting defence does not send a move.
+6. After a table attack card is selected, hand cards that can beat it show a subtle green border.
 
 ## Layout and Responsive Rules
 1. Table attack cards and hand cards remain independently selectable in mobile-first layout.

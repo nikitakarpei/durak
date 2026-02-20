@@ -237,6 +237,10 @@
     border-color: #86efac;
 }
 
+::deep .hand .card-face.beatable {
+    border-color: #86efac;
+}
+
 /* Dim cards that are not active when a turn is in progress */
 ::deep .hand .card-face.selected {
     z-index: 10;
