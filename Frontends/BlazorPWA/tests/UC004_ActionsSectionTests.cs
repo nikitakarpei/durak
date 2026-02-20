@@ -11,7 +11,6 @@ public class UC004_ActionsSectionTests : TestContext
     {
         var cut = RenderComponent<ActionsSection>(parameters => parameters
             .Add(p => p.CanPlayAttack, false)
-            .Add(p => p.CanBeatAttack, false)
             .Add(p => p.CanGiveUpDefence, false));
 
         cut.FindAll("[data-testid='actions-section'] button").Should().BeEmpty();

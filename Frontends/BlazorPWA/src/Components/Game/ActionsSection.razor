@@ -3,10 +3,6 @@
     {
         <button data-testid="play-attack-button" @onclick="OnPlayAttack" disabled="@(!IsPlayAttackEnabled)">Play Attack</button>
     }
-    @if (CanBeatAttack)
-    {
-        <button data-testid="beat-attack-button" @onclick="OnBeatAttack" disabled="@(!IsBeatAttackEnabled)">Beat Attack</button>
-    }
     @if (CanGiveUpDefence)
     {
         <button data-testid="give-up-defence-button" @onclick="OnGiveUpDefence">Give Up Defence</button>
@@ -18,22 +14,13 @@
     public bool CanPlayAttack { get; set; }
 
     [Parameter]
-    public bool CanBeatAttack { get; set; }
-
-    [Parameter]
     public bool CanGiveUpDefence { get; set; }
 
     [Parameter]
     public bool IsPlayAttackEnabled { get; set; }
 
     [Parameter]
-    public bool IsBeatAttackEnabled { get; set; }
-
-    [Parameter]
     public EventCallback OnPlayAttack { get; set; }
-
-    [Parameter]
-    public EventCallback OnBeatAttack { get; set; }
 
     [Parameter]
     public EventCallback OnGiveUpDefence { get; set; }

@@ -9,13 +9,10 @@
 ## Public UI Contract
 1. Inputs:
    - `CanPlayAttack` (whether Play Attack action is visible)
-   - `CanBeatAttack` (whether Beat Attack action is visible)
    - `CanGiveUpDefence` (whether Give Up Defence action is visible)
    - `IsPlayAttackEnabled` (whether Play Attack action is enabled)
-   - `IsBeatAttackEnabled` (whether Beat Attack action is enabled)
 2. Outputs:
    - `OnPlayAttack()`
-   - `OnBeatAttack()`
    - `OnGiveUpDefence()`
 3. Required accessibility semantics:
    - Action buttons expose disabled/enabled state semantically.
@@ -23,13 +20,11 @@
 ## Required States
 1. No available moves (no buttons shown).
 2. Attack-only move available (Play Attack visible; enabled depends on selection).
-3. Beat-only move available (Beat Attack visible; enabled depends on selections).
-4. Give-up move available (Give Up Defence visible).
+3. Give-up move available (Give Up Defence visible).
 
 ## Test Hooks
 - `data-testid='actions-section'`
 - `data-testid='play-attack-button'`
-- `data-testid='beat-attack-button'`
 - `data-testid='give-up-defence-button'`
 
 ## Out of Scope

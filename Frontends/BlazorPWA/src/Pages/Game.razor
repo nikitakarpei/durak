@@ -52,12 +52,9 @@
 
             <ActionsSection
                 CanPlayAttack="@State.YourPossibleMoves.Any(m => m.Type == PossibleMoveType.PlayAttackCard)"
-                CanBeatAttack="@State.YourPossibleMoves.Any(m => m.Type == PossibleMoveType.BeatAttackCard)"
                 CanGiveUpDefence="@State.YourPossibleMoves.Any(m => m.Type == PossibleMoveType.GiveUpDefence)"
                 IsPlayAttackEnabled="@(!string.IsNullOrWhiteSpace(selectedCardId))"
-                IsBeatAttackEnabled="@(!string.IsNullOrWhiteSpace(selectedCardId) && !string.IsNullOrWhiteSpace(selectedAttackCardId))"
                 OnPlayAttack="PlayAttackAsync"
-                OnBeatAttack="BeatAttackAsync"
                 OnGiveUpDefence="GiveUpAsync" />
         </section>
     }
@@ -251,14 +248,16 @@
             .ToHashSet();
     }
 
-    private void SelectCard(string cardId)
+    private async Task SelectCard(string cardId)
     {
         selectedCardId = selectedCardId == cardId ? null : cardId;
+        await TrySubmitBeatAsync();
     }
 
-    private void SelectAttackCard(string cardId)
+    private async Task SelectAttackCard(string cardId)
     {
         selectedAttackCardId = selectedAttackCardId == cardId ? null : cardId;
+        await TrySubmitBeatAsync();
     }
 
     private Task PlayAttackAsync()
@@ -279,6 +278,29 @@
         }
 
         return Connection.BeatAttackCardAsync(Connection.AccessToken, selectedAttackCardId, selectedCardId, CancellationToken.None);
+    }
+
+    private async Task TrySubmitBeatAsync()
+    {
+        if (string.IsNullOrWhiteSpace(selectedCardId) || string.IsNullOrWhiteSpace(selectedAttackCardId))
+        {
+            return;
+        }
+
+        var hasMove = State.YourPossibleMoves.Any(m =>
+            m.Type == PossibleMoveType.BeatAttackCard &&
+            m.YourCardId == selectedCardId &&
+            m.TargetCardId == selectedAttackCardId);
+
+        if (!hasMove)
+        {
+            return;
+        }
+
+        await BeatAttackAsync();
+
+        selectedCardId = null;
+        selectedAttackCardId = null;
     }
 
     private Task GiveUpAsync()

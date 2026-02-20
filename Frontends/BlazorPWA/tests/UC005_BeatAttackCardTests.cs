@@ -35,52 +35,11 @@ public class UC005_BeatAttackCardTests : TestContext
     }
 
     [Fact]
-    public void WhenOnlyBeatAttackMovesAvailable_OnlyBeatAttackButtonVisible()
+    public void WhenOnlyBeatAttackMovesAvailable_NoActionButtonsVisible()
     {
         var cut = RenderComponent<Game>();
 
-        var buttons = cut.FindAll("section.actions button");
-        buttons.Should().HaveCount(1);
-        buttons[0].TextContent.Should().Contain("Beat Attack");
-    }
-
-    [Fact]
-    public void WhenNeitherCardSelected_BeatAttackButtonIsDisabled()
-    {
-        var cut = RenderComponent<Game>();
-
-        cut.Find("section.actions button").HasAttribute("disabled").Should().BeTrue();
-    }
-
-    [Fact]
-    public void WhenOnlyHandCardSelected_BeatAttackButtonIsDisabled()
-    {
-        var cut = RenderComponent<Game>();
-
-        cut.Find("section.hand button.card-face").Click();
-
-        cut.Find("section.actions button").HasAttribute("disabled").Should().BeTrue();
-    }
-
-    [Fact]
-    public void WhenOnlyAttackCardSelected_BeatAttackButtonIsDisabled()
-    {
-        var cut = RenderComponent<Game>();
-
-        cut.Find("section.table-zone button.card-face").Click();
-
-        cut.Find("section.actions button").HasAttribute("disabled").Should().BeTrue();
-    }
-
-    [Fact]
-    public void WhenBothCardsSelected_BeatAttackButtonIsEnabled()
-    {
-        var cut = RenderComponent<Game>();
-
-        cut.Find("section.table-zone button.card-face").Click();
-        cut.Find("section.hand button.card-face").Click();
-
-        cut.Find("section.actions button").HasAttribute("disabled").Should().BeFalse();
+        cut.FindAll("section.actions button").Should().BeEmpty();
     }
 
     [Fact]
@@ -108,10 +67,6 @@ public class UC005_BeatAttackCardTests : TestContext
 
         cut.Find("section.table-zone button.card-face").Click();
 
-        cut.FindAll("section.actions button")
-            .First(b => b.TextContent.Contains("Beat Attack"))
-            .Click();
-
         _connectionMock.Verify(
             c => c.BeatAttackCardAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
             Times.Never
@@ -130,10 +85,6 @@ public class UC005_BeatAttackCardTests : TestContext
         cut.Find("section.table-zone button.card-face").Click();
         cut.Find("section.hand button.card-face").Click();
 
-        cut.FindAll("section.actions button")
-            .First(b => b.TextContent.Contains("Beat Attack"))
-            .Click();
-
         _connectionMock.Verify(
             c => c.BeatAttackCardAsync("token-abc", "atk-1", "def-1", It.IsAny<CancellationToken>()),
             Times.Once
@@ -149,9 +100,6 @@ public class UC005_BeatAttackCardTests : TestContext
 
         cut.Find("section.table-zone button.card-face").Click();
         cut.Find("section.hand button.card-face").Click();
-        cut.FindAll("section.actions button")
-            .First(b => b.TextContent.Contains("Beat Attack"))
-            .Click();
 
         _connectionMock.Verify(
             c => c.BeatAttackCardAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
@@ -227,9 +175,6 @@ public class UC005_BeatAttackCardTests : TestContext
 
         cut.Find("section.table-zone button.card-face").Click();
         cut.Find("section.hand button.card-face").Click();
-        cut.FindAll("section.actions button")
-            .First(b => b.TextContent.Contains("Beat Attack"))
-            .Click();
 
         _gameState.Table[0] = _gameState.Table[0] with { Defence = new Card("def-1", CardSuit.Spades, CardRank.Nine) };
         _gameState.YourHand.RemoveAll(c => c.Id == "def-1");
