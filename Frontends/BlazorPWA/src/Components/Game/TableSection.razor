@@ -1,6 +1,14 @@
 @using BlazorPWA.State
 
 <section class="table-zone" data-testid="table-section">
+    @if (CanPlayAttack && HasSelectedHandCard)
+    {
+        <button type="button"
+                class="table-play-target"
+                data-testid="table-play-target"
+                aria-label="Play attack"
+                @onclick="OnPlayAttack"></button>
+    }
     @foreach (var pair in Pairs)
     {
         <div class="pair @(pair.Defence is not null ? "beaten" : "")" data-testid="table-pair" data-attack-id="@pair.Attack.Id">
@@ -42,7 +50,13 @@
     public bool HasSelectedHandCard { get; set; }
 
     [Parameter]
+    public bool CanPlayAttack { get; set; }
+
+    [Parameter]
     public EventCallback<string> OnAttackCardSelected { get; set; }
+
+    [Parameter]
+    public EventCallback OnPlayAttack { get; set; }
 
     private readonly ShakeState shakeState = new();
 

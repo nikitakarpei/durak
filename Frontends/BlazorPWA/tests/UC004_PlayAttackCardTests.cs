@@ -35,35 +35,59 @@ public class UC004_PlayAttackCardTests : TestContext
     }
 
     [Fact]
-    public void WhenOnlyPlayAttackMovesAvailable_OnlyPlayAttackButtonVisible()
+    public void Given_PlayAttackMoveAvailableAndNoSelection_When_GameRenders_Then_TablePlayTargetHidden()
     {
         var cut = RenderComponent<Game>();
 
-        var buttons = cut.FindAll("section.actions button");
-        buttons.Should().HaveCount(1);
-        buttons[0].TextContent.Should().Contain("Play Attack");
+        cut.FindAll("[data-testid='table-play-target']").Should().BeEmpty();
     }
 
     [Fact]
-    public void WhenNoCardSelected_PlayAttackButtonIsDisabled()
-    {
-        var cut = RenderComponent<Game>();
-
-        cut.Find("section.actions button").HasAttribute("disabled").Should().BeTrue();
-    }
-
-    [Fact]
-    public void WhenCardSelected_PlayAttackButtonIsEnabled()
+    public void Given_PlayAttackMoveAvailableAndSelection_When_GameRenders_Then_TablePlayTargetVisible()
     {
         var cut = RenderComponent<Game>();
 
         cut.Find("section.hand button.card-face").Click();
 
-        cut.Find("section.actions button").HasAttribute("disabled").Should().BeFalse();
+        cut.FindAll("[data-testid='table-play-target']").Should().HaveCount(1);
     }
 
     [Fact]
-    public void PlayableCardsHavePlayableCssClass()
+    public void Given_PlayAttackMoveAvailableAndSelection_When_TablePlayTargetClicked_Then_MoveIsSent()
+    {
+        _connectionMock
+            .Setup(c => c.PlayAttackCardAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        var cut = RenderComponent<Game>();
+
+        cut.Find("section.hand button.card-face").Click();
+        cut.Find("[data-testid='table-play-target']").Click();
+
+        _connectionMock.Verify(
+            c => c.PlayAttackCardAsync("token-abc", "card-1", It.IsAny<CancellationToken>()),
+            Times.Once
+        );
+    }
+
+    [Fact]
+    public void Given_PlayAttackMoveAvailableAndSelection_When_NoAccessToken_Then_MoveIsNotSent()
+    {
+        _connectionMock.SetupGet(c => c.AccessToken).Returns((string?)null);
+
+        var cut = RenderComponent<Game>();
+
+        cut.Find("section.hand button.card-face").Click();
+        cut.Find("[data-testid='table-play-target']").Click();
+
+        _connectionMock.Verify(
+            c => c.PlayAttackCardAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Never
+        );
+    }
+
+    [Fact]
+    public void Given_PlayAttackMoveAvailable_When_GameRenders_Then_PlayableHandCardsAreMarked()
     {
         var cut = RenderComponent<Game>();
 
@@ -73,90 +97,34 @@ public class UC004_PlayAttackCardTests : TestContext
     }
 
     [Fact]
-    public void ClickingHandCardAddsSelectedClass()
+    public void Given_HandCardSelected_When_Clicked_Then_SelectedClassIsApplied()
     {
         var cut = RenderComponent<Game>();
 
-        var card = cut.FindAll("section.hand button.card-face")[0];
+        cut.Find("section.hand button.card-face").Click();
+
+        cut.Find("section.hand button.card-face").ClassList.Should().Contain("selected");
+    }
+
+    [Fact]
+    public void Given_HandCardSelected_When_ClickedAgain_Then_SelectedClassIsRemoved()
+    {
+        var cut = RenderComponent<Game>();
+
+        var card = cut.Find("section.hand button.card-face");
+        card.Click();
         card.Click();
 
-        cut.FindAll("section.hand button.card-face")[0].ClassList.Should().Contain("selected");
+        cut.Find("section.hand button.card-face").ClassList.Should().NotContain("selected");
     }
 
     [Fact]
-    public void ClickingSameCardAgainRemovesSelectedClass()
-    {
-        var cut = RenderComponent<Game>();
-
-        var card = cut.FindAll("section.hand button.card-face")[0];
-        card.Click();
-        cut.FindAll("section.hand button.card-face")[0].Click();
-
-        cut.FindAll("section.hand button.card-face")[0].ClassList.Should().NotContain("selected");
-    }
-
-    [Fact]
-    public void PlayAttackWithNoCardSelected_NotCalled()
-    {
-        var cut = RenderComponent<Game>();
-
-        cut.FindAll("section.actions button")
-            .FirstOrDefault(b => b.TextContent.Contains("Play Attack"))
-            ?.Click();
-
-        _connectionMock.Verify(
-            c => c.PlayAttackCardAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
-            Times.Never
-        );
-    }
-
-    [Fact]
-    public void PlayAttackWithCardSelected_CalledWithCorrectId()
-    {
-        _connectionMock
-            .Setup(c => c.PlayAttackCardAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
-            .Returns(Task.CompletedTask);
-
-        var cut = RenderComponent<Game>();
-
-        cut.FindAll("section.hand button.card-face")[0].Click();
-
-        cut.FindAll("section.actions button")
-            .First(b => b.TextContent.Contains("Play Attack"))
-            .Click();
-
-        _connectionMock.Verify(
-            c => c.PlayAttackCardAsync("token-abc", "card-1", It.IsAny<CancellationToken>()),
-            Times.Once
-        );
-    }
-
-    [Fact]
-    public void PlayAttackWithNoAccessToken_NotCalled()
-    {
-        _connectionMock.SetupGet(c => c.AccessToken).Returns((string?)null);
-
-        var cut = RenderComponent<Game>();
-
-        cut.FindAll("section.hand button.card-face")[0].Click();
-        cut.FindAll("section.actions button")
-            .First(b => b.TextContent.Contains("Play Attack"))
-            .Click();
-
-        _connectionMock.Verify(
-            c => c.PlayAttackCardAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
-            Times.Never
-        );
-    }
-
-    [Fact]
-    public void AfterOpponentTurnStarts_HandCardsLosePlayableClass()
+    public void Given_OpponentTurnStarts_When_StateUpdates_Then_HandCardsLosePlayableClass()
     {
         var cut = RenderComponent<Game>();
 
         cut.FindAll("section.hand button.card-face")[0].ClassList.Should().Contain("playable");
 
-        // Simulate OpponentTurnStarted state update
         _gameState.YourPossibleMoves.Clear();
         cut.Render();
 
@@ -165,7 +133,7 @@ public class UC004_PlayAttackCardTests : TestContext
     }
 
     [Fact]
-    public void AfterStateUpdate_PlayedCardMovesFromHandToTable()
+    public void Given_PlayAttackMoveSent_When_StateUpdates_Then_PlayedCardMovesFromHandToTable()
     {
         _connectionMock
             .Setup(c => c.PlayAttackCardAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
@@ -173,10 +141,8 @@ public class UC004_PlayAttackCardTests : TestContext
 
         var cut = RenderComponent<Game>();
 
-        cut.FindAll("section.hand button.card-face")[0].Click();
-        cut.FindAll("section.actions button")
-            .First(b => b.TextContent.Contains("Play Attack"))
-            .Click();
+        cut.Find("section.hand button.card-face").Click();
+        cut.Find("[data-testid='table-play-target']").Click();
 
         _gameState.YourHand.RemoveAll(c => c.Id == "card-1");
         _gameState.Table.Add(new TablePair(new Card("card-1", CardSuit.Hearts, CardRank.Ace), null));

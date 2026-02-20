@@ -40,7 +40,9 @@
                 SelectedAttackCardId="@selectedAttackCardId"
                 BeatableAttackCardIds="@GetBeatableAttackCardIds()"
                 HasSelectedHandCard="@(!string.IsNullOrWhiteSpace(selectedCardId))"
-                OnAttackCardSelected="SelectAttackCard" />
+                CanPlayAttack="@State.YourPossibleMoves.Any(m => m.Type == PossibleMoveType.PlayAttackCard)"
+                OnAttackCardSelected="SelectAttackCard"
+                OnPlayAttack="PlayAttackAsync" />
 
             <HandSection
                 Cards="@State.YourHand"
@@ -51,10 +53,7 @@
                 OnCardSelected="SelectCard" />
 
             <ActionsSection
-                CanPlayAttack="@State.YourPossibleMoves.Any(m => m.Type == PossibleMoveType.PlayAttackCard)"
                 CanGiveUpDefence="@State.YourPossibleMoves.Any(m => m.Type == PossibleMoveType.GiveUpDefence)"
-                IsPlayAttackEnabled="@(!string.IsNullOrWhiteSpace(selectedCardId))"
-                OnPlayAttack="PlayAttackAsync"
                 OnGiveUpDefence="GiveUpAsync" />
         </section>
     }

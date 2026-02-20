@@ -10,34 +10,30 @@ public class UC004_ActionsSectionTests : TestContext
     public void Given_NoAvailableMoves_When_ActionsSectionRenders_Then_NoButtonsAreVisible()
     {
         var cut = RenderComponent<ActionsSection>(parameters => parameters
-            .Add(p => p.CanPlayAttack, false)
             .Add(p => p.CanGiveUpDefence, false));
 
         cut.FindAll("[data-testid='actions-section'] button").Should().BeEmpty();
     }
 
     [Fact]
-    public void Given_PlayAttackAvailableWithoutSelection_When_ActionsSectionRenders_Then_PlayAttackIsVisibleAndDisabled()
+    public void Given_GiveUpAvailable_When_ActionsSectionRenders_Then_GiveUpButtonIsVisible()
     {
         var cut = RenderComponent<ActionsSection>(parameters => parameters
-            .Add(p => p.CanPlayAttack, true)
-            .Add(p => p.IsPlayAttackEnabled, false));
+            .Add(p => p.CanGiveUpDefence, true));
 
-        cut.FindAll("[data-testid='play-attack-button']").Should().HaveCount(1);
-        cut.Find("[data-testid='play-attack-button']").HasAttribute("disabled").Should().BeTrue();
+        cut.FindAll("[data-testid='give-up-defence-button']").Should().HaveCount(1);
     }
 
     [Fact]
-    public void Given_PlayAttackAvailableWithSelection_When_PlayAttackClicked_Then_CallbackIsRaised()
+    public void Given_GiveUpAvailable_When_GiveUpClicked_Then_CallbackIsRaised()
     {
         var calls = 0;
 
         var cut = RenderComponent<ActionsSection>(parameters => parameters
-            .Add(p => p.CanPlayAttack, true)
-            .Add(p => p.IsPlayAttackEnabled, true)
-            .Add(p => p.OnPlayAttack, () => calls++));
+            .Add(p => p.CanGiveUpDefence, true)
+            .Add(p => p.OnGiveUpDefence, () => calls++));
 
-        cut.Find("[data-testid='play-attack-button']").Click();
+        cut.Find("[data-testid='give-up-defence-button']").Click();
 
         calls.Should().Be(1);
     }

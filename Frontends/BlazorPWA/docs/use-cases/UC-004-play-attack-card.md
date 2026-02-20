@@ -15,23 +15,23 @@
 - Player selected one hand card
 
 ## Trigger
-- Player presses Play Attack
+- Player clicks the highlighted table area
 
 ## Main Flow
 1. Player selects one card from hand.
-2. Player submits attack.
+2. Player clicks the highlighted table area.
 3. App sends the move request.
 4. Match state updates and reflects result.
 
 ## Alternative / Failure Flows
-- If no hand card is selected, the Play Attack button is grayed out and the move is not sent.
+- If no hand card is selected, the table area is not highlighted and no move is sent.
 - If request fails, app shows error state.
 
 ## Postconditions
 - Attack intent is submitted.
 
 ## Observable Changes
-- The Play Attack button is visible only when it is the player's attack turn. No action buttons are shown otherwise.
+- The table area is highlighted only when it is the player's attack turn and a hand card is selected.
 - Player can select and unselect a hand card before submitting.
 - Selected card appears on the table and is removed from hand after the game state updates.
 - After the play is confirmed, the previous hand selection is cleared.
