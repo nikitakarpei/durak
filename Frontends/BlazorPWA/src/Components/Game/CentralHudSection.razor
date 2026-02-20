@@ -9,7 +9,8 @@
         else
         {
             <span class="central-hud__mini-card @SuitClass(TrumpCard.Suit)">
-                @RankToText(TrumpCard.Rank)@SuitToText(TrumpCard.Suit)
+                <span class="central-hud__mini-rank">@RankToText(TrumpCard.Rank)</span>
+                <span class="central-hud__mini-suit">@SuitToText(TrumpCard.Suit)</span>
             </span>
         }
     </div>
@@ -29,7 +30,7 @@
             {
                 <span class="central-hud__role-icon central-hud__role-icon--attacker" data-testid="central-role" data-role="attacker" aria-hidden="true">
                     <svg viewBox="0 0 24 24" role="presentation">
-                        <path d="M4 12H14L10.5 8.5L12 7L19 12L12 17L10.5 15.5L14 12H4Z" />
+                        <path d="M5.4 4.8L7.2 3L12 7.8L16.8 3L18.6 4.8L13.8 9.6L18.6 14.4L16.8 16.2L12 11.4L7.2 16.2L5.4 14.4L10.2 9.6L5.4 4.8Z" />
                     </svg>
                 </span>
             }
