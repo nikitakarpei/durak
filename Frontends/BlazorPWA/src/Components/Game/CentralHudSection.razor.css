@@ -27,8 +27,6 @@
     stroke-linecap: round;
     stroke-dasharray: 1;
     stroke-dashoffset: 0;
-    transform: rotate(-90deg);
-    transform-origin: 50% 50%;
     animation:
         central-hud-timer-dash var(--turn-timer-duration) linear forwards,
         central-hud-timer-color var(--turn-timer-duration) linear forwards,
