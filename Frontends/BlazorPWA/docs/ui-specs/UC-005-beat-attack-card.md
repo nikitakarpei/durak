@@ -20,6 +20,7 @@
 6. After a table attack card is selected, hand cards that cannot beat it are visually faded.
 7. After a hand card is selected, table attack cards that cannot be beaten by it are visually faded, even when none are beatable.
 8. Clicking a non-beatable table attack card does not select it and triggers a short shake animation on that card.
+9. Clicking a non-beatable hand card does not select it and triggers a short shake animation on that card.
 
 ## Layout and Responsive Rules
 1. Table attack cards and hand cards remain independently selectable in mobile-first layout.

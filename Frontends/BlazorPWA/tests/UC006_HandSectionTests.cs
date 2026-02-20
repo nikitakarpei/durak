@@ -83,10 +83,34 @@ public class UC006_HandSectionTests : TestContext
         var cut = RenderComponent<HandSection>(parameters => parameters
             .Add(p => p.Cards, cards)
             .Add(p => p.PlayableCardIds, new HashSet<string>())
-            .Add(p => p.BeatableHandCardIds, new HashSet<string> { "h1" }));
+            .Add(p => p.BeatableHandCardIds, new HashSet<string> { "h1" })
+            .Add(p => p.HasSelectedAttackCard, true));
 
         cut.Find("[data-testid='hand-card-h1']").GetAttribute("data-visual-state").Should().BeNull();
         cut.Find("[data-testid='hand-card-h2']").GetAttribute("data-visual-state").Should().Be("unbeatable");
+    }
+
+    [Fact]
+    public void Given_SelectedAttackAndNoBeatableCards_When_InvalidHandCardClicked_Then_NoSelectionAndCardShakes()
+    {
+        var selectedCard = string.Empty;
+        var cards = new List<Card>
+        {
+            new("h1", CardSuit.Hearts, CardRank.Queen),
+            new("h2", CardSuit.Clubs, CardRank.Jack),
+        };
+
+        var cut = RenderComponent<HandSection>(parameters => parameters
+            .Add(p => p.Cards, cards)
+            .Add(p => p.PlayableCardIds, new HashSet<string>())
+            .Add(p => p.BeatableHandCardIds, new HashSet<string>())
+            .Add(p => p.HasSelectedAttackCard, true)
+            .Add(p => p.OnCardSelected, id => selectedCard = id));
+
+        cut.Find("[data-testid='hand-card-h2']").Click();
+
+        selectedCard.Should().BeEmpty();
+        cut.Find("[data-testid='hand-card-h2']").GetAttribute("data-visual-state").Should().Be("invalid");
     }
 
     [Fact]

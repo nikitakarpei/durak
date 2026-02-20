@@ -47,6 +47,7 @@
                 SelectedCardId="@selectedCardId"
                 PlayableCardIds="@GetPlayableCardIds()"
                 BeatableHandCardIds="@GetBeatableHandCardIds()"
+                HasSelectedAttackCard="@(!string.IsNullOrWhiteSpace(selectedAttackCardId))"
                 OnCardSelected="SelectCard" />
 
             <ActionsSection

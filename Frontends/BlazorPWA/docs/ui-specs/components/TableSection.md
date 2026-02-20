@@ -31,7 +31,8 @@
 - `data-testid='table-section'`
 - `data-testid='table-pair'`
 - `data-testid='table-attack-<cardId>'`
-- `data-visual-state='unbeatable'` on non-beatable, non-selected attack cards when at least one beatable attack card exists.
+- `data-visual-state='unbeatable'` on non-beatable, non-selected attack cards when a hand card is selected.
+- `data-visual-state='invalid'` on the clicked attack card while the invalid selection shake is active.
 
 ## Out of Scope
 - Computing legal beat targets and selection rules.

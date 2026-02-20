@@ -13,8 +13,8 @@
                               IsInteractive="true"
                               TestId="@($"hand-card-{card.Id}")"
                               StateClasses="@BuildStateClasses(isSelected, isPlayable, isBeatable)"
-                              VisualState="@GetVisualState(isSelected, isBeatable)"
-                              OnClick="() => OnCardSelected.InvokeAsync(card.Id)" />
+                              VisualState="@GetVisualState(card.Id, isSelected, isBeatable)"
+                              OnClick="() => HandleHandClick(card.Id)" />
                 }
             </div>
         </div>
@@ -35,7 +35,12 @@
     public IReadOnlySet<string> BeatableHandCardIds { get; set; } = new HashSet<string>();
 
     [Parameter]
+    public bool HasSelectedAttackCard { get; set; }
+
+    [Parameter]
     public EventCallback<string> OnCardSelected { get; set; }
+
+    private readonly ShakeState shakeState = new();
 
     private static string BuildStateClasses(bool isSelected, bool isPlayable, bool isBeatable)
     {
@@ -58,14 +63,35 @@
         return classes.Count > 0 ? string.Join(" ", classes) : string.Empty;
     }
 
-    private string? GetVisualState(bool isSelected, bool isBeatable)
+    private string? GetVisualState(string cardId, bool isSelected, bool isBeatable)
     {
-        var hasBeatable = BeatableHandCardIds.Count > 0;
-        if (!hasBeatable || isSelected || isBeatable)
+        if (shakeState.ActiveId == cardId)
+        {
+            return "invalid";
+        }
+
+        if (!HasSelectedAttackCard || isSelected)
         {
             return null;
         }
 
-        return "unbeatable";
+        if (BeatableHandCardIds.Count == 0)
+        {
+            return "unbeatable";
+        }
+
+        return isBeatable ? null : "unbeatable";
+    }
+
+    private async Task HandleHandClick(string cardId)
+    {
+        var isBeatable = BeatableHandCardIds.Contains(cardId);
+        if (HasSelectedAttackCard && !isBeatable)
+        {
+            await shakeState.TriggerAsync(cardId, () => InvokeAsync(StateHasChanged));
+            return;
+        }
+
+        await OnCardSelected.InvokeAsync(cardId);
     }
 }
