@@ -1,7 +1,7 @@
 @using GameService.Api.Data
 @inject IJSRuntime JS
 
-<section class="central-hud @(Role != CentralHudRole.Neutral ? "central-hud--with-role" : "")" data-testid="central-hud" @ref="_hudRef">
+<div class="central-hud-wrapper" @ref="_hudRef">
     @if (IsTurnActive && TurnTimerDuration.HasValue && TurnTimerDuration.Value > TimeSpan.Zero)
     {
         <svg class="central-hud__timer"
@@ -19,39 +19,41 @@
             }
         </svg>
     }
-    <div class="central-hud__section central-hud__section--trump" data-testid="central-trump">
-        @if (TrumpCard is null)
-        {
-            <span class="central-hud__mini-card central-hud__mini-card--placeholder">?</span>
-        }
-        else
-        {
-            <span class="central-hud__mini-card @SuitClass(TrumpCard.Suit)">
-                <span class="central-hud__mini-rank">@RankToText(TrumpCard.Rank)</span>
-                <span class="central-hud__mini-suit">@SuitToText(TrumpCard.Suit)</span>
-            </span>
-        }
-    </div>
-    @if (Role != CentralHudRole.Neutral)
-    {
-        <div class="central-hud__divider" aria-hidden="true"></div>
-        <div class="central-hud__section central-hud__section--role">
-            @if (Role == CentralHudRole.Defender)
+    <section class="central-hud @(Role != CentralHudRole.Neutral ? "central-hud--with-role" : "")" data-testid="central-hud">
+        <div class="central-hud__section central-hud__section--trump" data-testid="central-trump">
+            @if (TrumpCard is null)
             {
-                <span class="central-hud__role-icon central-hud__role-icon--defender" data-testid="central-role" data-role="defender" aria-hidden="true">🛡️</span>
+                <span class="central-hud__mini-card central-hud__mini-card--placeholder">?</span>
             }
-            else if (Role == CentralHudRole.Attacker)
+            else
             {
-                <span class="central-hud__role-icon central-hud__role-icon--attacker" data-testid="central-role" data-role="attacker" aria-hidden="true">⚔️</span>
+                <span class="central-hud__mini-card @SuitClass(TrumpCard.Suit)">
+                    <span class="central-hud__mini-rank">@RankToText(TrumpCard.Rank)</span>
+                    <span class="central-hud__mini-suit">@SuitToText(TrumpCard.Suit)</span>
+                </span>
             }
         </div>
-    }
-    <div class="central-hud__divider" aria-hidden="true"></div>
-    <div class="central-hud__section central-hud__section--deck">
-        <span class="central-hud__deck-icon" data-testid="central-deck" aria-hidden="true"></span>
-        <span class="central-hud__count" data-testid="central-count">@TalonCount</span>
-    </div>
-</section>
+        @if (Role != CentralHudRole.Neutral)
+        {
+            <div class="central-hud__divider" aria-hidden="true"></div>
+            <div class="central-hud__section central-hud__section--role">
+                @if (Role == CentralHudRole.Defender)
+                {
+                    <span class="central-hud__role-icon central-hud__role-icon--defender" data-testid="central-role" data-role="defender" aria-hidden="true">🛡️</span>
+                }
+                else if (Role == CentralHudRole.Attacker)
+                {
+                    <span class="central-hud__role-icon central-hud__role-icon--attacker" data-testid="central-role" data-role="attacker" aria-hidden="true">⚔️</span>
+                }
+            </div>
+        }
+        <div class="central-hud__divider" aria-hidden="true"></div>
+        <div class="central-hud__section central-hud__section--deck">
+            <span class="central-hud__deck-icon" data-testid="central-deck" aria-hidden="true"></span>
+            <span class="central-hud__count" data-testid="central-count">@TalonCount</span>
+        </div>
+    </section>
+</div>
 
 @code {
     [Parameter]

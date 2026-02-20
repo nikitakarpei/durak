@@ -1,3 +1,8 @@
+.central-hud-wrapper {
+    position: relative;
+    display: inline-flex;
+}
+
 .central-hud {
     --turn-timer-neutral: #2563eb;
     --turn-timer-warning: #f59e0b;
@@ -16,7 +21,6 @@
     position: absolute;
     inset: -5px;
     pointer-events: none;
-    z-index: -1;
 }
 
 .central-hud__timer-path {
