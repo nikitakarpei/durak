@@ -18,7 +18,7 @@
    - Role indicator is presentational only.
 
 ## Required States
-1. Trump known: shows vertical mini card face with rank above suit.
+1. Trump known: shows mini card face with rank and suit on the same line.
 2. Trump unknown: shows placeholder content in the trump slot.
 3. Deck count present: shows count value and vertical card-back icon.
 4. Neutral role: no role icon is shown between trump and deck slots.
