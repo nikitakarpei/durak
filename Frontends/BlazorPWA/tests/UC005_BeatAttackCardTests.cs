@@ -208,6 +208,22 @@ public class UC005_BeatAttackCardTests : TestContext
     }
 
     [Fact]
+    public void When_SelectedHandCardRemoved_Then_TableAttackCanBeSelected()
+    {
+        var cut = RenderComponent<Game>();
+
+        cut.Find("section.hand button.card-face").Click();
+
+        _gameState.YourHand.RemoveAll(c => c.Id == "def-1");
+        _gameState.YourPossibleMoves.Clear();
+        cut.Render();
+
+        cut.Find("section.table-zone button.card-face").Click();
+
+        cut.Find("section.table-zone button.card-face").ClassList.Should().Contain("selected");
+    }
+
+    [Fact]
     public void WhenNoCardSelected_NoBeatableClassOnAnyCard()
     {
         var cut = RenderComponent<Game>();
