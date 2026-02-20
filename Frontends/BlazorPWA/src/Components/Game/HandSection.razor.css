@@ -32,7 +32,7 @@
 
 .hand ::deep .card-face:hover {
     z-index: 5;
-    transform: translateY(calc(-1 * var(--hand-hover-lift, 8px)));
+    --card-raise: var(--hand-hover-lift, 8px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
@@ -44,7 +44,7 @@
     z-index: 10;
     border-color: #4f46e5;
     background: #eef2ff;
-    transform: translateY(calc(-1 * var(--hand-selected-lift, 14px)));
+    --card-raise: var(--hand-selected-lift, 14px);
     box-shadow: 0 8px 20px rgba(79, 70, 229, 0.30);
 }
 

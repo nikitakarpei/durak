@@ -1,4 +1,5 @@
 .card-face {
+    --card-raise: 0px;
     background: #fff;
     border-radius: 10px;
     border: 1.5px solid #d1d5db;
@@ -11,6 +12,7 @@
     padding: 7px 8px;
     gap: 3px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.10), 0 1px 2px rgba(0, 0, 0, 0.06);
+    transform: translateY(calc(-1 * var(--card-raise))) translateX(0);
     transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease;
 }
 
@@ -36,7 +38,7 @@
     border-color: #4f46e5;
     background: #eef2ff;
     box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
-    transform: translateY(calc(-1 * var(--card-selected-lift, 10px)));
+    --card-raise: var(--card-selected-lift, 10px);
 }
 
 .card-face.selected .card-face__rank,
@@ -55,10 +57,10 @@
 }
 
 @keyframes card-face-shake {
-    0% { transform: translateX(0); }
-    20% { transform: translateX(-3px); }
-    40% { transform: translateX(3px); }
-    60% { transform: translateX(-2px); }
-    80% { transform: translateX(2px); }
-    100% { transform: translateX(0); }
+    0% { transform: translateY(calc(-1 * var(--card-raise))) translateX(0); }
+    20% { transform: translateY(calc(-1 * var(--card-raise))) translateX(-3px); }
+    40% { transform: translateY(calc(-1 * var(--card-raise))) translateX(3px); }
+    60% { transform: translateY(calc(-1 * var(--card-raise))) translateX(-2px); }
+    80% { transform: translateY(calc(-1 * var(--card-raise))) translateX(2px); }
+    100% { transform: translateY(calc(-1 * var(--card-raise))) translateX(0); }
 }
