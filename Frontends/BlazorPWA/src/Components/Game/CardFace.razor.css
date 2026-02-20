@@ -31,6 +31,22 @@
     color: #dc2626;
 }
 
+.card-face.selected {
+    border-color: #4f46e5;
+    background: #eef2ff;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+}
+
+.card-face.selected .card-face__rank,
+.card-face.selected .card-face__suit {
+    color: #4f46e5;
+}
+
+.card-face.selected.suit-red .card-face__rank,
+.card-face.selected.suit-red .card-face__suit {
+    color: #dc2626;
+}
+
 .card-face[data-visual-state='invalid'] {
     filter: grayscale(0.55) saturate(0.35) brightness(0.92);
     animation: card-face-shake 0.35s ease;
