@@ -3,30 +3,30 @@
 - Covers Use Case: `docs/use-cases/UC-003-view-match-state.md`
 - Scope: Current UI details for match-state presentation (can evolve over time).
 
-## Deck Area
-1. Show a compact talon HUD widget for trump and deck status.
+## Central HUD
+1. Show a compact central HUD widget for trump and deck status.
 2. The HUD uses a pill container with a light background, rounded corners, subtle border or shadow, and two sections separated by a faint divider.
 3. Trump section shows a mini card face with rank and suit when known.
 4. Deck section shows a small blue card-back icon and the remaining deck count.
 5. A role indicator slot sits between the trump and deck sections.
 6. When the player is defender, the role slot shows a shield icon.
-7. When the player is attacker, the role slot shows an attacker icon (crossed swords or a forward arrow).
+7. When the player is attacker, the role slot shows a forward arrow icon.
 8. When the player is neither attacker nor defender, the role slot is empty.
-9. The talon HUD sits directly below the opponent top zone and does not overlap any opponent seat.
-10. The talon HUD has a fixed, stable size at all times. Neither the trump rank (one-character "A" vs three-character "10♦") nor the deck count (single digit vs double digit) may change the physical dimensions of the pill. The HUD must also not grow or shrink based on the presence or absence of action buttons — its height must be determined solely by its own content.
+9. The central HUD sits directly below the opponent top zone and does not overlap any opponent seat.
+10. The central HUD has a fixed, stable size at all times. Neither the trump rank (one-character "A" vs three-character "10♦") nor the deck count (single digit vs double digit) may change the physical dimensions of the pill. The HUD must also not grow or shrink based on the presence or absence of action buttons — its height must be determined solely by its own content.
 
 ## Opponents Area
 1. Show all configured opponent seats, including unoccupied seats.
 2. Joined seats show a compact tile with identity placeholder and card-count indicator.
 3. Unoccupied seats show a placeholder tile.
 4. Current UI placeholders: friendly seat names such as `Player N` and unoccupied label such as `Not joined`.
-5. All opponent seats are displayed in a top zone above the talon HUD and table, arranged in up to two horizontal rows (tiers). The layout is symmetric and adjusts to seat count:
+5. All opponent seats are displayed in a top zone above the central HUD and table, arranged in up to two horizontal rows (tiers). The layout is symmetric and adjusts to seat count:
    - 1 seat  → tier 1: center
    - 2 seats → tier 1: left + right
    - 3 seats → tier 1: left + center + right
    - 4 seats → tier 1: left + right / tier 2: outer-left + outer-right
    - 5 seats → tier 1: left + center + right / tier 2: outer-left + outer-right
-6. All game sections stack in a fixed order: opponents → talon HUD → table (1fr) → hand → actions. Section positions must not shift based on the content or visibility of sibling sections.
+6. All game sections stack in a fixed order: opponents → central HUD → table (1fr) → hand → actions. Section positions must not shift based on the content or visibility of sibling sections.
 
 ## Table Area
 1. Show all attack/defence pairs currently on table.

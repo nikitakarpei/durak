@@ -41,8 +41,8 @@ public class UC003_ViewMatchStateTests : TestContext
 
         var cut = RenderComponent<Game>();
 
-        cut.FindAll("[data-testid='talon-hud']").Should().HaveCount(1);
-        cut.Find("[data-testid='talon-trump']").TextContent.Should().Contain("A");
+        cut.FindAll("[data-testid='central-hud']").Should().HaveCount(1);
+        cut.Find("[data-testid='central-trump']").TextContent.Should().Contain("A");
     }
 
     [Fact]
@@ -52,8 +52,8 @@ public class UC003_ViewMatchStateTests : TestContext
 
         var cut = RenderComponent<Game>();
 
-        cut.FindAll("[data-testid='talon-hud']").Should().HaveCount(1);
-        cut.Find("[data-testid='talon-count']").TextContent.Should().Be("7");
+        cut.FindAll("[data-testid='central-hud']").Should().HaveCount(1);
+        cut.Find("[data-testid='central-count']").TextContent.Should().Be("7");
     }
 
     [Fact]
@@ -63,8 +63,8 @@ public class UC003_ViewMatchStateTests : TestContext
 
         var cut = RenderComponent<Game>();
 
-        cut.FindAll("[data-testid='talon-hud']").Should().HaveCount(1);
-        cut.Find("[data-testid='talon-count']").TextContent.Should().Be("0");
+        cut.FindAll("[data-testid='central-hud']").Should().HaveCount(1);
+        cut.Find("[data-testid='central-count']").TextContent.Should().Be("0");
     }
 
     [Fact]

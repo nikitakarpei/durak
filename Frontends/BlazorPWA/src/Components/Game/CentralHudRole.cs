@@ -1,6 +1,6 @@
 namespace BlazorPWA.Components.Game;
 
-public enum TalonHudRole
+public enum CentralHudRole
 {
     Neutral,
     Attacker,

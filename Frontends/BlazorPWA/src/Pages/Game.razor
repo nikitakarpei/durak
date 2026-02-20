@@ -32,10 +32,10 @@
         <section class="match" data-testid="match-panel">
             <OpponentsSection Seats="@GetOpponents()" />
 
-            <div class="talon-hud-row">
-                <TalonHudSection TrumpCard="@State.TrumpCard"
-                                 TalonCount="@State.TalonCount"
-                                 Role="@GetHudRole()" />
+            <div class="central-hud-row">
+                <CentralHudSection TrumpCard="@State.TrumpCard"
+                                   TalonCount="@State.TalonCount"
+                                   Role="@GetHudRole()" />
             </div>
 
             <TableSection
@@ -237,24 +237,24 @@
             ? "suit-red"
             : "";
 
-    private TalonHudRole GetHudRole()
+    private CentralHudRole GetHudRole()
     {
         if (State.LocalPlayerId is null)
         {
-            return TalonHudRole.Neutral;
+            return CentralHudRole.Neutral;
         }
 
         if (State.LocalPlayerId == State.AttackerPlayerId)
         {
-            return TalonHudRole.Attacker;
+            return CentralHudRole.Attacker;
         }
 
         if (State.LocalPlayerId == State.DefenderPlayerId)
         {
-            return TalonHudRole.Defender;
+            return CentralHudRole.Defender;
         }
 
-        return TalonHudRole.Neutral;
+        return CentralHudRole.Neutral;
     }
 
     private IReadOnlySet<string> GetPlayableCardIds() =>

@@ -1,41 +1,41 @@
 @using GameService.Api.Data
 
-<section class="talon-hud" data-testid="talon-hud">
-    <div class="talon-hud__section talon-hud__section--trump" data-testid="talon-trump">
+<section class="central-hud" data-testid="central-hud">
+    <div class="central-hud__section central-hud__section--trump" data-testid="central-trump">
         @if (TrumpCard is null)
         {
-            <span class="talon-hud__mini-card talon-hud__mini-card--placeholder">?</span>
+            <span class="central-hud__mini-card central-hud__mini-card--placeholder">?</span>
         }
         else
         {
-            <span class="talon-hud__mini-card @SuitClass(TrumpCard.Suit)">
+            <span class="central-hud__mini-card @SuitClass(TrumpCard.Suit)">
                 @RankToText(TrumpCard.Rank)@SuitToText(TrumpCard.Suit)
             </span>
         }
     </div>
-    <div class="talon-hud__divider" aria-hidden="true"></div>
-    <div class="talon-hud__section talon-hud__section--role">
-        @if (Role == TalonHudRole.Defender)
+    <div class="central-hud__divider" aria-hidden="true"></div>
+    <div class="central-hud__section central-hud__section--role">
+        @if (Role == CentralHudRole.Defender)
         {
-            <span class="talon-hud__role-icon talon-hud__role-icon--defender" data-testid="talon-role" data-role="defender" aria-hidden="true">
+            <span class="central-hud__role-icon central-hud__role-icon--defender" data-testid="central-role" data-role="defender" aria-hidden="true">
                 <svg viewBox="0 0 24 24" role="presentation">
                     <path d="M12 2L20 6V12C20 17 16.5 20.5 12 22C7.5 20.5 4 17 4 12V6L12 2Z" />
                 </svg>
             </span>
         }
-        else if (Role == TalonHudRole.Attacker)
+        else if (Role == CentralHudRole.Attacker)
         {
-            <span class="talon-hud__role-icon talon-hud__role-icon--attacker" data-testid="talon-role" data-role="attacker" aria-hidden="true">
+            <span class="central-hud__role-icon central-hud__role-icon--attacker" data-testid="central-role" data-role="attacker" aria-hidden="true">
                 <svg viewBox="0 0 24 24" role="presentation">
                     <path d="M4 12H14L10.5 8.5L12 7L19 12L12 17L10.5 15.5L14 12H4Z" />
                 </svg>
             </span>
         }
     </div>
-    <div class="talon-hud__divider" aria-hidden="true"></div>
-    <div class="talon-hud__section talon-hud__section--deck">
-        <span class="talon-hud__deck-icon" data-testid="talon-deck" aria-hidden="true"></span>
-        <span class="talon-hud__count" data-testid="talon-count">@TalonCount</span>
+    <div class="central-hud__divider" aria-hidden="true"></div>
+    <div class="central-hud__section central-hud__section--deck">
+        <span class="central-hud__deck-icon" data-testid="central-deck" aria-hidden="true"></span>
+        <span class="central-hud__count" data-testid="central-count">@TalonCount</span>
     </div>
 </section>
 
@@ -47,7 +47,7 @@
     public int TalonCount { get; set; }
 
     [Parameter]
-    public TalonHudRole Role { get; set; }
+    public CentralHudRole Role { get; set; }
 
     private static string RankToText(CardRank rank) => rank switch
     {

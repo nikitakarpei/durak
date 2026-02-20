@@ -67,7 +67,7 @@
     gap: 16px;
 }
 
-.talon-hud-row {
+.central-hud-row {
     display: flex;
     justify-content: center;
     align-items: flex-start;
