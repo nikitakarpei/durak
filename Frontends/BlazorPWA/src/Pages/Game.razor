@@ -76,14 +76,6 @@
         Connection.StateChanged += OnConnectionStateChanged;
     }
 
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (NormalizeSelections())
-        {
-            InvokeAsync(StateHasChanged);
-        }
-    }
-
     private void OnConnectionStateChanged()
     {
         if (!_gameIdLogged && !string.IsNullOrEmpty(State.GameId))
@@ -91,29 +83,7 @@
             Console.WriteLine($"[Game] id={State.GameId}");
             _gameIdLogged = true;
         }
-
-        NormalizeSelections();
         InvokeAsync(StateHasChanged);
-    }
-
-    private bool NormalizeSelections()
-    {
-        var changed = false;
-
-        if (!string.IsNullOrWhiteSpace(selectedCardId) && State.YourHand.All(c => c.Id != selectedCardId))
-        {
-            selectedCardId = null;
-            changed = true;
-        }
-
-        if (!string.IsNullOrWhiteSpace(selectedAttackCardId) &&
-            State.Table.All(p => p.Attack.Id != selectedAttackCardId || p.Defence is not null))
-        {
-            selectedAttackCardId = null;
-            changed = true;
-        }
-
-        return changed;
     }
 
     private async Task ConnectAsync()
