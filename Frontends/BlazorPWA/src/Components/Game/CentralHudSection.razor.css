@@ -16,8 +16,11 @@
     justify-content: center;
 }
 
-.central-hud__section--role {
+.central-hud--with-role .central-hud__section {
     width: 44px;
+}
+
+.central-hud__section--role {
     justify-content: center;
 }
 

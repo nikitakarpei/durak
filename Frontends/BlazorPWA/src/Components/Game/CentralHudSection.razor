@@ -1,6 +1,6 @@
 @using GameService.Api.Data
 
-<section class="central-hud" data-testid="central-hud">
+<section class="central-hud @(Role != CentralHudRole.Neutral ? "central-hud--with-role" : "")" data-testid="central-hud">
     <div class="central-hud__section central-hud__section--trump" data-testid="central-trump">
         @if (TrumpCard is null)
         {
