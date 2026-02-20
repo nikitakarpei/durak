@@ -33,18 +33,18 @@
     z-index: 1;
 }
 
-::deep .table-zone .card-face {
+.table-zone ::deep .card-face {
     cursor: pointer;
 }
 
-::deep .table-zone .card-face.selected {
+.table-zone ::deep .card-face.selected {
     border-color: #4f46e5;
     background: #eef2ff;
     box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
 }
 
-::deep .table-zone .card-face.selected .card-face__rank,
-::deep .table-zone .card-face.selected .card-face__suit {
+.table-zone ::deep .card-face.selected .card-face__rank,
+.table-zone ::deep .card-face.selected .card-face__suit {
     color: #4f46e5;
 }
 
@@ -53,6 +53,6 @@
     color: #dc2626;
 }
 
-::deep .table-zone .card-face[data-visual-state='unbeatable'] {
+.table-zone ::deep .card-face[data-visual-state='unbeatable'] {
     filter: grayscale(0.55) saturate(0.35) brightness(0.92);
 }
