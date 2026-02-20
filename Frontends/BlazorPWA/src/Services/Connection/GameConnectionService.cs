@@ -20,6 +20,7 @@ public sealed class GameConnectionService : IGameConnectionService
     private string? _accessToken;
 
     public ConnectionStatus Status { get; private set; } = ConnectionStatus.Idle;
+    public bool IsReplayingHistory { get; private set; }
     public string? ErrorMessage { get; private set; }
     public string? AccessToken => _accessToken;
 
@@ -151,6 +152,9 @@ public sealed class GameConnectionService : IGameConnectionService
         TaskCompletionSource oldEventsEnded,
         CancellationToken cancellationToken)
     {
+        IsReplayingHistory = true;
+        NotifyStateChanged();
+
         try
         {
             await foreach (var response in _gameClient!.GetGameEventsAsync(gameId, cancellationToken))
@@ -165,13 +169,15 @@ public sealed class GameConnectionService : IGameConnectionService
                 }
                 else if (response.ResultCase == GetGameEventsCommand.Types.StreamResponse.ResultOneofCase.OldEventsEnded)
                 {
-                    oldEventsEnded.TrySetResult();
+                    IsReplayingHistory = false;
                     NotifyStateChanged();
+                    oldEventsEnded.TrySetResult();
                 }
             }
         }
         catch (Exception ex)
         {
+            IsReplayingHistory = false;
             oldEventsEnded.TrySetException(ex);
             Status = ConnectionStatus.Error;
             ErrorMessage = ex.Message;

@@ -38,3 +38,7 @@
 ## Actions Area
 1. Show action controls based on available moves in current state.
 2. Hide action buttons when no moves are available.
+
+## History Replay Overlay
+1. While old events are being applied on (re)connect, show a full-match overlay with a centred circular spinner.
+2. The overlay disappears as soon as all historical events have been applied.

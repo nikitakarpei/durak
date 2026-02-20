@@ -36,6 +36,7 @@
 - The trump suit and remaining deck count are shown in a compact HUD widget that does not occupy table space.
 - All opponent seats are displayed in a top zone above the table, arranged in up to two symmetric horizontal rows. The arrangement adjusts by seat count so the layout is always balanced and never lopsided.
 - Defended table pairs show the defence card overlaid on top of the attack card at an angle, so the player can see both the beating card and the card that was beaten.
+- While historical game events are being replayed on reconnect, a loading overlay is shown over the match area so the player knows the state is still loading.
 
 ## Out of Scope (MVP)
 - Desktop-first layout optimization

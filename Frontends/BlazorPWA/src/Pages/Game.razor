@@ -21,6 +21,7 @@
     else
     {
         <section class="match" data-testid="match-panel">
+            <HistoryReplayOverlay IsVisible="@Connection.IsReplayingHistory" />
             <OpponentsSection Seats="@GetOpponents()" />
 
             <div class="talon-hud-row">

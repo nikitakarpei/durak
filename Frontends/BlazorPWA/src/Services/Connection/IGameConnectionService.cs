@@ -3,6 +3,7 @@ namespace BlazorPWA.Services.Connection;
 public interface IGameConnectionService
 {
     ConnectionStatus Status { get; }
+    bool IsReplayingHistory { get; }
     string? ErrorMessage { get; }
     string? AccessToken { get; }
     event Action? StateChanged;

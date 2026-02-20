@@ -126,6 +126,34 @@ public class UC002_GameConnectionServiceTests
         _service.AccessToken.Should().Be("access-token");
     }
 
+    [Fact]
+    public async Task Given_OldEventsBeingApplied_When_StateChanges_Then_IsReplayingHistoryIsTrue()
+    {
+        var capturedDuringReplay = new List<bool>();
+        _service.StateChanged += () => capturedDuringReplay.Add(_service.IsReplayingHistory);
+
+        var playerJoined = Any.Pack(new PlayerJoined { PlayerId = "bob", Seat = 1 });
+        _gameClientMock
+            .Setup(c => c.GetGameEventsAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(EventStream(OldEvent(playerJoined), OldEventsEnded()));
+
+        await _service.ConnectAsync("game-1", "alice", CancellationToken.None);
+
+        capturedDuringReplay.Should().Contain(true);
+    }
+
+    [Fact]
+    public async Task AfterConnect_IsReplayingHistoryIsFalse()
+    {
+        _gameClientMock
+            .Setup(c => c.GetGameEventsAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .Returns(EventStream(OldEventsEnded()));
+
+        await _service.ConnectAsync("game-1", "alice", CancellationToken.None);
+
+        _service.IsReplayingHistory.Should().BeFalse();
+    }
+
     // ── helpers ──────────────────────────────────────────────────────────────
 
     private static async IAsyncEnumerable<GetGameEventsCommand.Types.StreamResponse> EventStream(

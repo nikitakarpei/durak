@@ -24,6 +24,7 @@ public class UC003_ViewMatchStateTests : TestContext
         _connectionMock.SetupGet(c => c.Status).Returns(ConnectionStatus.Connected);
         _connectionMock.SetupGet(c => c.ErrorMessage).Returns((string?)null);
         _connectionMock.SetupGet(c => c.AccessToken).Returns("token-abc");
+        _connectionMock.SetupGet(c => c.IsReplayingHistory).Returns(false);
 
         _gameState.GameId = "game-123";
 
@@ -188,5 +189,23 @@ public class UC003_ViewMatchStateTests : TestContext
         GameStateReducer.Apply(_gameState, Any.Pack(evt));
 
         _gameState.TalonCount.Should().Be(18);
+    }
+
+    [Fact]
+    public void Given_IsReplayingHistory_When_MatchRenders_Then_ReplayOverlayIsVisible()
+    {
+        _connectionMock.SetupGet(c => c.IsReplayingHistory).Returns(true);
+
+        var cut = RenderComponent<Game>();
+
+        cut.FindAll("[data-testid='history-replay-overlay']").Should().HaveCount(1);
+    }
+
+    [Fact]
+    public void Given_NotReplayingHistory_When_MatchRenders_Then_ReplayOverlayIsHidden()
+    {
+        var cut = RenderComponent<Game>();
+
+        cut.FindAll("[data-testid='history-replay-overlay']").Should().BeEmpty();
     }
 }
