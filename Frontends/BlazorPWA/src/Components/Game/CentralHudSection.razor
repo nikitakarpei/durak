@@ -6,10 +6,10 @@
         <svg class="central-hud__timer"
              data-testid="central-hud-timer"
              style="--turn-timer-duration: @($"{TurnTimerDuration.Value.TotalSeconds:0.###}s")"
-             viewBox="0 0 100 40"
+             viewBox="0 0 100 100"
              preserveAspectRatio="none"
              @key="TurnTimerKey">
-            <rect class="central-hud__timer-path" x="2" y="2" width="96" height="36" rx="999" ry="999" pathLength="1" vector-effect="non-scaling-stroke"></rect>
+            <rect class="central-hud__timer-path" x="2" y="2" width="96" height="96" rx="999" ry="999" pathLength="1"></rect>
         </svg>
     }
     <div class="central-hud__section central-hud__section--trump" data-testid="central-trump">
