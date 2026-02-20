@@ -16,11 +16,13 @@
     justify-content: center;
 }
 
-.central-hud--with-role .central-hud__section {
+.central-hud__section--trump,
+.central-hud__section--deck {
     width: 44px;
 }
 
 .central-hud__section--role {
+    width: 28px;
     justify-content: center;
 }
 

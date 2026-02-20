@@ -24,7 +24,7 @@
 4. Neutral role: no role icon is shown between trump and deck slots.
 5. Defender role: shield icon appears in the center slot.
 6. Attacker role: crossed swords icon appears in the center slot.
-7. Sizing: when the role slot is visible, the three sections use equal widths so the HUD remains stable across roles and is not stretched by the surrounding grid layout (e.g., when the actions section is empty).
+7. Sizing: the trump and deck sections use equal widths, while the role section may be narrower; the HUD is not stretched by the surrounding grid layout (e.g., when the actions section is empty).
 
 ## Test Hooks
 - `data-testid='central-hud'`
