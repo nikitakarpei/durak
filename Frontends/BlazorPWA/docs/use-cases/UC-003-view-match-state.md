@@ -32,7 +32,7 @@
 - Any unoccupied opponent seat within the configured seat count is shown as an empty placeholder until a player joins it.
 - Cards in the player's hand are displayed as recognizable playing cards with rank and suit information.
 - Cards on the table are displayed as recognizable playing cards with rank and suit information, matching the same face layout used in the hand.
-- When a turn highlights playable or beatable hand cards, the other hand cards are visually de-emphasized but remain opaque and keep normal card shadows.
+- Hand cards remain visually consistent even when some cards are playable or beatable.
 - Hovered or selected hand cards can lift upward without being clipped by the hand container.
 - The trump suit and remaining deck count are shown in a compact HUD widget that does not occupy table space.
 - All opponent seats are displayed in a top zone above the table, arranged in up to two symmetric horizontal rows. The arrangement adjusts by seat count so the layout is always balanced and never lopsided.

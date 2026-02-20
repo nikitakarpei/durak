@@ -12,7 +12,6 @@
    - `IsInteractive` (`bool`) to render a button for actionable cards or a div for static cards.
    - `StateClasses` (`string?`) for selected/beatable/defence visual states passed from the parent section.
    - `TestId` (`string`) to render a stable `data-testid`.
-   - `VisualState` (`string?`) to render `data-visual-state` when provided.
 2. Outputs:
    - `OnClick` when an interactive card is selected.
 3. Required accessibility semantics:

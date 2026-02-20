@@ -54,7 +54,7 @@ public class UC006_HandSectionTests : TestContext
     }
 
     [Fact]
-    public void Given_PlayableCardExists_When_SectionRenders_Then_NonPlayableCardsAreMarkedInactive()
+    public void Given_PlayableCardExists_When_SectionRenders_Then_NonPlayableCardsRemainVisuallyActive()
     {
         var cards = new List<Card>
         {
@@ -68,7 +68,7 @@ public class UC006_HandSectionTests : TestContext
             .Add(p => p.BeatableHandCardIds, new HashSet<string>()));
 
         cut.Find("[data-testid='hand-card-h1']").GetAttribute("data-visual-state").Should().BeNull();
-        cut.Find("[data-testid='hand-card-h2']").GetAttribute("data-visual-state").Should().Be("inactive");
+        cut.Find("[data-testid='hand-card-h2']").GetAttribute("data-visual-state").Should().BeNull();
     }
 
     [Fact]

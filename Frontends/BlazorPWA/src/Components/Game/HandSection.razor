@@ -13,7 +13,6 @@
                               IsInteractive="true"
                               TestId="@($"hand-card-{card.Id}")"
                               StateClasses="@BuildStateClasses(isSelected, isPlayable, isBeatable)"
-                              VisualState="@(GetVisualState(isSelected, isPlayable, isBeatable))"
                               OnClick="() => OnCardSelected.InvokeAsync(card.Id)" />
                 }
             </div>
@@ -36,15 +35,6 @@
 
     [Parameter]
     public EventCallback<string> OnCardSelected { get; set; }
-
-    private string? GetVisualState(bool isSelected, bool isPlayable, bool isBeatable)
-    {
-        var hasPlayable = PlayableCardIds.Count > 0;
-        var hasBeatable = BeatableHandCardIds.Count > 0;
-        var isInactive = (hasPlayable && !isPlayable && !isSelected) || (hasBeatable && !isBeatable && !isSelected);
-
-        return isInactive ? "inactive" : null;
-    }
 
     private static string BuildStateClasses(bool isSelected, bool isPlayable, bool isBeatable)
     {

@@ -12,8 +12,9 @@
 2. **Use cases must contain only user-observable behavior and user value.**
 3. **UI specs must contain exact UI contracts needed for implementation and testing.**
 4. **Do not include implementation details in use cases or UI specs.** Exclude logs, events, APIs, services, reducers, storage, and technical workflows.
-5. **Every user-visible code change must update use cases/UI specs in the same task.**
-6. **Every user-visible UI change must satisfy `docs/ui-specs/HTML-CSS-GENERATION-CHECKLIST.md` and update the relevant UI spec accordingly.**
+5. **Avoid parenthetical negations in use cases.** Write positive, observable statements instead of “(no X)” or “(not Y)”.
+6. **Every user-visible code change must update use cases/UI specs in the same task.**
+7. **Every user-visible UI change must satisfy `docs/ui-specs/HTML-CSS-GENERATION-CHECKLIST.md` and update the relevant UI spec accordingly.**
 
 ## UI Modularity Enforcement
 1. **User-visible UI changes must be implemented in section components, not by expanding monolithic page files.**

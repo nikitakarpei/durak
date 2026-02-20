@@ -238,11 +238,6 @@
 }
 
 /* Dim cards that are not active when a turn is in progress */
-::deep .hand .card-face[data-visual-state='inactive'] {
-    filter: grayscale(0.7) saturate(0.35) brightness(0.92);
-}
-
-
 ::deep .hand .card-face.selected {
     z-index: 10;
     border-color: #4f46e5;

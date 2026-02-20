@@ -43,17 +43,15 @@ public class UC003_CardFaceTests : TestContext
     }
 
     [Fact]
-    public void Given_VisualStateAndRedSuit_When_CardFaceRenders_Then_RendersStateAttributeAndRedClass()
+    public void Given_RedSuit_When_CardFaceRenders_Then_RendersRedClass()
     {
         var card = new Card("c-3", CardSuit.Diamonds, CardRank.Queen);
 
         var cut = RenderComponent<CardFace>(parameters => parameters
             .Add(p => p.Card, card)
-            .Add(p => p.TestId, "card-face")
-            .Add(p => p.VisualState, "inactive"));
+            .Add(p => p.TestId, "card-face"));
 
         var element = cut.Find("[data-testid='card-face']");
-        element.GetAttribute("data-visual-state").Should().Be("inactive");
         element.ClassList.Should().Contain("suit-red");
     }
 }
