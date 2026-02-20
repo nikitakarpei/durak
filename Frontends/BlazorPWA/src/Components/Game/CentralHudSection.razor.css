@@ -66,12 +66,8 @@
     align-items: center;
     justify-content: center;
     transform: translateY(-1px);
-}
-
-.central-hud__role-icon svg {
-    width: 100%;
-    height: 100%;
-    fill: currentColor;
+    font-size: 1.1rem;
+    line-height: 1;
 }
 
 .central-hud__role-icon--defender {

@@ -20,19 +20,11 @@
         <div class="central-hud__section central-hud__section--role">
             @if (Role == CentralHudRole.Defender)
             {
-                <span class="central-hud__role-icon central-hud__role-icon--defender" data-testid="central-role" data-role="defender" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" role="presentation">
-                        <path d="M12 2L20 6V12C20 17 16.5 20.5 12 22C7.5 20.5 4 17 4 12V6L12 2Z" />
-                    </svg>
-                </span>
+                <span class="central-hud__role-icon central-hud__role-icon--defender" data-testid="central-role" data-role="defender" aria-hidden="true">🛡️</span>
             }
             else if (Role == CentralHudRole.Attacker)
             {
-                <span class="central-hud__role-icon central-hud__role-icon--attacker" data-testid="central-role" data-role="attacker" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" role="presentation">
-                        <path d="M5.4 4.8L7.2 3L12 7.8L16.8 3L18.6 4.8L13.8 9.6L18.6 14.4L16.8 16.2L12 11.4L7.2 16.2L5.4 14.4L10.2 9.6L5.4 4.8Z" />
-                    </svg>
-                </span>
+                <span class="central-hud__role-icon central-hud__role-icon--attacker" data-testid="central-role" data-role="attacker" aria-hidden="true">⚔️</span>
             }
         </div>
     }

@@ -9,8 +9,8 @@
 3. Trump section shows a mini outlined card with centered rank and suit when known.
 4. Deck section shows a mini outlined card-back icon with diagonal hatching and the remaining deck count.
 5. A role indicator slot sits between the trump and deck sections.
-6. When the player is defender and it is their turn, the role slot shows a prominent shield icon centered in the slot.
-7. When the player is attacker and it is their turn, the role slot shows a prominent crossed swords icon centered in the slot.
+6. When the player is defender and it is their turn, the role slot shows a prominent shield emoji centered in the slot.
+7. When the player is attacker and it is their turn, the role slot shows a prominent crossed swords emoji centered in the slot.
 8. When the player is not the active player, the role slot is empty.
 9. When the player is not active, the HUD shows only the trump and deck sections.
 10. The trump and deck sections always share the same width, while the role slot may be narrower.

@@ -22,8 +22,8 @@
 2. Trump unknown: shows placeholder content in the trump slot.
 3. Deck count present: shows count value and mini outlined card-back icon with diagonal hatching.
 4. Neutral role: no role icon is shown between trump and deck slots.
-5. Defender role: shield icon appears in the center slot.
-6. Attacker role: crossed swords icon appears in the center slot.
+5. Defender role: shield emoji appears in the center slot.
+6. Attacker role: crossed swords emoji appears in the center slot.
 7. Sizing: the trump and deck sections use equal widths, while the role section may be narrower; the HUD height is compact and not stretched by surrounding layout (e.g., when the actions section is empty).
 
 ## Test Hooks
