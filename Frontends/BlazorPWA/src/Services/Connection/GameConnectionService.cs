@@ -193,7 +193,8 @@ public sealed class GameConnectionService : IGameConnectionService
             await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
 
         GameStateReducer.Apply(_state, payload);
-        NotifyStateChanged();
+        if (!IsReplayingHistory)
+            NotifyStateChanged();
     }
 
     private Uri BuildGameServiceEndpoint(string playerIdToken)

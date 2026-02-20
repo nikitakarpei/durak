@@ -6,7 +6,15 @@
 
 <main class="game-shell">
     <ErrorToast />
-    @if (State.GameId == string.Empty || Connection.Status == ConnectionStatus.Idle)
+    @if (Connection.IsReplayingHistory)
+    {
+        <svg class="loading-progress" data-testid="history-loading">
+            <circle r="40%" cx="50%" cy="50%" />
+            <circle r="40%" cx="50%" cy="50%" />
+        </svg>
+        <div class="loading-progress-text"></div>
+    }
+    else if (State.GameId == string.Empty || Connection.Status == ConnectionStatus.Idle)
     {
         <JoinPanel
             GameId="@gameId"
@@ -21,7 +29,6 @@
     else
     {
         <section class="match" data-testid="match-panel">
-            <HistoryReplayOverlay IsVisible="@Connection.IsReplayingHistory" />
             <OpponentsSection Seats="@GetOpponents()" />
 
             <div class="talon-hud-row">

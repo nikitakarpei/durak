@@ -192,20 +192,22 @@ public class UC003_ViewMatchStateTests : TestContext
     }
 
     [Fact]
-    public void Given_IsReplayingHistory_When_MatchRenders_Then_ReplayOverlayIsVisible()
+    public void Given_IsReplayingHistory_When_MatchRenders_Then_MatchPanelIsHidden()
     {
         _connectionMock.SetupGet(c => c.IsReplayingHistory).Returns(true);
 
         var cut = RenderComponent<Game>();
 
-        cut.FindAll("[data-testid='history-replay-overlay']").Should().HaveCount(1);
+        cut.FindAll("[data-testid='match-panel']").Should().BeEmpty();
     }
 
     [Fact]
-    public void Given_NotReplayingHistory_When_MatchRenders_Then_ReplayOverlayIsHidden()
+    public void Given_IsReplayingHistory_When_MatchRenders_Then_LoadingProgressIsShown()
     {
+        _connectionMock.SetupGet(c => c.IsReplayingHistory).Returns(true);
+
         var cut = RenderComponent<Game>();
 
-        cut.FindAll("[data-testid='history-replay-overlay']").Should().BeEmpty();
+        cut.FindAll("[data-testid='history-loading']").Should().HaveCount(1);
     }
 }

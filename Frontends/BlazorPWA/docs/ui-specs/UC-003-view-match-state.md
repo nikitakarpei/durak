@@ -39,6 +39,6 @@
 1. Show action controls based on available moves in current state.
 2. Hide action buttons when no moves are available.
 
-## History Replay Overlay
-1. While old events are being applied on (re)connect, show a full-match overlay with a centred circular spinner.
-2. The overlay disappears as soon as all historical events have been applied.
+## History Replay Loading
+1. While old events are being applied on (re)connect, hide the match screen entirely and show the same circular loading progress indicator used during Blazor startup.
+2. No intermediate game state is shown during replay — the match screen appears only once all historical events have been fully applied.
