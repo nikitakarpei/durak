@@ -154,6 +154,7 @@ public static class GameStateReducer
     {
         state.AttackerPlayerId = evt.AttackerPlayerId;
         state.DefenderPlayerId = evt.DefenderPlayerId;
+        state.CurrentTurnPlayerId = null;
         state.Table.Clear();
     }
 

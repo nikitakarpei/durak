@@ -9,9 +9,9 @@
 3. Trump section shows a mini card face with rank and suit when known.
 4. Deck section shows a small blue card-back icon and the remaining deck count.
 5. A role indicator slot sits between the trump and deck sections.
-6. When the player is defender, the role slot shows a shield icon.
-7. When the player is attacker, the role slot shows a forward arrow icon.
-8. When the player is neither attacker nor defender, the role slot is empty.
+6. When the player is defender and it is their turn, the role slot shows a shield icon.
+7. When the player is attacker and it is their turn, the role slot shows a forward arrow icon.
+8. When the player is not the active player, the role slot is empty.
 9. The central HUD sits directly below the opponent top zone and does not overlap any opponent seat.
 10. The central HUD may change width between roles (neutral, attacker, defender) but should remain stable within a given role. The HUD must not grow or shrink based on the presence or absence of action buttons — its height must be determined solely by its own content.
 

@@ -35,7 +35,7 @@
 - Hand cards remain visually consistent even when some cards are playable or beatable.
 - Hovered or selected hand cards can lift upward without being clipped by the hand container.
 - The trump suit and remaining deck count are shown in a compact central HUD widget that does not occupy table space.
-- The central HUD shows a role icon when the player is the attacker or defender, and shows no role icon otherwise.
+- The central HUD shows a role icon when the player is the attacker or defender and it is their turn, and shows no role icon otherwise.
 - All opponent seats are displayed in a top zone above the table, arranged in up to two symmetric horizontal rows. The arrangement adjusts by seat count so the layout is always balanced and never lopsided.
 - Defended table pairs show the defence card overlaid on top of the attack card at an angle, so the player can see both the beating card and the card that was beaten.
 - When the player has no available moves, hand and table cards are shown as non-interactive.

@@ -244,6 +244,11 @@
             return CentralHudRole.Neutral;
         }
 
+        if (State.CurrentTurnPlayerId != State.LocalPlayerId)
+        {
+            return CentralHudRole.Neutral;
+        }
+
         if (State.LocalPlayerId == State.AttackerPlayerId)
         {
             return CentralHudRole.Attacker;

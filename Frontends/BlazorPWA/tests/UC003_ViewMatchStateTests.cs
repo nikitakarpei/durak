@@ -68,6 +68,30 @@ public class UC003_ViewMatchStateTests : TestContext
     }
 
     [Fact]
+    public void Given_PlayerIsAttackerButNotActive_When_MatchRenders_Then_RoleIconIsHidden()
+    {
+        _gameState.LocalPlayerId = "player-1";
+        _gameState.AttackerPlayerId = "player-1";
+        _gameState.CurrentTurnPlayerId = "player-2";
+
+        var cut = RenderComponent<Game>();
+
+        cut.FindAll("[data-testid='central-role']").Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Given_PlayerIsAttackerAndActive_When_MatchRenders_Then_RoleIconIsVisible()
+    {
+        _gameState.LocalPlayerId = "player-1";
+        _gameState.AttackerPlayerId = "player-1";
+        _gameState.CurrentTurnPlayerId = "player-1";
+
+        var cut = RenderComponent<Game>();
+
+        cut.Find("[data-testid='central-role']").GetAttribute("data-role").Should().Be("attacker");
+    }
+
+    [Fact]
     public void Given_ConfiguredSeatsAndJoinedOpponents_When_MatchRenders_Then_AllOpponentSlotsAreShown()
     {
         _gameState.TotalPlayerSeats = 6;
