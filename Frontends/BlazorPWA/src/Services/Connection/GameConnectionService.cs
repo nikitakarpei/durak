@@ -160,11 +160,11 @@ public sealed class GameConnectionService : IGameConnectionService
             {
                 if (response.ResultCase == GetGameEventsCommand.Types.StreamResponse.ResultOneofCase.OldEvent)
                 {
-                    await ApplyEventAsync(response.OldEvent.Event, cancellationToken);
+                    ApplyOldEvent(response.OldEvent.Event);
                 }
                 else if (response.ResultCase == GetGameEventsCommand.Types.StreamResponse.ResultOneofCase.NewEvent)
                 {
-                    await ApplyEventAsync(response.NewEvent.Event, cancellationToken);
+                    await ApplyNewEventAsync(response.NewEvent.Event, cancellationToken);
                 }
                 else if (response.ResultCase == GetGameEventsCommand.Types.StreamResponse.ResultOneofCase.OldEventsEnded)
                 {
@@ -184,16 +184,22 @@ public sealed class GameConnectionService : IGameConnectionService
         }
     }
 
+    // Reconstruction pipeline: apply old events as fast as possible, no UI updates.
+    private void ApplyOldEvent(Any payload)
+    {
+        GameStateReducer.Apply(_state, payload);
+    }
+
+    // Live gameplay pipeline: apply delays for UX, then update UI.
     // TECH DEBT: 1s artificial delay before RoundFinished to let players see the final table state.
     // Replace with a proper server-driven acknowledgement flow.
-    private async Task ApplyEventAsync(Any payload, CancellationToken cancellationToken)
+    private async Task ApplyNewEventAsync(Any payload, CancellationToken cancellationToken)
     {
         if (payload.Is(RoundFinished.Descriptor))
             await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
 
         GameStateReducer.Apply(_state, payload);
-        if (!IsReplayingHistory)
-            NotifyStateChanged();
+        NotifyStateChanged();
     }
 
     private Uri BuildGameServiceEndpoint(string playerIdToken)
