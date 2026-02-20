@@ -25,6 +25,7 @@
 3. Defended pair (attack non-selectable; defence card overlaid on the attack card, offset and rotated, so both cards remain visible).
 4. Selected/beatable highlighting states for open attack cards.
 5. When a hand card is selected, non-beatable and non-selected attack cards are visually faded.
+6. Clicking a non-beatable attack card does not select it and briefly shakes the card.
 
 ## Test Hooks
 - `data-testid='table-section'`

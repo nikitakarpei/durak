@@ -63,6 +63,28 @@ public class UC005_TableSectionTests : TestContext
     }
 
     [Fact]
+    public void Given_SelectedHandCardAndNoBeatableAttacks_When_InvalidAttackClicked_Then_NoSelectionAndCardShakes()
+    {
+        var selectedAttack = string.Empty;
+        var pairs = new List<TablePair>
+        {
+            new(new Card("atk-1", CardSuit.Clubs, CardRank.Six), null),
+            new(new Card("atk-2", CardSuit.Hearts, CardRank.King), null),
+        };
+
+        var cut = RenderComponent<TableSection>(parameters => parameters
+            .Add(p => p.Pairs, pairs)
+            .Add(p => p.BeatableAttackCardIds, new HashSet<string>())
+            .Add(p => p.HasSelectedHandCard, true)
+            .Add(p => p.OnAttackCardSelected, id => selectedAttack = id));
+
+        cut.Find("[data-testid='table-attack-atk-2']").Click();
+
+        selectedAttack.Should().BeEmpty();
+        cut.Find("[data-testid='table-attack-atk-2']").GetAttribute("data-visual-state").Should().Be("invalid");
+    }
+
+    [Fact]
     public void Given_SelectedHandCardAndNoBeatableAttacks_When_TableSectionRenders_Then_AllAttacksAreMarkedUnbeatable()
     {
         var pairs = new List<TablePair>

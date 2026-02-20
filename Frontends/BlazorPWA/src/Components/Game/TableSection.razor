@@ -11,7 +11,7 @@
                           TestId="@($"table-attack-{pair.Attack.Id}")"
                           StateClasses="@BuildAttackStateClasses(pair.Attack.Id)"
                           VisualState="@GetVisualState(pair.Attack.Id)"
-                          OnClick="() => OnAttackCardSelected.InvokeAsync(pair.Attack.Id)" />
+                          OnClick="() => HandleAttackClick(pair.Attack.Id)" />
             }
             else
             {
@@ -44,6 +44,9 @@
     [Parameter]
     public EventCallback<string> OnAttackCardSelected { get; set; }
 
+    private string? shakingAttackId;
+    private bool isShakeActive;
+
     private string BuildAttackStateClasses(string attackId)
     {
         var classes = new List<string>();
@@ -62,6 +65,11 @@
 
     private string? GetVisualState(string attackId)
     {
+        if (shakingAttackId == attackId)
+        {
+            return "invalid";
+        }
+
         if (!HasSelectedHandCard || SelectedAttackCardId == attackId)
         {
             return null;
@@ -73,5 +81,35 @@
         }
 
         return BeatableAttackCardIds.Contains(attackId) ? null : "unbeatable";
+    }
+
+    private async Task HandleAttackClick(string attackId)
+    {
+        var isBeatable = BeatableAttackCardIds.Contains(attackId);
+        if (HasSelectedHandCard && !isBeatable)
+        {
+            await TriggerInvalidShakeAsync(attackId);
+            return;
+        }
+
+        await OnAttackCardSelected.InvokeAsync(attackId);
+    }
+
+    private async Task TriggerInvalidShakeAsync(string attackId)
+    {
+        if (isShakeActive)
+        {
+            return;
+        }
+
+        isShakeActive = true;
+        shakingAttackId = attackId;
+        await InvokeAsync(StateHasChanged);
+
+        await Task.Delay(350);
+
+        shakingAttackId = null;
+        isShakeActive = false;
+        await InvokeAsync(StateHasChanged);
     }
 }

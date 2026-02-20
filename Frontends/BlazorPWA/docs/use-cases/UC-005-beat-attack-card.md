@@ -36,6 +36,7 @@
 - Player can explicitly select a target attack card and a defender card before submitting.
 - After selecting a target attack card on the table, hand cards that cannot beat it are faded to emphasize valid defenders.
 - After selecting a hand card, table attack cards that cannot be beaten by it are faded to emphasize valid targets, even when none are beatable.
+- Clicking a non-beatable table attack card does not select it and triggers a brief shake animation to indicate it is invalid.
 - Defender card appears overlaid on the chosen attack card after the game state updates: the defender card is placed on top, offset and rotated, while the attack card remains visible beneath it.
 
 ## Out of Scope (MVP)

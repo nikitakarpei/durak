@@ -236,6 +236,20 @@
     filter: grayscale(0.55) saturate(0.35) brightness(0.92);
 }
 
+::deep .table-zone .card-face[data-visual-state='invalid'] {
+    filter: grayscale(0.55) saturate(0.35) brightness(0.92);
+    animation: table-card-shake 0.35s ease;
+}
+
+@keyframes table-card-shake {
+    0% { transform: translateX(0); }
+    20% { transform: translateX(-3px); }
+    40% { transform: translateX(3px); }
+    60% { transform: translateX(-2px); }
+    80% { transform: translateX(2px); }
+    100% { transform: translateX(0); }
+}
+
 ::deep .hand .card-face[data-visual-state='unbeatable'] {
     filter: grayscale(0.55) saturate(0.35) brightness(0.92);
 }
