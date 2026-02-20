@@ -72,6 +72,24 @@ public class UC006_HandSectionTests : TestContext
     }
 
     [Fact]
+    public void Given_BeatableCardsExist_When_SectionRenders_Then_NonBeatableCardsAreMarkedUnbeatable()
+    {
+        var cards = new List<Card>
+        {
+            new("h1", CardSuit.Hearts, CardRank.Queen),
+            new("h2", CardSuit.Clubs, CardRank.Jack),
+        };
+
+        var cut = RenderComponent<HandSection>(parameters => parameters
+            .Add(p => p.Cards, cards)
+            .Add(p => p.PlayableCardIds, new HashSet<string>())
+            .Add(p => p.BeatableHandCardIds, new HashSet<string> { "h1" }));
+
+        cut.Find("[data-testid='hand-card-h1']").GetAttribute("data-visual-state").Should().BeNull();
+        cut.Find("[data-testid='hand-card-h2']").GetAttribute("data-visual-state").Should().Be("unbeatable");
+    }
+
+    [Fact]
     public void Given_SelectableCard_When_Clicked_Then_OnCardSelectedCallbackIsRaisedWithCardId()
     {
         var selectedCard = string.Empty;

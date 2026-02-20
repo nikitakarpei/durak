@@ -23,11 +23,13 @@
 3. Selected card state.
 4. Playable/beatable highlight states.
 5. Hand card face layout matches table cards with rank stacked above suit and compact spacing.
+6. When beatable cards exist, non-beatable and non-selected hand cards are visually faded.
 
 ## Test Hooks
 - `data-testid='hand-section'`
 - `data-testid='hand-scroll'`
 - `data-testid='hand-card-<cardId>'`
+- `data-visual-state='unbeatable'` on non-beatable, non-selected hand cards when at least one beatable hand card exists.
 
 ## Out of Scope
 - Move legality computation and selected-card toggle logic ownership.

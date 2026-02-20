@@ -6,6 +6,7 @@
     <button type="button"
             class="@BuildCardClass()"
             data-testid="@TestId"
+            data-visual-state="@VisualState"
             @onclick="OnClick">
         <span class="card-face__rank">@RankToText(Card.Rank)</span>
         <span class="card-face__suit">@SuitToText(Card.Suit)</span>
@@ -14,7 +15,8 @@
 else
 {
     <div class="@BuildCardClass()"
-         data-testid="@TestId">
+         data-testid="@TestId"
+         data-visual-state="@VisualState">
         <span class="card-face__rank">@RankToText(Card.Rank)</span>
         <span class="card-face__suit">@SuitToText(Card.Suit)</span>
     </div>
@@ -32,6 +34,9 @@ else
 
     [Parameter]
     public string? StateClasses { get; set; }
+
+    [Parameter]
+    public string? VisualState { get; set; }
 
     [Parameter]
     public EventCallback OnClick { get; set; }

@@ -237,8 +237,9 @@
     border-color: #86efac;
 }
 
-::deep .hand .card-face.beatable {
-    border-color: #86efac;
+::deep .hand .card-face[data-visual-state='unbeatable'] {
+    filter: grayscale(0.55) saturate(0.35) brightness(0.92);
+    opacity: 0.75;
 }
 
 /* Dim cards that are not active when a turn is in progress */
