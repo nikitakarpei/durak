@@ -7,14 +7,14 @@
         <svg class="central-hud__timer"
              data-testid="central-hud-timer"
              style="--turn-timer-duration: @($"{TurnTimerDuration.Value.TotalSeconds:0.###}s")"
-             viewBox="0 0 @Fmt(_hudWidth) @Fmt(_hudHeight)"
+             viewBox="0 0 @Fmt(_hudWidth + 10) @Fmt(_hudHeight + 10)"
              @key="TurnTimerKey">
             @if (_hudWidth > 0 && _hudHeight > 0)
             {
                 <rect class="central-hud__timer-path"
-                      x="2" y="2"
-                      width="@Fmt(_hudWidth - 4)" height="@Fmt(_hudHeight - 4)"
-                      rx="@Fmt((_hudHeight - 4) / 2)" ry="@Fmt((_hudHeight - 4) / 2)"
+                      x="3" y="3"
+                      width="@Fmt(_hudWidth + 4)" height="@Fmt(_hudHeight + 4)"
+                      rx="@Fmt(_hudHeight / 2 + 2)" ry="@Fmt(_hudHeight / 2 + 2)"
                       pathLength="1" />
             }
         </svg>
