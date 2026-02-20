@@ -39,6 +39,7 @@
                 Pairs="@State.Table"
                 SelectedAttackCardId="@selectedAttackCardId"
                 BeatableAttackCardIds="@GetBeatableAttackCardIds()"
+                HasSelectedHandCard="@(!string.IsNullOrWhiteSpace(selectedCardId))"
                 OnAttackCardSelected="SelectAttackCard" />
 
             <HandSection

@@ -11,6 +11,7 @@
    - `Pairs` (`IReadOnlyList<TablePair>`) representing current table state.
    - `SelectedAttackCardId` (`string?`) for selected target attack card.
    - `BeatableAttackCardIds` (`IReadOnlySet<string>`) for currently beatable attack cards.
+   - `HasSelectedHandCard` (`bool`) indicating whether the player has selected a hand card.
 2. Outputs:
    - `OnAttackCardSelected(string)` when user selects an open attack card.
 3. Required accessibility semantics:
@@ -23,7 +24,7 @@
 2. Open attack pair (attack selectable).
 3. Defended pair (attack non-selectable; defence card overlaid on the attack card, offset and rotated, so both cards remain visible).
 4. Selected/beatable highlighting states for open attack cards.
-5. When beatable attack cards exist, non-beatable and non-selected attack cards are visually faded.
+5. When a hand card is selected, non-beatable and non-selected attack cards are visually faded.
 
 ## Test Hooks
 - `data-testid='table-section'`

@@ -232,11 +232,6 @@
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
-/* Beatable table attack cards: green border to highlight the target */
-::deep .table-zone .card-face.beatable {
-    border-color: #86efac;
-}
-
 ::deep .table-zone .card-face[data-visual-state='unbeatable'] {
     filter: grayscale(0.55) saturate(0.35) brightness(0.92);
 }

@@ -39,6 +39,9 @@
     public IReadOnlySet<string> BeatableAttackCardIds { get; set; } = new HashSet<string>();
 
     [Parameter]
+    public bool HasSelectedHandCard { get; set; }
+
+    [Parameter]
     public EventCallback<string> OnAttackCardSelected { get; set; }
 
     private string BuildAttackStateClasses(string attackId)
@@ -59,9 +62,14 @@
 
     private string? GetVisualState(string attackId)
     {
-        if (BeatableAttackCardIds.Count == 0 || SelectedAttackCardId == attackId)
+        if (!HasSelectedHandCard || SelectedAttackCardId == attackId)
         {
             return null;
+        }
+
+        if (BeatableAttackCardIds.Count == 0)
+        {
+            return "unbeatable";
         }
 
         return BeatableAttackCardIds.Contains(attackId) ? null : "unbeatable";
