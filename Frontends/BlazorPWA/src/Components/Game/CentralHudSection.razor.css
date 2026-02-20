@@ -14,7 +14,7 @@
 
 .central-hud__timer {
     position: absolute;
-    inset: -4px;
+    inset: -2px;
     pointer-events: none;
     z-index: 1;
 }
@@ -25,6 +25,7 @@
     stroke-linecap: round;
     stroke-dasharray: 100;
     stroke-dashoffset: 0;
+    shape-rendering: geometricPrecision;
     animation:
         central-hud-timer-dash var(--turn-timer-duration) linear forwards,
         central-hud-timer-color var(--turn-timer-duration) linear forwards,
