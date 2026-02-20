@@ -23,11 +23,13 @@
 2. Open attack pair (attack selectable).
 3. Defended pair (attack non-selectable; defence card overlaid on the attack card, offset and rotated, so both cards remain visible).
 4. Selected/beatable highlighting states for open attack cards.
+5. When beatable attack cards exist, non-beatable and non-selected attack cards are visually faded.
 
 ## Test Hooks
 - `data-testid='table-section'`
 - `data-testid='table-pair'`
 - `data-testid='table-attack-<cardId>'`
+- `data-visual-state='unbeatable'` on non-beatable, non-selected attack cards when at least one beatable attack card exists.
 
 ## Out of Scope
 - Computing legal beat targets and selection rules.

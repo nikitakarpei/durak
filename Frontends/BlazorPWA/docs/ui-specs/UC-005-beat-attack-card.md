@@ -18,6 +18,7 @@
 4. If either selection is missing, submitting defence does not send a move.
 5. If access token is unavailable, submitting defence does not send a move.
 6. After a table attack card is selected, hand cards that cannot beat it are visually faded.
+7. After a hand card is selected, table attack cards that cannot be beaten by it are visually faded.
 
 ## Layout and Responsive Rules
 1. Table attack cards and hand cards remain independently selectable in mobile-first layout.

@@ -10,6 +10,7 @@
                           IsInteractive="true"
                           TestId="@($"table-attack-{pair.Attack.Id}")"
                           StateClasses="@BuildAttackStateClasses(pair.Attack.Id)"
+                          VisualState="@GetVisualState(pair.Attack.Id)"
                           OnClick="() => OnAttackCardSelected.InvokeAsync(pair.Attack.Id)" />
             }
             else
@@ -54,5 +55,15 @@
         }
 
         return classes.Count > 0 ? string.Join(" ", classes) : string.Empty;
+    }
+
+    private string? GetVisualState(string attackId)
+    {
+        if (BeatableAttackCardIds.Count == 0 || SelectedAttackCardId == attackId)
+        {
+            return null;
+        }
+
+        return BeatableAttackCardIds.Contains(attackId) ? null : "unbeatable";
     }
 }

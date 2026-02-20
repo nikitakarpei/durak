@@ -45,6 +45,23 @@ public class UC005_TableSectionTests : TestContext
     }
 
     [Fact]
+    public void Given_BeatableAttackExists_When_TableSectionRenders_Then_NonBeatableCardsAreMarkedUnbeatable()
+    {
+        var pairs = new List<TablePair>
+        {
+            new(new Card("atk-1", CardSuit.Clubs, CardRank.Six), null),
+            new(new Card("atk-2", CardSuit.Hearts, CardRank.King), null),
+        };
+
+        var cut = RenderComponent<TableSection>(parameters => parameters
+            .Add(p => p.Pairs, pairs)
+            .Add(p => p.BeatableAttackCardIds, new HashSet<string> { "atk-1" }));
+
+        cut.Find("[data-testid='table-attack-atk-1']").GetAttribute("data-visual-state").Should().BeNull();
+        cut.Find("[data-testid='table-attack-atk-2']").GetAttribute("data-visual-state").Should().Be("unbeatable");
+    }
+
+    [Fact]
     public void Given_DefendedPair_When_TableSectionRenders_Then_PairHasBeatenClass()
     {
         var pairs = new List<TablePair>
