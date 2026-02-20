@@ -14,45 +14,36 @@
 
 .central-hud__timer {
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
+    inset: -4px;
+    border-radius: 999px;
     pointer-events: none;
     z-index: 1;
-}
-
-.central-hud__timer rect {
-    fill: none;
-    stroke-width: 4px;
-    stroke-linecap: round;
-    stroke-dasharray: 100;
-    stroke-dashoffset: 0;
-    shape-rendering: geometricPrecision;
+    --timer-progress: 1turn;
+    background: conic-gradient(
+        var(--turn-timer-neutral) 0 180deg,
+        var(--turn-timer-warning) 180deg 288deg,
+        var(--turn-timer-urgent) 288deg 360deg
+    );
+    -webkit-mask:
+        conic-gradient(#000 0 var(--timer-progress), transparent 0),
+        radial-gradient(transparent calc(100% - 6px), #000 calc(100% - 5px));
+    -webkit-mask-composite: source-in;
+    mask:
+        conic-gradient(#000 0 var(--timer-progress), transparent 0),
+        radial-gradient(transparent calc(100% - 6px), #000 calc(100% - 5px));
+    mask-composite: intersect;
     animation:
-        central-hud-timer-dash var(--turn-timer-duration) linear forwards,
-        central-hud-timer-color var(--turn-timer-duration) linear forwards,
+        central-hud-timer-progress var(--turn-timer-duration) linear forwards,
         central-hud-timer-pulse var(--turn-timer-duration) linear forwards;
 }
 
-@keyframes central-hud-timer-dash {
+@keyframes central-hud-timer-progress {
+    from {
+        --timer-progress: 1turn;
+    }
     to {
-        stroke-dashoffset: 100;
+        --timer-progress: 0turn;
         opacity: 0;
-    }
-}
-
-@keyframes central-hud-timer-color {
-    0%,
-    50% {
-        stroke: var(--turn-timer-neutral);
-    }
-    50.01%,
-    80% {
-        stroke: var(--turn-timer-warning);
-    }
-    80.01%,
-    100% {
-        stroke: var(--turn-timer-urgent);
     }
 }
 

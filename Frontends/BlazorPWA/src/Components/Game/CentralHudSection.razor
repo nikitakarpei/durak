@@ -3,14 +3,10 @@
 <section class="central-hud @(Role != CentralHudRole.Neutral ? "central-hud--with-role" : "")" data-testid="central-hud">
     @if (IsTurnActive && TurnTimerDuration.HasValue && TurnTimerDuration.Value > TimeSpan.Zero)
     {
-        <svg class="central-hud__timer"
+        <div class="central-hud__timer"
              data-testid="central-hud-timer"
              style="--turn-timer-duration: @($"{TurnTimerDuration.Value.TotalSeconds:0.###}s")"
-             viewBox="0 0 100 40"
-             preserveAspectRatio="none"
-             @key="TurnTimerKey">
-            <rect x="2" y="2" width="96" height="36" rx="18" ry="18" pathLength="100" vector-effect="non-scaling-stroke"></rect>
-        </svg>
+             @key="TurnTimerKey"></div>
     }
     <div class="central-hud__section central-hud__section--trump" data-testid="central-trump">
         @if (TrumpCard is null)
