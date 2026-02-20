@@ -35,7 +35,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 22px;
+    width: 28px;
     height: 34px;
     border-radius: 5px;
     background: #ffffff;
@@ -83,7 +83,7 @@
 }
 
 .central-hud__deck-icon {
-    width: 24px;
+    width: 28px;
     height: 28px;
     border-radius: 4px;
     border: 1px solid rgba(148, 163, 184, 0.5);
