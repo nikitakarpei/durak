@@ -1,15 +1,22 @@
 @using GameService.Api.Data
+@inject IJSRuntime JS
 
-<section class="central-hud @(Role != CentralHudRole.Neutral ? "central-hud--with-role" : "")" data-testid="central-hud">
+<section class="central-hud @(Role != CentralHudRole.Neutral ? "central-hud--with-role" : "")" data-testid="central-hud" @ref="_hudRef">
     @if (IsTurnActive && TurnTimerDuration.HasValue && TurnTimerDuration.Value > TimeSpan.Zero)
     {
         <svg class="central-hud__timer"
              data-testid="central-hud-timer"
              style="--turn-timer-duration: @($"{TurnTimerDuration.Value.TotalSeconds:0.###}s")"
-             viewBox="0 0 100 100"
-             preserveAspectRatio="none"
+             viewBox="0 0 @Fmt(_hudWidth) @Fmt(_hudHeight)"
              @key="TurnTimerKey">
-            <rect class="central-hud__timer-path" x="2" y="2" width="96" height="96" rx="999" ry="999" pathLength="1"></rect>
+            @if (_hudWidth > 0 && _hudHeight > 0)
+            {
+                <rect class="central-hud__timer-path"
+                      x="2" y="2"
+                      width="@Fmt(_hudWidth - 4)" height="@Fmt(_hudHeight - 4)"
+                      rx="@Fmt((_hudHeight - 4) / 2)" ry="@Fmt((_hudHeight - 4) / 2)"
+                      pathLength="1" />
+            }
         </svg>
     }
     <div class="central-hud__section central-hud__section--trump" data-testid="central-trump">
@@ -64,6 +71,31 @@
 
     [Parameter]
     public string TurnTimerKey { get; set; } = "turn-0";
+
+    private ElementReference _hudRef;
+    private double _hudWidth;
+    private double _hudHeight;
+
+    private sealed record HudSize(double Width, double Height);
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        try
+        {
+            var size = await JS.InvokeAsync<HudSize>("hudTimer.getElementSize", _hudRef);
+            if (size is { Width: > 0, Height: > 0 })
+            {
+                _hudWidth = size.Width;
+                _hudHeight = size.Height;
+                StateHasChanged();
+            }
+        }
+        catch { }
+    }
+
+    private static string Fmt(double v) =>
+        v.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
 
     private static string RankToText(CardRank rank) => rank switch
     {
