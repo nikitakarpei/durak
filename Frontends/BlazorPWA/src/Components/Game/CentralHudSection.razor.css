@@ -34,8 +34,7 @@
 .central-hud__mini-card {
     display: inline-flex;
     align-items: center;
-    justify-content: flex-start;
-    flex-direction: column;
+    justify-content: center;
     width: 22px;
     height: 34px;
     border-radius: 5px;
@@ -44,7 +43,7 @@
     font-size: 0.7rem;
     font-weight: 700;
     color: #0f172a;
-    padding: 2px 0 0 3px;
+    padding: 0;
 }
 
 .central-hud__mini-card.suit-red {
@@ -56,9 +55,8 @@
     border-style: dashed;
 }
 
-.central-hud__mini-rank,
-.central-hud__mini-suit {
-    line-height: 1;
+.central-hud__mini-rank {
+    margin-right: 1px;
 }
 
 .central-hud__role-icon {
@@ -85,7 +83,7 @@
 }
 
 .central-hud__deck-icon {
-    width: 18px;
+    width: 24px;
     height: 28px;
     border-radius: 4px;
     border: 1px solid rgba(148, 163, 184, 0.5);
