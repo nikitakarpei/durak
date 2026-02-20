@@ -18,13 +18,13 @@
    - Role indicator is presentational only.
 
 ## Required States
-1. Trump known: shows mini card face with rank and suit on the same line.
+1. Trump known: shows mini outlined card with rank and suit in the top-left.
 2. Trump unknown: shows placeholder content in the trump slot.
-3. Deck count present: shows count value and vertical card-back icon.
+3. Deck count present: shows count value and mini outlined card-back icon with diagonal hatching.
 4. Neutral role: no role icon is shown between trump and deck slots.
 5. Defender role: shield icon appears in the center slot.
 6. Attacker role: crossed swords icon appears in the center slot.
-7. Sizing: the trump and deck sections use equal widths, while the role section may be narrower; the HUD is not stretched by the surrounding grid layout (e.g., when the actions section is empty).
+7. Sizing: the trump and deck sections use equal widths, while the role section may be narrower; the HUD height is compact and not stretched by surrounding layout (e.g., when the actions section is empty).
 
 ## Test Hooks
 - `data-testid='central-hud'`

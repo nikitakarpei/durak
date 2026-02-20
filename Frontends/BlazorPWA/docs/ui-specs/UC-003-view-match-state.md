@@ -5,12 +5,12 @@
 
 ## Central HUD
 1. Show a compact central HUD widget for trump and deck status.
-2. The HUD uses a pill container with a light background, rounded corners, subtle border or shadow, and two sections separated by a faint divider.
-3. Trump section shows a mini card face with rank and suit on the same line when known.
-4. Deck section shows a vertical card-back icon and the remaining deck count.
+2. The HUD uses a pill container with a light background, rounded corners, and a subtle border without a drop shadow. Thin dividers separate the three sections.
+3. Trump section shows a mini outlined card with rank and suit in the top-left when known.
+4. Deck section shows a mini outlined card-back icon with diagonal hatching and the remaining deck count.
 5. A role indicator slot sits between the trump and deck sections.
-6. When the player is defender and it is their turn, the role slot shows a shield icon.
-7. When the player is attacker and it is their turn, the role slot shows a crossed swords icon.
+6. When the player is defender and it is their turn, the role slot shows a prominent shield icon centered in the slot.
+7. When the player is attacker and it is their turn, the role slot shows a prominent crossed swords icon centered in the slot.
 8. When the player is not the active player, the role slot is empty.
 9. When the player is not active, the HUD shows only the trump and deck sections.
 10. The trump and deck sections always share the same width, while the role slot may be narrower.

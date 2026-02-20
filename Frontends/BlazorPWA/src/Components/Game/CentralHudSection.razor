@@ -9,7 +9,8 @@
         else
         {
             <span class="central-hud__mini-card @SuitClass(TrumpCard.Suit)">
-                @RankToText(TrumpCard.Rank)@SuitToText(TrumpCard.Suit)
+                <span class="central-hud__mini-rank">@RankToText(TrumpCard.Rank)</span>
+                <span class="central-hud__mini-suit">@SuitToText(TrumpCard.Suit)</span>
             </span>
         }
     </div>
