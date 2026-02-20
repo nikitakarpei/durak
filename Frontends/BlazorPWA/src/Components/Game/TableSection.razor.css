@@ -1,0 +1,71 @@
+.table-zone {
+    flex: 1;
+    min-height: 180px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 0;
+}
+
+.pair {
+    display: grid;
+    gap: 8px;
+    align-items: center;
+    justify-items: center;
+}
+
+.pair.beaten {
+    position: relative;
+    display: block;
+    width: 62px;
+    height: 87px;
+    overflow: visible;
+}
+
+.pair.beaten ::deep .card-face.defence {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    transform: rotate(20deg);
+    z-index: 1;
+}
+
+::deep .table-zone .card-face {
+    cursor: pointer;
+}
+
+::deep .table-zone .card-face.selected {
+    border-color: #4f46e5;
+    background: #eef2ff;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+}
+
+::deep .table-zone .card-face.selected .card-face__rank,
+::deep .table-zone .card-face.selected .card-face__suit {
+    color: #4f46e5;
+}
+
+.table-zone ::deep .card-face.selected.suit-red .card-face__rank,
+.table-zone ::deep .card-face.selected.suit-red .card-face__suit {
+    color: #dc2626;
+}
+
+::deep .table-zone .card-face[data-visual-state='unbeatable'] {
+    filter: grayscale(0.55) saturate(0.35) brightness(0.92);
+}
+
+::deep .table-zone .card-face[data-visual-state='invalid'] {
+    filter: grayscale(0.55) saturate(0.35) brightness(0.92);
+    animation: table-card-shake 0.35s ease;
+}
+
+@keyframes table-card-shake {
+    0% { transform: translateX(0); }
+    20% { transform: translateX(-3px); }
+    40% { transform: translateX(3px); }
+    60% { transform: translateX(-2px); }
+    80% { transform: translateX(2px); }
+    100% { transform: translateX(0); }
+}
