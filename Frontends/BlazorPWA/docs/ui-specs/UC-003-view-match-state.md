@@ -8,8 +8,12 @@
 2. The HUD uses a pill container with a light background, rounded corners, subtle border or shadow, and two sections separated by a faint divider.
 3. Trump section shows a mini card face with rank and suit when known.
 4. Deck section shows a small blue card-back icon and the remaining deck count.
-5. The talon HUD sits directly below the opponent top zone and does not overlap any opponent seat.
-6. The talon HUD has a fixed, stable size at all times. Neither the trump rank (one-character "A" vs three-character "10♦") nor the deck count (single digit vs double digit) may change the physical dimensions of the pill. The HUD must also not grow or shrink based on the presence or absence of action buttons — its height must be determined solely by its own content.
+5. A role indicator slot sits between the trump and deck sections.
+6. When the player is defender, the role slot shows a shield icon.
+7. When the player is attacker, the role slot shows an attacker icon (crossed swords or a forward arrow).
+8. When the player is neither attacker nor defender, the role slot is empty.
+9. The talon HUD sits directly below the opponent top zone and does not overlap any opponent seat.
+10. The talon HUD has a fixed, stable size at all times. Neither the trump rank (one-character "A" vs three-character "10♦") nor the deck count (single digit vs double digit) may change the physical dimensions of the pill. The HUD must also not grow or shrink based on the presence or absence of action buttons — its height must be determined solely by its own content.
 
 ## Opponents Area
 1. Show all configured opponent seats, including unoccupied seats.

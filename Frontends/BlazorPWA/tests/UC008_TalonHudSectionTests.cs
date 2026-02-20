@@ -39,4 +39,37 @@ public class UC008_TalonHudSectionTests : TestContext
 
         cut.Find("[data-testid='talon-count']").TextContent.Should().Be("2");
     }
+
+    [Fact]
+    public void Given_NeutralRole_When_SectionRenders_Then_RoleIconIsHidden()
+    {
+        var cut = RenderComponent<TalonHudSection>(parameters => parameters
+            .Add(p => p.TrumpCard, null)
+            .Add(p => p.TalonCount, 2)
+            .Add(p => p.Role, TalonHudRole.Neutral));
+
+        cut.FindAll("[data-testid='talon-role']").Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Given_DefenderRole_When_SectionRenders_Then_ShieldIconIsVisible()
+    {
+        var cut = RenderComponent<TalonHudSection>(parameters => parameters
+            .Add(p => p.TrumpCard, null)
+            .Add(p => p.TalonCount, 2)
+            .Add(p => p.Role, TalonHudRole.Defender));
+
+        cut.Find("[data-testid='talon-role']").GetAttribute("data-role").Should().Be("defender");
+    }
+
+    [Fact]
+    public void Given_AttackerRole_When_SectionRenders_Then_AttackerIconIsVisible()
+    {
+        var cut = RenderComponent<TalonHudSection>(parameters => parameters
+            .Add(p => p.TrumpCard, null)
+            .Add(p => p.TalonCount, 2)
+            .Add(p => p.Role, TalonHudRole.Attacker));
+
+        cut.Find("[data-testid='talon-role']").GetAttribute("data-role").Should().Be("attacker");
+    }
 }

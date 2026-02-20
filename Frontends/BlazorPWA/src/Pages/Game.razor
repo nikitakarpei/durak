@@ -1,4 +1,5 @@
 @page "/game"
+@using BlazorPWA.Components.Game
 @using BlazorPWA.Services.Connection
 @using BlazorPWA.State
 @inject IGameConnectionService Connection
@@ -32,7 +33,9 @@
             <OpponentsSection Seats="@GetOpponents()" />
 
             <div class="talon-hud-row">
-                <TalonHudSection TrumpCard="@State.TrumpCard" TalonCount="@State.TalonCount" />
+                <TalonHudSection TrumpCard="@State.TrumpCard"
+                                 TalonCount="@State.TalonCount"
+                                 Role="@GetHudRole()" />
             </div>
 
             <TableSection
@@ -233,6 +236,26 @@
         suit is GameService.Api.Data.CardSuit.Hearts or GameService.Api.Data.CardSuit.Diamonds
             ? "suit-red"
             : "";
+
+    private TalonHudRole GetHudRole()
+    {
+        if (State.LocalPlayerId is null)
+        {
+            return TalonHudRole.Neutral;
+        }
+
+        if (State.LocalPlayerId == State.AttackerPlayerId)
+        {
+            return TalonHudRole.Attacker;
+        }
+
+        if (State.LocalPlayerId == State.DefenderPlayerId)
+        {
+            return TalonHudRole.Defender;
+        }
+
+        return TalonHudRole.Neutral;
+    }
 
     private IReadOnlySet<string> GetPlayableCardIds() =>
         State.YourPossibleMoves
