@@ -24,7 +24,7 @@
 4. Neutral role: no role icon is shown between trump and deck slots.
 5. Defender role: shield icon appears in the center slot.
 6. Attacker role: forward arrow icon appears in the center slot.
-7. Rigid size: the pill, trump slot, and count slot are fixed-width; content changes (rank length, digit count) must not change the physical dimensions of the HUD. The HUD height must also be stable — it must not be stretched by the surrounding grid layout (e.g., when the actions section is empty).
+7. Role sizing: the HUD may change width between roles, but the size should remain stable within a given role and must not be stretched by the surrounding grid layout (e.g., when the actions section is empty).
 
 ## Test Hooks
 - `data-testid='central-hud'`

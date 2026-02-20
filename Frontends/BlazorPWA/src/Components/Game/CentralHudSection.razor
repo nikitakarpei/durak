@@ -13,25 +13,28 @@
             </span>
         }
     </div>
-    <div class="central-hud__divider" aria-hidden="true"></div>
-    <div class="central-hud__section central-hud__section--role">
-        @if (Role == CentralHudRole.Defender)
-        {
-            <span class="central-hud__role-icon central-hud__role-icon--defender" data-testid="central-role" data-role="defender" aria-hidden="true">
-                <svg viewBox="0 0 24 24" role="presentation">
-                    <path d="M12 2L20 6V12C20 17 16.5 20.5 12 22C7.5 20.5 4 17 4 12V6L12 2Z" />
-                </svg>
-            </span>
-        }
-        else if (Role == CentralHudRole.Attacker)
-        {
-            <span class="central-hud__role-icon central-hud__role-icon--attacker" data-testid="central-role" data-role="attacker" aria-hidden="true">
-                <svg viewBox="0 0 24 24" role="presentation">
-                    <path d="M4 12H14L10.5 8.5L12 7L19 12L12 17L10.5 15.5L14 12H4Z" />
-                </svg>
-            </span>
-        }
-    </div>
+    @if (Role != CentralHudRole.Neutral)
+    {
+        <div class="central-hud__divider" aria-hidden="true"></div>
+        <div class="central-hud__section central-hud__section--role">
+            @if (Role == CentralHudRole.Defender)
+            {
+                <span class="central-hud__role-icon central-hud__role-icon--defender" data-testid="central-role" data-role="defender" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" role="presentation">
+                        <path d="M12 2L20 6V12C20 17 16.5 20.5 12 22C7.5 20.5 4 17 4 12V6L12 2Z" />
+                    </svg>
+                </span>
+            }
+            else if (Role == CentralHudRole.Attacker)
+            {
+                <span class="central-hud__role-icon central-hud__role-icon--attacker" data-testid="central-role" data-role="attacker" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" role="presentation">
+                        <path d="M4 12H14L10.5 8.5L12 7L19 12L12 17L10.5 15.5L14 12H4Z" />
+                    </svg>
+                </span>
+            }
+        </div>
+    }
     <div class="central-hud__divider" aria-hidden="true"></div>
     <div class="central-hud__section central-hud__section--deck">
         <span class="central-hud__deck-icon" data-testid="central-deck" aria-hidden="true"></span>

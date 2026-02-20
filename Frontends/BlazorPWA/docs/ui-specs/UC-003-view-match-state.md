@@ -13,7 +13,7 @@
 7. When the player is attacker, the role slot shows a forward arrow icon.
 8. When the player is neither attacker nor defender, the role slot is empty.
 9. The central HUD sits directly below the opponent top zone and does not overlap any opponent seat.
-10. The central HUD has a fixed, stable size at all times. Neither the trump rank (one-character "A" vs three-character "10♦") nor the deck count (single digit vs double digit) may change the physical dimensions of the pill. The HUD must also not grow or shrink based on the presence or absence of action buttons — its height must be determined solely by its own content.
+10. The central HUD may change width between roles (neutral, attacker, defender) but should remain stable within a given role. The HUD must not grow or shrink based on the presence or absence of action buttons — its height must be determined solely by its own content.
 
 ## Opponents Area
 1. Show all configured opponent seats, including unoccupied seats.
