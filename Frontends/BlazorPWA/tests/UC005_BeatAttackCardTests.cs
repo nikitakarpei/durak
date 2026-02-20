@@ -67,7 +67,7 @@ public class UC005_BeatAttackCardTests : TestContext
     {
         var cut = RenderComponent<Game>();
 
-        cut.Find("section.table button.card-face").Click();
+        cut.Find("section.table-zone button.card-face").Click();
 
         cut.Find("section.actions button").HasAttribute("disabled").Should().BeTrue();
     }
@@ -77,7 +77,7 @@ public class UC005_BeatAttackCardTests : TestContext
     {
         var cut = RenderComponent<Game>();
 
-        cut.Find("section.table button.card-face").Click();
+        cut.Find("section.table-zone button.card-face").Click();
         cut.Find("section.hand button.card-face").Click();
 
         cut.Find("section.actions button").HasAttribute("disabled").Should().BeFalse();
@@ -88,7 +88,7 @@ public class UC005_BeatAttackCardTests : TestContext
     {
         var cut = RenderComponent<Game>();
 
-        cut.Find("section.table button.card-face").Should().NotBeNull();
+        cut.Find("section.table-zone button.card-face").Should().NotBeNull();
     }
 
     [Fact]
@@ -96,9 +96,9 @@ public class UC005_BeatAttackCardTests : TestContext
     {
         var cut = RenderComponent<Game>();
 
-        cut.Find("section.table button.card-face").Click();
+        cut.Find("section.table-zone button.card-face").Click();
 
-        cut.Find("section.table button.card-face").ClassList.Should().Contain("selected");
+        cut.Find("section.table-zone button.card-face").ClassList.Should().Contain("selected");
     }
 
     [Fact]
@@ -106,7 +106,7 @@ public class UC005_BeatAttackCardTests : TestContext
     {
         var cut = RenderComponent<Game>();
 
-        cut.Find("section.table button.card-face").Click();
+        cut.Find("section.table-zone button.card-face").Click();
 
         cut.FindAll("section.actions button")
             .First(b => b.TextContent.Contains("Beat Attack"))
@@ -127,7 +127,7 @@ public class UC005_BeatAttackCardTests : TestContext
 
         var cut = RenderComponent<Game>();
 
-        cut.Find("section.table button.card-face").Click();
+        cut.Find("section.table-zone button.card-face").Click();
         cut.Find("section.hand button.card-face").Click();
 
         cut.FindAll("section.actions button")
@@ -147,7 +147,7 @@ public class UC005_BeatAttackCardTests : TestContext
 
         var cut = RenderComponent<Game>();
 
-        cut.Find("section.table button.card-face").Click();
+        cut.Find("section.table-zone button.card-face").Click();
         cut.Find("section.hand button.card-face").Click();
         cut.FindAll("section.actions button")
             .First(b => b.TextContent.Contains("Beat Attack"))
@@ -166,7 +166,7 @@ public class UC005_BeatAttackCardTests : TestContext
 
         cut.Find("section.hand button.card-face").Click();
 
-        cut.Find("section.table button.card-face").ClassList.Should().Contain("beatable");
+        cut.Find("section.table-zone button.card-face").ClassList.Should().Contain("beatable");
     }
 
     [Fact]
@@ -174,7 +174,7 @@ public class UC005_BeatAttackCardTests : TestContext
     {
         var cut = RenderComponent<Game>();
 
-        cut.Find("section.table button.card-face").Click();
+        cut.Find("section.table-zone button.card-face").Click();
 
         cut.Find("section.hand button.card-face").ClassList.Should().Contain("beatable");
     }
@@ -188,7 +188,7 @@ public class UC005_BeatAttackCardTests : TestContext
 
         cut.Find("section.hand button.card-face").Click();
 
-        var tableButtons = cut.FindAll("section.table button.card-face");
+        var tableButtons = cut.FindAll("section.table-zone button.card-face");
         tableButtons[0].ClassList.Should().Contain("beatable");    // atk-1 is beatable
         tableButtons[1].ClassList.Should().NotContain("beatable"); // atk-2 has no move
     }
@@ -200,7 +200,7 @@ public class UC005_BeatAttackCardTests : TestContext
 
         var cut = RenderComponent<Game>();
 
-        cut.Find("section.table button.card-face").Click();
+        cut.Find("section.table-zone button.card-face").Click();
 
         var handCards = cut.FindAll("section.hand button.card-face");
         handCards[0].ClassList.Should().Contain("beatable");    // def-1 can beat atk-1
@@ -212,7 +212,7 @@ public class UC005_BeatAttackCardTests : TestContext
     {
         var cut = RenderComponent<Game>();
 
-        cut.Find("section.table button.card-face").ClassList.Should().NotContain("beatable");
+        cut.Find("section.table-zone button.card-face").ClassList.Should().NotContain("beatable");
         cut.Find("section.hand button.card-face").ClassList.Should().NotContain("beatable");
     }
 
@@ -225,7 +225,7 @@ public class UC005_BeatAttackCardTests : TestContext
 
         var cut = RenderComponent<Game>();
 
-        cut.Find("section.table button.card-face").Click();
+        cut.Find("section.table-zone button.card-face").Click();
         cut.Find("section.hand button.card-face").Click();
         cut.FindAll("section.actions button")
             .First(b => b.TextContent.Contains("Beat Attack"))
@@ -236,7 +236,7 @@ public class UC005_BeatAttackCardTests : TestContext
         cut.Render();
 
         cut.FindAll("section.hand button.card-face").Should().BeEmpty();
-        var defenceText = cut.Find("section.table .pair .card-face.defence").TextContent;
+        var defenceText = cut.Find("section.table-zone .pair .card-face.defence").TextContent;
         defenceText.Should().Contain("9");
         defenceText.Should().Contain("♠");
     }

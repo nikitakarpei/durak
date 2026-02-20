@@ -161,7 +161,7 @@
     margin-inline-start: -10px;
 }
 
-::deep .table {
+::deep .table-zone {
     flex: 1;
     min-height: 180px;
     display: flex;
@@ -233,7 +233,7 @@
 }
 
 /* Beatable table attack cards: green border to highlight the target */
-::deep .table .card-face.beatable {
+::deep .table-zone .card-face.beatable {
     border-color: #86efac;
 }
 
@@ -261,12 +261,22 @@
     color: #dc2626;
 }
 
-::deep .table .card-face {
+::deep .table-zone .card-face {
     cursor: pointer;
 }
 
-::deep .table .card-face.selected {
+::deep .table-zone .card-face.selected {
     border-color: #4f46e5;
     background: #eef2ff;
     box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+}
+
+::deep .table-zone .card-face.selected .card-face__rank,
+::deep .table-zone .card-face.selected .card-face__suit {
+    color: #4f46e5;
+}
+
+.table-zone .card-face.selected.suit-red .card-face__rank,
+.table-zone .card-face.selected.suit-red .card-face__suit {
+    color: #dc2626;
 }

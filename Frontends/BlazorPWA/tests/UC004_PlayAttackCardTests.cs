@@ -183,7 +183,7 @@ public class UC004_PlayAttackCardTests : TestContext
         cut.Render();
 
         cut.FindAll("section.hand button.card-face").Should().HaveCount(1);
-        var tableCardText = cut.Find("section.table .pair .card-face").TextContent;
+        var tableCardText = cut.Find("section.table-zone .pair .card-face").TextContent;
         tableCardText.Should().Contain("A");
         tableCardText.Should().Contain("♥");
     }

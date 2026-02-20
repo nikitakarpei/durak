@@ -1,6 +1,6 @@
 @using BlazorPWA.State
 
-<section class="table" data-testid="table-section">
+<section class="table-zone" data-testid="table-section">
     @foreach (var pair in Pairs)
     {
         <div class="pair @(pair.Defence is not null ? "beaten" : "")" data-testid="table-pair" data-attack-id="@pair.Attack.Id">
