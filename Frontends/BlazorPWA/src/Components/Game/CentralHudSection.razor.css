@@ -1,4 +1,7 @@
 .central-hud {
+    --turn-timer-neutral: #2563eb;
+    --turn-timer-warning: #f59e0b;
+    --turn-timer-urgent: #dc2626;
     display: inline-flex;
     align-items: center;
     gap: 10px;
@@ -6,6 +9,62 @@
     border-radius: 999px;
     background: #f8fafc;
     border: 1px solid rgba(148, 163, 184, 0.5);
+    position: relative;
+}
+
+.central-hud__timer {
+    position: absolute;
+    inset: -4px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.central-hud__timer rect {
+    fill: none;
+    stroke-width: 4px;
+    stroke-linecap: round;
+    stroke-dasharray: 100;
+    stroke-dashoffset: 0;
+    animation:
+        central-hud-timer-dash var(--turn-timer-duration) linear forwards,
+        central-hud-timer-color var(--turn-timer-duration) linear forwards,
+        central-hud-timer-pulse var(--turn-timer-duration) linear forwards;
+}
+
+@keyframes central-hud-timer-dash {
+    to {
+        stroke-dashoffset: 100;
+        opacity: 0;
+    }
+}
+
+@keyframes central-hud-timer-color {
+    0%,
+    50% {
+        stroke: var(--turn-timer-neutral);
+    }
+    50.01%,
+    80% {
+        stroke: var(--turn-timer-warning);
+    }
+    80.01%,
+    100% {
+        stroke: var(--turn-timer-urgent);
+    }
+}
+
+@keyframes central-hud-timer-pulse {
+    0%,
+    79% {
+        filter: none;
+    }
+    80%,
+    90% {
+        filter: drop-shadow(0 0 4px rgba(220, 38, 38, 0.5));
+    }
+    100% {
+        filter: none;
+    }
 }
 
 .central-hud__section {
@@ -13,6 +72,8 @@
     align-items: center;
     gap: 8px;
     justify-content: center;
+    position: relative;
+    z-index: 2;
 }
 
 .central-hud__section--trump,

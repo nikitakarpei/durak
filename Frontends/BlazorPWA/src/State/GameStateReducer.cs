@@ -94,16 +94,26 @@ public static class GameStateReducer
         state.YourPossibleMoves.Clear();
         state.TalonCount = evt.CardsInTalon.Count;
         state.TotalPlayerSeats = null;
+        state.PlayerAfkTimerDuration = null;
+        state.TurnSequence = 0;
 
         foreach (var option in evt.Options)
         {
             if (!option.Is(AmountOfPlayers.Descriptor))
             {
+                if (option.Is(PlayerAfkTimerDuration.Descriptor))
+                {
+                    var duration = option.Unpack<PlayerAfkTimerDuration>().Duration.ToTimeSpan();
+                    if (duration > TimeSpan.Zero)
+                    {
+                        state.PlayerAfkTimerDuration = duration;
+                    }
+                }
+
                 continue;
             }
 
             state.TotalPlayerSeats = Math.Max(0, option.Unpack<AmountOfPlayers>().Count);
-            break;
         }
     }
 
@@ -155,12 +165,14 @@ public static class GameStateReducer
         state.AttackerPlayerId = evt.AttackerPlayerId;
         state.DefenderPlayerId = evt.DefenderPlayerId;
         state.CurrentTurnPlayerId = null;
+        state.TurnSequence++;
         state.Table.Clear();
     }
 
     private static void Apply(GameState state, YourTurnStarted evt)
     {
         state.CurrentTurnPlayerId = evt.PlayerId;
+        state.TurnSequence++;
         state.YourPossibleMoves.Clear();
         foreach (var moveAny in evt.PossibleMoves)
         {
@@ -186,6 +198,7 @@ public static class GameStateReducer
     private static void Apply(GameState state, OpponentTurnStarted evt)
     {
         state.CurrentTurnPlayerId = evt.PlayerId;
+        state.TurnSequence++;
         state.YourPossibleMoves.Clear();
     }
 

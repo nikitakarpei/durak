@@ -1,6 +1,17 @@
 @using GameService.Api.Data
 
 <section class="central-hud @(Role != CentralHudRole.Neutral ? "central-hud--with-role" : "")" data-testid="central-hud">
+    @if (IsTurnActive && TurnTimerDuration.HasValue && TurnTimerDuration.Value > TimeSpan.Zero)
+    {
+        <svg class="central-hud__timer"
+             data-testid="central-hud-timer"
+             style="--turn-timer-duration: @($"{TurnTimerDuration.Value.TotalSeconds:0.###}s")"
+             viewBox="0 0 100 36"
+             preserveAspectRatio="none"
+             @key="TurnTimerKey">
+            <rect x="2" y="2" width="96" height="32" rx="16" ry="16" pathLength="100"></rect>
+        </svg>
+    }
     <div class="central-hud__section central-hud__section--trump" data-testid="central-trump">
         @if (TrumpCard is null)
         {
@@ -44,6 +55,15 @@
 
     [Parameter]
     public CentralHudRole Role { get; set; }
+
+    [Parameter]
+    public bool IsTurnActive { get; set; }
+
+    [Parameter]
+    public TimeSpan? TurnTimerDuration { get; set; }
+
+    [Parameter]
+    public string TurnTimerKey { get; set; } = "turn-0";
 
     private static string RankToText(CardRank rank) => rank switch
     {

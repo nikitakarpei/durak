@@ -72,4 +72,33 @@ public class UC008_CentralHudSectionTests : TestContext
 
         cut.Find("[data-testid='central-role']").GetAttribute("data-role").Should().Be("attacker");
     }
+
+    [Fact]
+    public void Given_ActiveTurnAndTimerDuration_When_SectionRenders_Then_CountdownBorderIsVisible()
+    {
+        var cut = RenderComponent<CentralHudSection>(parameters => parameters
+            .Add(p => p.TrumpCard, null)
+            .Add(p => p.TalonCount, 2)
+            .Add(p => p.Role, CentralHudRole.Attacker)
+            .Add(p => p.IsTurnActive, true)
+            .Add(p => p.TurnTimerDuration, TimeSpan.FromSeconds(15))
+            .Add(p => p.TurnTimerKey, "turn-1"));
+
+        cut.FindAll("[data-testid='central-hud-timer']").Should().HaveCount(1);
+        cut.Find("[data-testid='central-hud-timer']").GetAttribute("style").Should().Contain("15s");
+    }
+
+    [Fact]
+    public void Given_InactiveTurn_When_SectionRenders_Then_CountdownBorderIsHidden()
+    {
+        var cut = RenderComponent<CentralHudSection>(parameters => parameters
+            .Add(p => p.TrumpCard, null)
+            .Add(p => p.TalonCount, 2)
+            .Add(p => p.Role, CentralHudRole.Attacker)
+            .Add(p => p.IsTurnActive, false)
+            .Add(p => p.TurnTimerDuration, TimeSpan.FromSeconds(15))
+            .Add(p => p.TurnTimerKey, "turn-1"));
+
+        cut.FindAll("[data-testid='central-hud-timer']").Should().BeEmpty();
+    }
 }

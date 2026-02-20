@@ -92,6 +92,19 @@ public class UC003_ViewMatchStateTests : TestContext
     }
 
     [Fact]
+    public void Given_LocalPlayerTurnAndAfkDuration_When_MatchRenders_Then_TimerBorderIsVisible()
+    {
+        _gameState.LocalPlayerId = "player-1";
+        _gameState.CurrentTurnPlayerId = "player-1";
+        _gameState.PlayerAfkTimerDuration = TimeSpan.FromSeconds(20);
+
+        var cut = RenderComponent<Game>();
+
+        cut.FindAll("[data-testid='central-hud-timer']").Should().HaveCount(1);
+        cut.Find("[data-testid='central-hud-timer']").GetAttribute("style").Should().Contain("20s");
+    }
+
+    [Fact]
     public void Given_ConfiguredSeatsAndJoinedOpponents_When_MatchRenders_Then_AllOpponentSlotsAreShown()
     {
         _gameState.TotalPlayerSeats = 6;

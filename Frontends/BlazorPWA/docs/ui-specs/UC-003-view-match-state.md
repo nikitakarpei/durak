@@ -16,6 +16,11 @@
 10. The trump and deck sections always share the same width, while the role slot may be narrower.
 11. The central HUD sits directly below the opponent top zone and does not overlap any opponent seat.
 12. The central HUD width stays stable across roles and must not grow or shrink based on the presence or absence of action buttons — its height must be determined solely by its own content.
+13. When it is the player's active turn and a turn timer duration is available, a 4px rounded countdown border appears around the HUD.
+14. The countdown border depletes clockwise around the pill perimeter until the turn timer reaches zero.
+15. The border color shifts from neutral (100–50%), to warning (50–20%), to urgent (20–0%) and pulses subtly in the urgent range.
+16. When the timer reaches zero, the border disappears.
+17. The countdown border uses rounded stroke caps.
 
 ## Opponents Area
 1. Show all configured opponent seats, including unoccupied seats.

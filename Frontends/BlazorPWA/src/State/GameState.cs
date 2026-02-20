@@ -17,6 +17,8 @@ public sealed class GameState
     public RegularCard? TrumpCard { get; set; }
     public int TalonCount { get; set; }
     public List<PossibleMove> YourPossibleMoves { get; } = new();
+    public TimeSpan? PlayerAfkTimerDuration { get; set; }
+    public int TurnSequence { get; set; }
 }
 
 public sealed record PlayerState(string PlayerId, int Seat)
