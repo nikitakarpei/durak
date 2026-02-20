@@ -27,8 +27,8 @@
 
 .central-hud__divider {
     width: 1px;
-    height: 22px;
-    background: rgba(148, 163, 184, 0.45);
+    height: 20px;
+    background: rgba(148, 163, 184, 0.3);
 }
 
 .central-hud__mini-card {
@@ -36,15 +36,15 @@
     align-items: center;
     justify-content: flex-start;
     flex-direction: column;
-    width: 24px;
-    height: 32px;
+    width: 22px;
+    height: 34px;
     border-radius: 5px;
     background: #ffffff;
     border: 1px solid rgba(148, 163, 184, 0.5);
     font-size: 0.7rem;
     font-weight: 700;
     color: #0f172a;
-    padding: 4px 0 0 4px;
+    padding: 2px 0 0 3px;
 }
 
 .central-hud__mini-card.suit-red {
@@ -62,11 +62,12 @@
 }
 
 .central-hud__role-icon {
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    transform: translateY(-1px);
 }
 
 .central-hud__role-icon svg {
@@ -90,11 +91,15 @@
     border: 1px solid rgba(148, 163, 184, 0.5);
     background: repeating-linear-gradient(
         45deg,
-        rgba(148, 163, 184, 0.2) 0px,
-        rgba(148, 163, 184, 0.2) 2px,
-        rgba(148, 163, 184, 0.4) 2px,
-        rgba(148, 163, 184, 0.4) 4px
+        rgba(148, 163, 184, 0.15) 0px,
+        rgba(148, 163, 184, 0.15) 2px,
+        rgba(148, 163, 184, 0.3) 2px,
+        rgba(148, 163, 184, 0.3) 4px
     );
+}
+
+.central-hud__count {
+    margin-left: 2px;
 }
 
 .central-hud__count {
